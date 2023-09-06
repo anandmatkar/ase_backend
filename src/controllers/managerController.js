@@ -3,28 +3,29 @@ const { issueJWT } = require("../utils/jwt")
 const { mysql_real_escape_string, verifyTokenFn } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
-const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail } = require('../utils/sendMail');
+const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNotificationEmail } = require('../utils/sendMail');
 
 
 module.exports.createManager = async (req, res) => {
     try {
-        let { name, surname, company, position, emailAddress, password, phone } = req.body
+        let { name, surname, company, position, emailAddress, password, phone, profilePic } = req.body
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q5'], { var1: emailAddress })
         let findManager = await connection.query(s1)
         if (findManager.rowCount == 0) {
+            profilePic = profilePic == "" ? process.env.DEFAULT_PROFILE_PIC_MANAGER : profilePic;
+
             const saltRounds = 10;
             const salt = bcrypt.genSaltSync(saltRounds);
             const encryptedPassword = bcrypt.hashSync(password, salt);
 
-            let s2 = dbScript(db_sql['Q6'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(company), var4: mysql_real_escape_string(position), var5: mysql_real_escape_string(emailAddress), var6: encryptedPassword, var7: phone, var8: 0 })
+            let s2 = dbScript(db_sql['Q6'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(company), var4: mysql_real_escape_string(position), var5: mysql_real_escape_string(emailAddress), var6: encryptedPassword, var7: phone, var8: 0, var9: profilePic })
             let insertManager = await connection.query(s2)
             if (insertManager.rowCount > 0) {
                 await connection.query('COMMIT')
                 let token = await issueJWT(insertManager.rows[0], 'Manager')
                 link = `${process.env.AUTH_LINK}/verify-email/${token}`
                 await welcomeEmail2(emailAddress, link, name);
-                await connection.query('COMMIT')
                 return res.json({
                     status: 201,
                     success: true,
@@ -164,6 +165,114 @@ module.exports.managerLogin = async (req, res) => {
     }
 }
 
+module.exports.uploadProfilePic = async (req, res) => {
+    try {
+        let file = req.file
+        let path = `${process.env.PROFILE_PIC}/${file.filename}`;
+        res.json({
+            status: 201,
+            success: true,
+            message: "Profile Uploaded successfully!",
+            data: path
+        })
+
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+            data: ""
+        })
+    }
+}
+
+module.exports.showProfile = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        await connection.query('BEGIN')
+
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q7'], { var1: id })
+            let showProfile = await connection.query(s2)
+
+            if (showProfile.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Manager Profile",
+                    data: showProfile.rows[0]
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+module.exports.updateProfile = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { name, surname, emailAddress, phone, profilePic } = req.body
+        await connection.query('BEGIN')
+
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let _dt = new Date.toISOString()
+            let s2 = dbScript(db_sql['Q14'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(emailAddress), var4: phone, var5: profilePic, var6: id, var7: _dt })
+            let updateProfile = await connection.query(s2)
+
+            if (updateProfile.rowCount > 0) {
+                await connection.query('COMMIT')
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Profile Updated successfully"
+                })
+            } else {
+                await connection.query('ROLLBACK')
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+
+    } catch (error) {
+        await connection.query('ROLLBACK')
+        res.json({
+            status: 500,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 module.exports.changePassword = async (req, res) => {
     try {
         let userEmail = req.user.email
@@ -274,7 +383,7 @@ module.exports.resetPassword = async (req, res) => {
                 const encryptedPassword = bcrypt.hashSync(password, salt);
                 let _dt = new Date().toISOString();
 
-                let s2 = dbScript(db_sql['Q13'], { var1: encryptedPassword , var2: user.id, var3: _dt })
+                let s2 = dbScript(db_sql['Q13'], { var1: encryptedPassword, var2: user.id, var3: _dt })
                 let updatePassword = await connection.query(s2)
 
                 if (updatePassword.rowCount == 1) {
@@ -321,141 +430,6 @@ module.exports.resetPassword = async (req, res) => {
     }
 }
 
-module.exports.createCustomer = async (req, res) => {
-    try {
-        let { id, position } = req.user
-        let { customerName, customerContactName, customerAccount, email, phone, country, city, address, scopeOfWork } = req.body
-        await connection.query('BEGIN')
-
-        let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let findManager = await connection.query(s1)
-        if (findManager.rowCount > 0 && position == 'Manager') {
-
-            let s2 = dbScript(db_sql['Q9'], { var1: mysql_real_escape_string(customerName), var2: mysql_real_escape_string(customerContactName), var3: customerAccount, var4: mysql_real_escape_string(email), var5: phone, var6: mysql_real_escape_string(country), var7: mysql_real_escape_string(city), var8: mysql_real_escape_string(address), var9: mysql_real_escape_string(scopeOfWork), var10: id })
-            let createCustomer = await connection.query(s2)
-
-            if (createCustomer.rowCount > 0) {
-                await connection.query('COMMIT')
-                res.json({
-                    status: 201,
-                    success: true,
-                    message: "Customer created successfully"
-                })
-            } else {
-                await connection.query('ROLLBACK')
-                res.json({
-                    status: 400,
-                    success: false,
-                    message: "Something went wrong"
-                })
-            }
-        } else {
-            res.json({
-                status: 400,
-                success: false,
-                message: "Manager not found"
-            })
-        }
-    } catch (error) {
-        await connection.query('ROLLBACK')
-        res.json({
-            success: false,
-            status: 400,
-            message: error.message,
-        })
-    }
-}
-
-module.exports.customerList = async (req, res) => {
-    try {
-        let { id, position } = req.user
-
-        let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let findManager = await connection.query(s1)
-
-        if (findManager.rowCount > 0 && position == 'Manager') {
-            let s1 = dbScript(db_sql['Q10'], { var1: id })
-            let customerList = await connection.query(s1)
-
-            if (customerList.rowCount > 0) {
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Customer List",
-                    data: customerList.rows
-                })
-            } else {
-                res.json({
-                    status: 200,
-                    success: false,
-                    message: "Empty Customer List"
-                })
-            }
-        }
-        else {
-            res.json({
-                status: 400,
-                success: false,
-                message: "Manager not found"
-            })
-        }
-    } catch (error) {
-        res.json({
-            success: false,
-            status: 400,
-            message: error.message,
-        })
-    }
-}
-
-module.exports.createProject = async (req, res) => {
-    try {
-        let { id, position } = req.user
-        let { customerId, projectType, description, startDate, endDate } = req.body
-        await connection.query('BEGIN')
-
-        let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let findManager = await connection.query(s1)
-        if (findManager.rowCount > 0 && position == 'Manager') {
-            let s3 = dbScript(db_sql['Q12'], {})
-            let findProject = await connection.query(s3)
-
-            let orderId = findProject.rowCount > 0 ? findProject.rows[0].id + 1 : 1
-            console.log(orderId)
-            let s2 = dbScript(db_sql['Q11'], { var1: orderId, var2: customerId, var3: mysql_real_escape_string(projectType), var4: mysql_real_escape_string(description), var6: startDate, var7: endDate })
-            let createProject = await connection.query(s2)
-            if (createProject.rowCount > 0) {
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Project created successfully",
-                    data: createProject.rows
-                })
-            } else {
-                await connection.query('ROLLBACK')
-                res.json({
-                    status: 400,
-                    success: false,
-                    message: "Something went wrong"
-                })
-            }
-        } else {
-            res.json({
-                status: 400,
-                success: false,
-                message: "Manager not found"
-            })
-        }
-    } catch (error) {
-        await connection.query('ROLLBACK')
-        res.json({
-            success: false,
-            status: 400,
-            message: error.message,
-        })
-    }
-}
-
 module.exports.uploadMachineFiles = async (req, res) => {
     try {
         let files = req.files;
@@ -480,9 +454,11 @@ module.exports.uploadMachineFiles = async (req, res) => {
         res.json({
             status: 400,
             success: false,
-            message: error.message,
+            message: error.stack,
             data: []
         });
     }
 };
+
+
 

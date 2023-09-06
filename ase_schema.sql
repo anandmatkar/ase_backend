@@ -6,6 +6,7 @@ CREATE TABLE public.admin (
     name character varying,
     email_address character varying,
     encrypted_password character varying,
+    avatar character varying,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
     deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
@@ -25,6 +26,7 @@ CREATE TABLE public.manager (
     email_address character varying,
     phone_number character varying,
     encrypted_password character varying,
+    avatar character varying,
     status numeric DEFAULT 0,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
@@ -66,9 +68,81 @@ CREATE TABLE public.project (
     start_date character varying,
     end_date character varying,
     manager_id uuid,
+    is_completed boolean DEFAULT false
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
     deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
     
 );
 ALTER TABLE public.project OWNER TO postgres;
+
+-- Machine Table
+CREATE TABLE public.machine (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    order_id numeric,
+    customer_id uuid,
+    project_id uuid,
+    machine_type character varying,
+    serial character varying,
+    hour_count character varying,
+    nom_speed character varying,
+    act_speed character varying,
+    description character varying,
+    manager_id uuid,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+    
+);
+ALTER TABLE public.machine OWNER TO postgres;
+
+
+
+-- Tech_machine Table
+CREATE TABLE public.tech_machine (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    tech_id uuid,
+    machine_id uuid,
+    manager_id uuid,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+    
+);
+ALTER TABLE public.tech_machine OWNER TO postgres;
+
+
+-- Project_attach Table
+CREATE TABLE public.project_attach (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    file_path character varying,
+    file_type character varying,
+    file_size character varying,
+    manager_id uuid,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+    
+);
+ALTER TABLE public.project_attach OWNER TO postgres;
+
+
+
+-- machine_attach Table
+CREATE TABLE public.machine_attach (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    machine_id uuid,
+    file_path character varying,
+    file_type character varying,
+    file_size character varying,
+    manager_id uuid,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+    
+);
+ALTER TABLE public.machine_attach OWNER TO postgres;
+

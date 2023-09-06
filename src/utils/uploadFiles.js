@@ -1,6 +1,5 @@
 const multer = require('multer')
 
-
 const storage1 = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/machineAttachements')
@@ -16,7 +15,22 @@ const uploadMachineFiles = multer({
     storage: storage1
 })
 
+const storage2 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/profilePicture')
+    },
+    filename: function (req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const fileName = `${Date.now()}.${ext}`
+        cb(null, fileName)
+    }
+})
+const uploadProfile= multer({
+    storage: storage2
+})
+
 
 module.exports = { 
-    uploadMachineFiles
+    uploadMachineFiles,
+    uploadProfile
  };

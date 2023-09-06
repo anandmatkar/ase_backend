@@ -1,5 +1,4 @@
 module.exports.managerNotification = function (data) {
-    console.log(data)
     let managerNotificationTemplate = 
     `<!DOCTYPE html>
     <html lang="en-US">

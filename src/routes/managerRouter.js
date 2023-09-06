@@ -1,8 +1,10 @@
 const express = require('express');
 const controller = require('../controllers');
 const { verifyTokenAdmin, verifyTokenManager } = require('../utils/jwt');
-const { uploadMachineFiles } = require('../utils/uploadFiles');
+const { uploadMachineFiles, uploadProfile } = require('../utils/uploadFiles');
 const router = express.Router();
+
+//---------------------------------------------------------- Manager Auth Routes------------------------------------------------------//
 
 router.post('/createManager',controller.manager.createManager)
 router.put('/verifyManager',controller.manager.verifyManager)
@@ -10,9 +12,21 @@ router.post('/managerLogin',controller.manager.managerLogin)
 router.put('/changePassword',verifyTokenManager,controller.manager.changePassword)
 router.post('/forgotPassword',controller.manager.forgotPassword)
 router.put('/resetPassword',controller.manager.resetPassword)
-router.post('/createCustomer',verifyTokenManager,controller.manager.createCustomer)
-router.get('/customerList',verifyTokenManager,controller.manager.customerList)
-router.post('/createProject',verifyTokenManager,controller.manager.createProject)
+router.put('/updateProfile',verifyTokenManager,controller.manager.updateProfile)
+router.get('/showProfile',verifyTokenManager,controller.manager.showProfile)
+router.post('/uploadProfilePic',uploadProfile.single('image'),controller.manager.uploadProfilePic)
+
+//---------------------------------------------------------- Customer Routes ------------------------------------------------------//
+
+router.post('/createCustomer',verifyTokenManager,controller.customer.createCustomer)
+router.get('/customerList',verifyTokenManager,controller.customer.customerList)
+router.get('/customerDetails',verifyTokenManager,controller.customer.customerDetails)
+router.put('/updateCustomer',verifyTokenManager,controller.customer.updateCustomer)
+
+//---------------------------------------------------------- Project Routes ------------------------------------------------------//
+
+router.post('/createProject',verifyTokenManager,controller.project.createProject)
+router.get('/projectList',verifyTokenManager,controller.project.projectList)
 
 router.post('/uploadMachineFiles',uploadMachineFiles.array('files'),controller.manager.uploadMachineFiles);
 
