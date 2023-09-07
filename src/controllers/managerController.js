@@ -125,7 +125,18 @@ module.exports.managerLogin = async (req, res) => {
                         success: true,
                         message: "Login successfull",
                         data: {
-                            token: jwtToken
+                            token: jwtToken,
+                            id: findManager.rows[0].id,
+                            name:findManager.rows[0].name, 
+                            surname:findManager.rows[0].surname, 
+                            company:findManager.rows[0].company, 
+                            position:findManager.rows[0].position, 
+                            email_address:findManager.rows[0].email_address, 
+                            phone_number:findManager.rows[0].phone_number, 
+                            avatar:findManager.rows[0].avatar,
+                            created_at: findManager.rows[0].created_at,
+                            updated_at: findManager.rows[0].updated_at,
+                            deleted_at: findManager.rows[0].deleted_at
                         }
                     });
                 } else {

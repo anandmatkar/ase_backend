@@ -1,6 +1,6 @@
 const express = require('express');
 const controller = require('../controllers');
-const { verifyTokenAdmin, verifyTokenManager } = require('../utils/jwt');
+const { verifyTokenAdmin, verifyTokenManager, verifyTokenManagerORTechnician } = require('../utils/jwt');
 const { uploadMachineFiles, uploadProfile } = require('../utils/uploadFiles');
 const router = express.Router();
 
@@ -27,6 +27,13 @@ router.put('/updateCustomer',verifyTokenManager,controller.customer.updateCustom
 
 router.post('/createProject',verifyTokenManager,controller.project.createProject)
 router.get('/projectList',verifyTokenManager,controller.project.projectList)
+router.get('/projectDetails',verifyTokenManager,controller.project.projectDetails)
+
+//---------------------------------------------------------- Technician Routes ------------------------------------------------------//
+
+router.post('/createTechnician',verifyTokenManager,controller.technician.createTechnician)
+router.get('/technicianLists',verifyTokenManager,controller.technician.technicianLists)
+router.get('/technicianDetails',verifyTokenManagerORTechnician,controller.technician.technicianDetails)
 
 router.post('/uploadMachineFiles',uploadMachineFiles.array('files'),controller.manager.uploadMachineFiles);
 

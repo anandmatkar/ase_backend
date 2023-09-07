@@ -146,3 +146,25 @@ CREATE TABLE public.machine_attach (
 );
 ALTER TABLE public.machine_attach OWNER TO postgres;
 
+
+-- Technician Table
+CREATE TABLE public.technician (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying,
+    surname character varying,
+    position character varying,
+    email_address character varying,
+    phone_number character varying,
+    encrypted_password character varying,
+    nationality character varying,
+    qualification character varying,
+    level character varying,
+    avatar character varying,
+    manager_id character varying,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+    
+);
+ALTER TABLE public.technician OWNER TO postgres;
+
