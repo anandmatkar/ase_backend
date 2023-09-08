@@ -44,9 +44,24 @@ const uploadTechnicianDocuments = multer({
     storage: storage3
 })
 
+const storage4 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/technicianDocuments')
+    },
+    filename: function (req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const fileName = `${Date.now()}.${ext}`
+        cb(null, fileName)
+    }
+})
+const uploadTimesheet = multer({
+    storage: storage4
+})
+
 
 module.exports = { 
     uploadMachineFiles,
     uploadProfile,
-    uploadTechnicianDocuments
+    uploadTechnicianDocuments,
+    uploadTimesheet
  };

@@ -168,3 +168,34 @@ CREATE TABLE public.technician (
 );
 ALTER TABLE public.technician OWNER TO postgres;
 
+-- timesheet Table
+CREATE TABLE public.timesheet (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    tech_id uuid,
+    date character varying,
+    start_time TIME,
+    end_time TIME,
+    comments character varying, 
+    is_timesheet_approved boolean DEFAULT false,
+    is_timesheet_requested_for_approval boolean DEFAULT false
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+);
+ALTER TABLE public.timesheet OWNER TO postgres;
+
+-- timesheet_attach Table
+CREATE TABLE public.timesheet_attach (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    tech_id uuid,
+    file_path character varying,
+    file_type character varying,
+    file_size character varying,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+);
+ALTER TABLE public.timesheet_attach OWNER TO postgres;
+

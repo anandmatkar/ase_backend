@@ -5,6 +5,8 @@ const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
 const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNotificationEmail } = require('../utils/sendMail');
 
+
+//Create Project by Manager
 module.exports.createProject = async (req, res) => {
     try {
         let { id, position, email } = req.user
@@ -82,6 +84,7 @@ module.exports.createProject = async (req, res) => {
     }
 }
 
+//Project LIST for Manager
 module.exports.projectList = async (req, res) => {
     try {
         let { id, position } = req.user
@@ -121,6 +124,7 @@ module.exports.projectList = async (req, res) => {
     }
 }
 
+//Project Details for Manager
 module.exports.projectDetails = async (req, res) => {
     try {
         let { id, position } = req.user
@@ -161,4 +165,6 @@ module.exports.projectDetails = async (req, res) => {
         })
     }
 }
+
+
 

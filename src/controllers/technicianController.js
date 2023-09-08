@@ -313,11 +313,25 @@ module.exports.assignedProjectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
             if (findAssignedProjectList.rows.length > 0) {
+                console.log(findAssignedProjectList.rows)
+                const assignedProject = [];
+                const completedProject = [];
+
+                findAssignedProjectList.rows.forEach((project) => {
+                    if (project.is_completed === false) {
+                        assignedProject.push(project);
+                    } else {
+                        completedProject.push(project);
+                    }
+                });
                 res.json({
                     status: 200,
                     success: true,
                     message: "Projects List ",
-                    data: findAssignedProjectList.rows
+                    data: {
+                        assignedProject,
+                        completedProject
+                    }
                 })
             } else {
                 res.json({
@@ -349,9 +363,8 @@ module.exports.assignedProjectDetails = async (req, res) => {
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0) {
-            let s2 = dbScript(db_sql['Q31'], { var1: projectId, var2 : id })
+            let s2 = dbScript(db_sql['Q31'], { var1: projectId, var2: id })
             let projectDetails = await connection.query(s2)
-            console.log(s2)
             if (projectDetails.rowCount > 0) {
                 res.json({
                     status: 200,
@@ -380,5 +393,213 @@ module.exports.assignedProjectDetails = async (req, res) => {
             success: false,
             message: error.message
         })
+    }
+}
+
+module.exports.createTimesheet = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { projectId, date, startTime, endTime, comments } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0) {
+            let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments })
+            let createTimeSheet = await connection.query(s2)
+            if (createTimeSheet.rowCount > 0) {
+                await connection.query('COMMIT')
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "TimeSheet created successfully",
+                })
+            } else {
+                await connection.query('ROLLBACK')
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+module.exports.timesheetList = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { projectId } = req.query
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0) {
+            let s2 = dbScript(db_sql['Q33'], { var1: projectId, var2: id })
+            let timesheetList = await connection.query(s2)
+            if (timesheetList.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "TimeSheet List",
+                    data: timesheetList.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty TimeSheet List",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+module.exports.uploadTimesheetAttachements = async (req, res) => {
+    try {
+        let files = req.files;
+        let { id } = req.user
+        let { projectId } = req.query
+        let fileDetails = [];
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0) {
+            // Iterate through the uploaded files and gather their details
+            for (const file of files) {
+                let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
+                let size = file.size;
+                let mimetype = file.mimetype;
+                fileDetails.push({ path, size, mimetype });
+                let s2 = dbScript(db_sql['Q34'], { var1: projectId, var2: id, var3: path, var4: mimetype, var5: size })
+                let uploadAttach = await connection.query(s2)
+            }
+            await connection.query("COMMIT")
+            res.json({
+                status: 201,
+                success: true,
+                message: "Files Uploaded successfully!"
+            });
+
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+        });
+    }
+}
+
+module.exports.timesheetAttachList = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { projectId } = req.query
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0) {
+            let s2 = dbScript(db_sql['Q35'], { var1: projectId, var2: id })
+            let findTimesheetAttach = await connection.query(s2)
+            if (findTimesheetAttach.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Timesheet Attachement List",
+                    data: findTimesheetAttach.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Attachement List",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+module.exports.requestForTimesheetApproval = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { projectId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0) {
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql['Q36'], { var1: true, var2: _dt, var3: projectId, var4: id })
+            let requestforApproval = await connection.query(s2)
+            if (requestforApproval.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Timesheet requested for approval successfully",
+                })
+            } else {
+                await connection.query('ROLLBACK')
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
     }
 }

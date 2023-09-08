@@ -465,11 +465,23 @@ module.exports.uploadMachineFiles = async (req, res) => {
         res.json({
             status: 400,
             success: false,
-            message: error.stack,
-            data: []
+            message: error.message
         });
     }
 };
+
+module.exports.acceptTimesheetRequest = async(req,res) => {
+    try {
+        
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
 
 
 

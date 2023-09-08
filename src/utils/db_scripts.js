@@ -40,53 +40,72 @@ const db_sql = {
         "Q22": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, created_at, is_completed, manager_id
           FROM project WHERE manager_id = '{var1}' AND deleted_at IS NULL`,
         "Q23": `SELECT
-                p.id AS project_id,
-                p.order_id,
-                p.customer_id,
-                p.project_type,
-                p.description,
-                p.start_date,
-                p.end_date,
-                p.created_at,
-                p.is_completed,
-                p.manager_id,
-                c.id AS customer_id,
-                c.customer_name,
-                c.customer_contact,
-                c.customer_account,
-                c.email_address,
-                c.phone_number,
-                c.country,
-                c.city,
-                c.address,
-                c.scope_of_work,
-                        (
-                        SELECT
-                                JSON_AGG(pa.*)
-                        FROM
-                                project_attach pa
-                        WHERE
-                                pa.project_id = p.id
-                                AND pa.deleted_at IS NULL
-                        ) AS project_attach_data,
-                        (
-                        SELECT
-                                JSON_AGG(t.*)
-                        FROM
-                                technician t
-                        JOIN
-                                tech_machine tm ON t.id = tm.tech_id
-                        WHERE
-                                tm.project_id = p.id
-                                AND tm.deleted_at IS NULL
+                   p.id AS project_id,
+                   p.order_id,
+                   p.customer_id,
+                   p.project_type,
+                   p.description,
+                   p.start_date,
+                   p.end_date,
+                   p.created_at,
+                   p.is_completed,
+                   p.manager_id,
+                   c.id AS customer_id,
+                   c.customer_name,
+                   c.customer_contact,
+                   c.customer_account,
+                   c.email_address,
+                   c.phone_number,
+                   c.country,
+                   c.city,
+                   c.address,
+                   c.scope_of_work,
+                   (
+                                SELECT
+                                        JSON_AGG(pa.*)
+                                FROM
+                                        project_attach pa
+                                WHERE
+                                        pa.project_id = p.id
+                                        AND pa.deleted_at IS NULL
+                                ) AS project_attach_data,
+                   (
+                   SELECT JSON_AGG(
+                        json_build_object(
+                        'id', t.id,
+                        'name', t.name,
+                        'surname', t.surname,
+                        'position', t.position,
+                        'email_address', t.email_address,
+                        'phone_number', t.phone_number,
+                        'encrypted_password', t.encrypted_password,
+                        'nationality', t.nationality,
+                        'qualification', t.qualification,
+                        'level', t.level,
+                        'avatar', t.avatar,
+                        'manager_id', t.manager_id,
+                        'created_at', t.created_at,
+                        'updated_at', t.updated_at,
+                        'deleted_at', t.deleted_at,
+                        'timesheet_data', (
+                                SELECT JSON_AGG(ts.*)
+                                FROM timesheet ts
+                                WHERE ts.tech_id = t.id
+                                AND ts.project_id = p.id
+                                AND ts.deleted_at IS NULL
+                        )
+                        )
+                )
+                        FROM technician t
+                        JOIN tech_machine tm ON t.id = tm.tech_id
+                        WHERE tm.project_id = p.id
+                        AND tm.deleted_at IS NULL
                         ) AS technician_data
-                FROM
-                        project AS p
-                LEFT JOIN
-                        customer c ON c.id = p.customer_id
-                WHERE
-                p.id = '{var1}'
-                AND p.deleted_at IS NULL;`,
+                FROM project AS p
+                LEFT JOIN customer c ON c.id = p.customer_id
+                WHERE p.id = '{var1}' -- Filter by the desired project ID
+                AND p.deleted_at IS NULL;
+        `,
         "Q24": `INSERT INTO technician
           (name, surname, position, email_address, encrypted_password, phone_number, nationality, qualification,level, avatar, manager_id)
           VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}', '{var9}', '{var10}', '{var11}') RETURNING *`,
@@ -132,7 +151,7 @@ const db_sql = {
                 INNER JOIN customer as c on c.id = p.customer_id
                 INNER JOIN tech_machine as tm on tm.project_id = p.id
                 WHERE tm.tech_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL AND tm.deleted_at IS NULL`,
-        "Q31":`SELECT
+        "Q31": `SELECT
                 p.id AS project_id,
                 p.order_id,
                 p.customer_id,
@@ -153,7 +172,15 @@ const db_sql = {
                 c.city,
                 c.address,
                 c.scope_of_work,
-                (
+                        (
+                                SELECT JSON_AGG(ts.*)
+                                FROM timesheet ts
+                                WHERE ts.tech_id = '{var2}'
+                                AND ts.project_id = p.id
+                                AND ts.deleted_at IS NULL
+                        ) AS timesheet_data,
+                             
+                        (
                         SELECT
                                 JSON_AGG(pa.*)
                         FROM
@@ -172,7 +199,16 @@ const db_sql = {
                         ) AS machine_data
                         FROM project p 
                         JOIN customer c ON p.customer_id = c.id
-                WHERE p.id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`        
+                WHERE p.id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`,
+        "Q32": `INSERT INTO timesheet
+               (project_id, tech_id, date, start_time, end_time, comments)
+               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}') RETURNING *` ,
+        "Q33": `SELECT id, project_id, tech_id, date, start_time, end_time, comments, created_at, is_timesheet_approved FROM timesheet WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
+        "Q34": `INSERT INTO timesheet_attach
+               (project_id,tech_id,file_path,file_type,file_size)
+               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}') RETURNING *`,
+        "Q35": `SELECT id, project_id, tech_id, file_path, file_type, file_size, created_at FROM timesheet_attach WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
+        "Q36": `UPDATE timesheet SET is_timesheet_requested_for_approval = '{var1}', updated_at = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
 
 }
 
