@@ -22,7 +22,7 @@ module.exports.createProject = async (req, res) => {
             let orderId = findProject.rowCount > 0 ? Number(findProject.rows[0].order_id) + 1 : 1
 
             let s3 = dbScript(db_sql['Q11'], { var1: orderId, var2: customerId, var3: mysql_real_escape_string(projectType), var4: mysql_real_escape_string(description), var5: startDate, var6: endDate, var7: id })
-            console.log(s3,"s3")
+            console.log(s3, "s3")
             let createProject = await connection.query(s3)
 
             if (projectAttach.length > 0) {
@@ -133,8 +133,8 @@ module.exports.projectDetails = async (req, res) => {
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let s2 = dbScript(db_sql['Q23'], { var1: projectId })
-            console.log(s2)
             let projectDetails = await connection.query(s2)
+
             if (projectDetails.rowCount > 0) {
                 res.json({
                     status: 200,
@@ -165,6 +165,64 @@ module.exports.projectDetails = async (req, res) => {
         })
     }
 }
+
+module.exports.deleteProject = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql['Q37'], { var1: _dt, var2: projectId })
+            let deleteProjectDetails = await connection.query(s2)
+
+            let s3 = dbScript(db_sql['Q38'], { var1: _dt, var2: projectId })
+            let deleteProjectAttach = await connection.query(s3)
+
+            let s4 = dbScript(db_sql['Q39'], { var1: _dt, var2: projectId })
+            let deleteMachine = await connection.query(s4)
+
+            let s5 = dbScript(db_sql['Q40'], { var1: _dt, var2: projectId })
+            let deleteMachineAttach = await connection.query(s5)
+
+            let s6 = dbScript(db_sql['Q41'], { var1: _dt, var2: projectId })
+            let deleteTimesheet = await connection.query(s6)
+
+            let s7 = dbScript(db_sql['Q42'], { var1: _dt, var2: projectId })
+            let deleteTimesheetAttach = await connection.query(s7)
+            if (deleteProjectDetails.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Project deleted successfully."
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong."
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            success: false,
+            status: 400,
+            message: error.message,
+        })
+    }
+}
+
 
 
 

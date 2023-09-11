@@ -181,27 +181,56 @@ module.exports.deleteCustomer = async (req, res) => {
         let { id, position } = req.user
         let { customerId } = req.query
         await connection.query("BEGIN")
-        let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let findManager = await connection.query(s1)
+        let s0 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s0)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q21'], { var1: _dt, var2 : customerId })
-            let deleteCustomer = await connection.query(s2)
-            if (deleteCustomer.rowCount > 0) {
-                await connection.query('COMMIT')
+            let s1 = dbScript(db_sql['Q43'], { var1: customerId, var2: true })
+            let findInProgressProject = await connection.query(s1)
+            if (findInProgressProject.rowCount > 0) {
                 res.json({
-                    status: 201,
+                    status: 409,
                     success: true,
-                    message: "Customer Details",
-                    data: customerDetails.rows[0]
+                    message: "Can not delete customer because project is already in progress"
                 })
             } else {
-                await connection.query('ROLLBACK')
-                res.json({
-                    status: 400,
-                    success: false,
-                    message: "Something went wrong"
-                })
+                let _dt = new Date().toISOString()
+
+                let s2 = dbScript(db_sql['Q21'], { var1: _dt, var2: customerId })
+                let deleteCustomer = await connection.query(s2)
+
+                let s3 = dbScript(db_sql['Q37'], { var1: _dt, var2: findInProgressProject.rows[0].id })
+                let deleteProjectDetails = await connection.query(s3)
+
+                let s4 = dbScript(db_sql['Q38'], { var1: _dt, var2: findInProgressProject.rows[0].id })
+                let deleteProjectAttach = await connection.query(s4)
+
+                let s5 = dbScript(db_sql['Q39'], { var1: _dt, var2: findInProgressProject.rows[0].id })
+                let deleteMachine = await connection.query(s5)
+
+                let s6 = dbScript(db_sql['Q40'], { var1: _dt, var2: findInProgressProject.rows[0].id })
+                let deleteMachineAttach = await connection.query(s6)
+
+                let s7 = dbScript(db_sql['Q41'], { var1: _dt, var2: findInProgressProject.rows[0].id })
+                let deleteTimesheet = await connection.query(s7)
+
+                let s8 = dbScript(db_sql['Q42'], { var1: _dt, var2: findInProgressProject.rows[0].id })
+                let deleteTimesheetAttach = await connection.query(s8)
+
+                if (deleteCustomer.rowCount > 0) {
+                    // await connection.query('COMMIT')
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "Customer deleted successfully"
+                    })
+                } else {
+                    await connection.query('ROLLBACK')
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    })
+                }
             }
         } else {
             res.json({
@@ -219,4 +248,5 @@ module.exports.deleteCustomer = async (req, res) => {
         })
     }
 }
+
 

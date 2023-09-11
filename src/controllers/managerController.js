@@ -127,13 +127,13 @@ module.exports.managerLogin = async (req, res) => {
                         data: {
                             token: jwtToken,
                             id: findManager.rows[0].id,
-                            name:findManager.rows[0].name, 
-                            surname:findManager.rows[0].surname, 
-                            company:findManager.rows[0].company, 
-                            position:findManager.rows[0].position, 
-                            email_address:findManager.rows[0].email_address, 
-                            phone_number:findManager.rows[0].phone_number, 
-                            avatar:findManager.rows[0].avatar,
+                            name: findManager.rows[0].name,
+                            surname: findManager.rows[0].surname,
+                            company: findManager.rows[0].company,
+                            position: findManager.rows[0].position,
+                            email_address: findManager.rows[0].email_address,
+                            phone_number: findManager.rows[0].phone_number,
+                            avatar: findManager.rows[0].avatar,
                             created_at: findManager.rows[0].created_at,
                             updated_at: findManager.rows[0].updated_at,
                             deleted_at: findManager.rows[0].deleted_at
@@ -470,9 +470,77 @@ module.exports.uploadMachineFiles = async (req, res) => {
     }
 };
 
-module.exports.acceptTimesheetRequest = async(req,res) => {
+module.exports.timesheetListsForApproval = async (req, res) => {
     try {
-        
+        let { id, position } = req.user
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q44'], { var1: id })
+            let timesheetListTobeApproved = await connection.query(s2)
+            if (timesheetListTobeApproved.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Timesheet list for approval",
+                    data: timesheetListTobeApproved.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Timesheet list for approval",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+module.exports.acceptTimesheetRequest = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { timesheetId } = req.query
+
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q46'], { var1: timesheetId })
+            let updateApprovalStatus = await connection.query(s2)
+            if (updateApprovalStatus.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Timesheet approved successfully"
+                })
+            } else {
+                await connection.query('ROLLBACK')
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Manager not found"
+            })
+        }
     } catch (error) {
         await connection.query("ROLLBACK")
         res.json({

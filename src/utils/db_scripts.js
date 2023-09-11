@@ -100,11 +100,13 @@ const db_sql = {
                         JOIN tech_machine tm ON t.id = tm.tech_id
                         WHERE tm.project_id = p.id
                         AND tm.deleted_at IS NULL
+                        AND t.deleted_at IS NULL
                         ) AS technician_data
                 FROM project AS p
                 LEFT JOIN customer c ON c.id = p.customer_id
-                WHERE p.id = '{var1}' -- Filter by the desired project ID
-                AND p.deleted_at IS NULL;
+                WHERE p.id = '{var1}'
+                AND p.deleted_at IS NULL
+                AND c.deleted_at IS NULL;
         `,
         "Q24": `INSERT INTO technician
           (name, surname, position, email_address, encrypted_password, phone_number, nationality, qualification,level, avatar, manager_id)
@@ -201,14 +203,24 @@ const db_sql = {
                         JOIN customer c ON p.customer_id = c.id
                 WHERE p.id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`,
         "Q32": `INSERT INTO timesheet
-               (project_id, tech_id, date, start_time, end_time, comments)
-               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}') RETURNING *` ,
+               (project_id, tech_id, date, start_time, end_time, comments, manager_id)
+               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}') RETURNING *` ,
         "Q33": `SELECT id, project_id, tech_id, date, start_time, end_time, comments, created_at, is_timesheet_approved FROM timesheet WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
         "Q34": `INSERT INTO timesheet_attach
                (project_id,tech_id,file_path,file_type,file_size)
                VALUES('{var1}','{var2}','{var3}','{var4}','{var5}') RETURNING *`,
         "Q35": `SELECT id, project_id, tech_id, file_path, file_type, file_size, created_at FROM timesheet_attach WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
         "Q36": `UPDATE timesheet SET is_timesheet_requested_for_approval = '{var1}', updated_at = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q37":`UPDATE project SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q38":`UPDATE project_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q39":`UPDATE machine SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q40":`UPDATE machine_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q41":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q42":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q43":`SELECT id, order_id, customer_id, project_type, description, start_date, end_date, manager_id, is_completed, created_at, updated_at, deleted_at FROM project WHERE customer_id = '{var1}' AND is_completed = '{var2}' AND deleted_at IS NULL`,
+        "Q44":`SELECT id, project_id, tech_id, date, start_time, end_time, comments, is_timesheet_approved, is_timesheet_requested_for_approval, created_at, updated_at FROM timesheet WHERE is_timesheet_requested_for_approval = true AND manager_id = '{var1}'`,
+        "Q45":`SELECT * FROM project WHERE id = '{var1}' AND deleted_at IS NULL`,
+        "Q46":`UPDATE timesheet SET is_timesheet_approved = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`, 
 
 }
 

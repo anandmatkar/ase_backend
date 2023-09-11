@@ -22,18 +22,25 @@ router.post('/createCustomer', verifyTokenManager, controller.customer.createCus
 router.get('/customerList', verifyTokenManager, controller.customer.customerList)
 router.get('/customerDetails', verifyTokenManager, controller.customer.customerDetails)
 router.put('/updateCustomer', verifyTokenManager, controller.customer.updateCustomer)
+router.put('/deleteCustomer', verifyTokenManager, controller.customer.deleteCustomer)
 
 //---------------------------------------------------------- Project Routes ------------------------------------------------------//
 
 router.post('/createProject', verifyTokenManager, controller.project.createProject)
 router.get('/projectList', verifyTokenManager, controller.project.projectList)
 router.get('/projectDetails', verifyTokenManager, controller.project.projectDetails)
+router.put('/deleteProject', verifyTokenManager, controller.project.deleteProject)
 
 //---------------------------------------------------------- Technician Routes ------------------------------------------------------//
 
 router.post('/createTechnician', verifyTokenManager, controller.technician.createTechnician)
 router.get('/technicianLists', verifyTokenManager, controller.technician.technicianLists)
 router.get('/technicianDetails', verifyTokenManagerORTechnician, controller.technician.technicianDetails)
+
+//---------------------------------------------------------- TImesheet Routes ------------------------------------------------------//
+
+router.get('/timesheetListsForApproval', verifyTokenManager, controller.manager.timesheetListsForApproval)
+router.put('/acceptTimesheetRequest', verifyTokenManager, controller.manager.acceptTimesheetRequest)
 
 router.post('/uploadMachineFiles', uploadMachineFiles.array('files'), controller.manager.uploadMachineFiles);
 

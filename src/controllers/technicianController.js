@@ -401,10 +401,13 @@ module.exports.createTimesheet = async (req, res) => {
         let { id } = req.user
         let { projectId, date, startTime, endTime, comments } = req.body
         await connection.query("BEGIN")
-        let s1 = dbScript(db_sql['Q27'], { var1: id })
-        let findTechnician = await connection.query(s1)
+        let s0 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s0)
         if (findTechnician.rowCount > 0) {
-            let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments })
+            let s0 = dbScript(db_sql['Q45'], { var1: projectId })
+            let findProjectDetails = await connection.query(s0)
+            console.log(findProjectDetails.rows)
+            let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7 : findProjectDetails.rows[0].manager_id })
             let createTimeSheet = await connection.query(s2)
             if (createTimeSheet.rowCount > 0) {
                 await connection.query('COMMIT')
