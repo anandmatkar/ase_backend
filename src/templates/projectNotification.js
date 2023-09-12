@@ -1,6 +1,7 @@
 module.exports.projectNotification = function (data) {
-    let projectNotificationTemplate = 
-    `<!DOCTYPE html>
+    console.log(data, "in template")
+    let projectNotificationTemplate =
+        `<!DOCTYPE html>
     <html lang="en-US">
     
     <head>
@@ -36,43 +37,37 @@ module.exports.projectNotification = function (data) {
                                     <tr>
                                         <td style="padding:0 35px;">
                                             <br style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                            Hi ${there}, <br>
+                                            Hi there, <br>
                                             <br>
                                             Subject: Project Assignment. <br>
                                             <br>
-                                            You have been assigned to the following project:
+                                            You have been assigned to the following project by ${data.manager_email_address}:
     
                                             <table>
                                                 <tr>
-                                                    <td>Project Name:</td>
-                                                    <td>${data.project_name}</td>
+                                                    <td>Project Type:</td>
+                                                    <td>${data.project_type}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Project Description:</td>
+                                                    <td>${data.description}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Customer Name:</td>
                                                     <td>${data.customer_name}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Machine Type:</td>
-                                                    <td>${data.machine_type}</td>
+                                                    <td>Customer contact:</td>
+                                                    <td>${data.phone_number}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Serial:</td>
-                                                    <td>${data.serial}</td>
+                                                    <td>Customer contact Name:</td>
+                                                    <td>${data.customer_contact}</td>
                                                 </tr>
-                                                <tr>
-                                                    <td>Hour Count:</td>
-                                                    <td>${data.hour_count}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Nominal Speed:</td>
-                                                    <td>${data.nom_speed}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Actual Speed:</td>
-                                                    <td>${data.act_speed}</td>
-                                                </tr>
+                                        
                                             </table>
-    
+                                            Please go to your dashboard to see more details.
+                                            <br>
                                             If you have any questions, please email us at <a href=""
                                                 style="text-decoration:none !important; font-weight:500; margin-top:30px; color: #1bb2cc; font-size:14px;padding:4px 4px;display:inline-block;"><u>Admin@contactus.com</u></a>
                                             <br>

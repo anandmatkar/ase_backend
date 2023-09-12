@@ -22,7 +22,6 @@ module.exports.createProject = async (req, res) => {
             let orderId = findProject.rowCount > 0 ? Number(findProject.rows[0].order_id) + 1 : 1
 
             let s3 = dbScript(db_sql['Q11'], { var1: orderId, var2: customerId, var3: mysql_real_escape_string(projectType), var4: mysql_real_escape_string(description), var5: startDate, var6: endDate, var7: id })
-            console.log(s3, "s3")
             let createProject = await connection.query(s3)
 
             if (projectAttach.length > 0) {
@@ -52,7 +51,8 @@ module.exports.createProject = async (req, res) => {
                 }
             }
             if (createProject.rowCount > 0) {
-                await connection.query("COMMIT")
+                await this.sendProjectMail(createProject.rows[0].id)
+                // await connection.query("COMMIT")
                 res.json({
                     status: 200,
                     success: true,
@@ -82,6 +82,22 @@ module.exports.createProject = async (req, res) => {
             message: error.stack,
         })
     }
+}
+
+module.exports.sendProjectMail = async (req, res) => {
+    let s1 = dbScript(db_sql['Q47'], { var1: req })
+    console.log(s1)
+    let selectProjectData = await connection.query(s1)
+
+    if (selectProjectData.rowCount > 0) {
+        let emailArr = []
+        for (let data of selectProjectData.rows[0].technicians) {
+            emailArr.push(data.email_address)
+        }
+        await sendProjectNotificationEmail(emailArr, selectProjectData.rows[0])
+
+    }
+
 }
 
 //Project LIST for Manager
