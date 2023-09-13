@@ -80,7 +80,6 @@ module.exports.uploadTechnicianDocuments = async (req, res) => {
 
             fileDetails.push({ path, size, mimetype });
         }
-
         res.json({
             status: 201,
             success: true,
@@ -262,14 +261,14 @@ module.exports.uploadProfilePic = async (req, res) => {
 //only for Technician
 module.exports.updateTechnicianProfile = async (req, res) => {
     try {
-        let { id } = req.user
-        let { name, surname, position, emailAddress, phoneNumber, nationality, qualification, level, avatar } = req.body
+        let { id, position } = req.user
+        let { name, surname, emailAddress, phoneNumber, nationality, qualification, level, avatar } = req.body
         await connection.query("BEGIN")
         let s2 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s2)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             let _dt = new Date().toISOString()
-            let s3 = dbScript(db_sql['Q29'], { var1: name, var2: surname, var3: emailAddress, var4: phoneNumber, var5: nationality, var6: qualification, var7: level, var8: avatar, var9: mysql_real_escape_string(position), var10: _dt, var11: id })
+            let s3 = dbScript(db_sql['Q29'], { var1: name, var2: surname, var3: emailAddress, var4: phoneNumber, var5: nationality, var6: qualification, var7: level, var8: avatar, var9: _dt, var10: id })
             let updateTechnician = await connection.query(s3)
 
             if (updateTechnician.rowCount > 0) {
@@ -306,10 +305,10 @@ module.exports.updateTechnicianProfile = async (req, res) => {
 
 module.exports.assignedProjectList = async (req, res) => {
     try {
-        let { id } = req.user
+        let { id, position } = req.user
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
             if (findAssignedProjectList.rows.length > 0) {
@@ -358,11 +357,11 @@ module.exports.assignedProjectList = async (req, res) => {
 
 module.exports.assignedProjectDetails = async (req, res) => {
     try {
-        let { id } = req.user
+        let { id, position } = req.user
         let { projectId } = req.query
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q31'], { var1: projectId, var2: id })
             let projectDetails = await connection.query(s2)
             if (projectDetails.rowCount > 0) {
@@ -398,16 +397,16 @@ module.exports.assignedProjectDetails = async (req, res) => {
 
 module.exports.createTimesheet = async (req, res) => {
     try {
-        let { id } = req.user
+        let { id, position } = req.user
         let { projectId, date, startTime, endTime, comments } = req.body
         await connection.query("BEGIN")
         let s0 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s0)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             let s0 = dbScript(db_sql['Q45'], { var1: projectId })
             let findProjectDetails = await connection.query(s0)
             console.log(findProjectDetails.rows)
-            let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7 : findProjectDetails.rows[0].manager_id })
+            let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7: findProjectDetails.rows[0].manager_id })
             let createTimeSheet = await connection.query(s2)
             if (createTimeSheet.rowCount > 0) {
                 await connection.query('COMMIT')
@@ -443,14 +442,14 @@ module.exports.createTimesheet = async (req, res) => {
 
 module.exports.timesheetList = async (req, res) => {
     try {
-        let { id } = req.user
+        let { id, position } = req.user
         let { projectId } = req.query
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0) {
             let s2 = dbScript(db_sql['Q33'], { var1: projectId, var2: id })
             let timesheetList = await connection.query(s2)
-            if (timesheetList.rowCount > 0) {
+            if (timesheetList.rowCount > 0 && position == "Technician") {
                 res.json({
                     status: 200,
                     success: true,
@@ -484,13 +483,13 @@ module.exports.timesheetList = async (req, res) => {
 module.exports.uploadTimesheetAttachements = async (req, res) => {
     try {
         let files = req.files;
-        let { id } = req.user
+        let { id, position } = req.user
         let { projectId } = req.query
         let fileDetails = [];
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             // Iterate through the uploaded files and gather their details
             for (const file of files) {
                 let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
@@ -526,11 +525,11 @@ module.exports.uploadTimesheetAttachements = async (req, res) => {
 
 module.exports.timesheetAttachList = async (req, res) => {
     try {
-        let { id } = req.user
+        let { id, position } = req.user
         let { projectId } = req.query
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q35'], { var1: projectId, var2: id })
             let findTimesheetAttach = await connection.query(s2)
             if (findTimesheetAttach.rowCount > 0) {
@@ -566,12 +565,12 @@ module.exports.timesheetAttachList = async (req, res) => {
 
 module.exports.requestForTimesheetApproval = async (req, res) => {
     try {
-        let { id } = req.user
+        let { id, position } = req.user
         let { projectId } = req.query
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
-        if (findTechnician.rowCount > 0) {
+        if (findTechnician.rowCount > 0 && position == "Technician") {
             let _dt = new Date().toISOString()
             let s2 = dbScript(db_sql['Q36'], { var1: true, var2: _dt, var3: projectId, var4: id })
             let requestforApproval = await connection.query(s2)
@@ -591,6 +590,89 @@ module.exports.requestForTimesheetApproval = async (req, res) => {
                 })
             }
         } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+module.exports.createReport = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, date, description } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s2 = dbScript(db_sql['Q48'], { var1: projectId, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description })
+            let createReport = await connection.query(s2)
+            if (createReport.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Report created successfully"
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                status: 400,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+module.exports.submitReportForApproval = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId } = req.query
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, vaar3: id })
+            let updaateReqForApproval = await connection.query(s2)
+            if (updaateReqForApproval.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Report created successfully"
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            await connection.query("ROLLBACK")
             res.json({
                 status: 400,
                 success: false,

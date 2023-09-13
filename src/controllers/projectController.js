@@ -110,18 +110,35 @@ module.exports.projectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q22'], { var1: id })
             let projectList = await connection.query(s2)
             if (projectList.rowCount > 0) {
+                console.log(projectList.rows)
+                let completedProjects = []
+                let projectInProgress = []
+                let projectRequestedForApproval = []
+                projectList.rows.forEach(row => {
+                    if (row.is_completed == true) {
+                        completedProjects.push(row)
+                    }else if(row.is_completed == false) {
+                        projectInProgress.push(row)
+                    }else if(row.is_requested_for_approval == true){
+                        projectRequestedForApproval.push(row)
+                    }
+                })
                 res.json({
                     status: 200,
                     success: true,
                     message: "Project List",
-                    data: projectList.rows
+                    data: {
+                        completedProjects,
+                        projectInProgress,
+                        projectRequestedForApproval
+                    }
                 })
             } else {
                 res.json({
                     status: 200,
                     success: false,
                     message: "Empty project list",
-                    data: []
+                    data: {}
                 })
             }
         } else {

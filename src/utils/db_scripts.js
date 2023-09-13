@@ -37,7 +37,7 @@ const db_sql = {
         "Q20": `SELECT customer_name,customer_contact,customer_account,email_address,phone_number,country,city,address, scope_of_work,  manager_id, created_at, updated_at, deleted_at
           FROM customer WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q21": `UPDATE customer SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL`,
-        "Q22": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, created_at, is_completed, manager_id
+        "Q22": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, created_at, is_requested_for_approval, is_completed, manager_id
           FROM project WHERE manager_id = '{var1}' AND deleted_at IS NULL`,
         "Q23": `SELECT
                    p.id AS project_id,
@@ -125,7 +125,7 @@ const db_sql = {
           SELECT id, name, surname, NULL AS company, NULL AS position, email_address, phone_number, qualification, level, nationality, avatar, created_at, updated_at, deleted_at 
           FROM technician 
           WHERE id = '{var1}' AND deleted_at IS NULL`,
-        "Q29": ` UPDATE technician SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', nationality = '{var5}', qualification = '{var6}' , level = '{var7}', avatar = '{var8}', position = '{var9}', updated_at = '{var10}' WHERE id = '{var11}' AND deleted_at IS NULL RETURNING *`,
+        "Q29": ` UPDATE technician SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', nationality = '{var5}', qualification = '{var6}' , level = '{var7}', avatar = '{var8}',  updated_at = '{var9}' WHERE id = '{var10}' AND deleted_at IS NULL RETURNING *`,
         "Q30": `SELECT
                   p.id AS project_id,
                   p.order_id,
@@ -222,71 +222,73 @@ const db_sql = {
         "Q45":`SELECT * FROM project WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q46":`UPDATE timesheet SET is_timesheet_approved = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q47":`SELECT
-        p.id AS project_id,
-        p.order_id,
-        p.customer_id,
-        p.project_type,
-        p.description,
-        p.start_date,
-        p.end_date,
-        p.created_at,
-        p.is_completed,
-        p.manager_id,
-        c.customer_name,
-        c.customer_contact,
-        c.customer_account,
-        c.email_address,
-        c.phone_number,
-        c.country,
-        c.city,
-        c.address,
-        c.scope_of_work,
-        c.manager_id,
-                                m.email_address as manager_email_address,
-        json_agg(
-        jsonb_build_object(
-                'tech_id', t.id,
-                'name', t.name,
-                'surname', t.surname,
-                'position', t.position,
-                'email_address', t.email_address,
-                'phone_number', t.phone_number
-        )
-        ) AS technicians
-FROM
-        project p
-LEFT JOIN customer c ON p.customer_id = c.id
-LEFT JOIN technician t ON t.manager_id = c.manager_id
-                LEFT JOIN manager m ON m.id = p.manager_id
-WHERE
-        p.id = '{var1}'
-        AND p.deleted_at IS NULL
-        AND c.deleted_at IS NULL
-        AND t.deleted_at IS NULL
-GROUP BY
-        p.id,
-        p.order_id,
-        p.customer_id,
-        p.project_type,
-        p.description,
-        p.start_date,
-        p.end_date,
-        p.created_at,
-        p.is_completed,
-        p.manager_id,
-        c.customer_name,
-        c.customer_contact,
-        c.customer_account,
-        c.email_address,
-        c.phone_number,
-        c.country,
-        c.city,
-        c.address,
-        c.scope_of_work,
-        c.manager_id,
-        m.email_address;
+                        p.id AS project_id,
+                        p.order_id,
+                        p.customer_id,
+                        p.project_type,
+                        p.description,
+                        p.start_date,
+                        p.end_date,
+                        p.created_at,
+                        p.is_completed,
+                        p.manager_id,
+                        c.customer_name,
+                        c.customer_contact,
+                        c.customer_account,
+                        c.email_address,
+                        c.phone_number,
+                        c.country,
+                        c.city,
+                        c.address,
+                        c.scope_of_work,
+                        c.manager_id,
+                                                m.email_address as manager_email_address,
+                        json_agg(
+                        jsonb_build_object(
+                                'tech_id', t.id,
+                                'name', t.name,
+                                'surname', t.surname,
+                                'position', t.position,
+                                'email_address', t.email_address,
+                                'phone_number', t.phone_number
+                        )
+                        ) AS technicians
+                FROM
+                        project p
+                LEFT JOIN customer c ON p.customer_id = c.id
+                LEFT JOIN technician t ON t.manager_id = c.manager_id
+                                LEFT JOIN manager m ON m.id = p.manager_id
+                WHERE
+                        p.id = '{var1}'
+                        AND p.deleted_at IS NULL
+                        AND c.deleted_at IS NULL
+                        AND t.deleted_at IS NULL
+                GROUP BY
+                        p.id,
+                        p.order_id,
+                        p.customer_id,
+                        p.project_type,
+                        p.description,
+                        p.start_date,
+                        p.end_date,
+                        p.created_at,
+                        p.is_completed,
+                        p.manager_id,
+                        c.customer_name,
+                        c.customer_contact,
+                        c.customer_account,
+                        c.email_address,
+                        c.phone_number,
+                        c.country,
+                        c.city,
+                        c.address,
+                        c.scope_of_work,
+                        c.manager_id,
+                        m.email_address;` ,
+        "Q48":`INSERT INTO project_report(project_id, tech_id, manager_id, date, description)
+               VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
+        "Q49":`UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`                       
 
-    ` 
 
 }
 

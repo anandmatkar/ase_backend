@@ -199,3 +199,19 @@ CREATE TABLE public.timesheet_attach (
 );
 ALTER TABLE public.timesheet_attach OWNER TO postgres;
 
+-- project report Table
+CREATE TABLE public.project_report (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    tech_id uuid,
+    manager_id uuid,
+    date character varying,
+    description character varying,
+    is_requested_for_approval boolean DEFAULT false,
+    is_approved boolean DEFAULT false,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+);
+ALTER TABLE public.project_report OWNER TO postgres;
+
