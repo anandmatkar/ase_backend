@@ -3,6 +3,7 @@ const manager = require('./managerController')
 const customer = require('./customerController')
 const project = require('./projectController')
 const technician = require('./technicianController')
+const report = require('./reportController')
 
 
 const controller = {
@@ -10,7 +11,8 @@ const controller = {
     manager,
     customer,
     project,
-    technician
+    technician,
+    report
 }
 
 module.exports = controller

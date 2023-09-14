@@ -42,6 +42,14 @@ router.get('/technicianDetails', verifyTokenManagerORTechnician, controller.tech
 router.get('/timesheetListsForApproval', verifyTokenManager, controller.manager.timesheetListsForApproval)
 router.put('/acceptTimesheetRequest', verifyTokenManager, controller.manager.acceptTimesheetRequest)
 
+
+//-------------------------------------------------------- Report Routes ----------------------------------------------------//
+
+router.get('/reportDetails', verifyTokenManager, controller.report.reportDetails)
+router.put('/validateReport', verifyTokenManager, controller.report.validateReport)
+
+
+
 router.post('/uploadMachineFiles', uploadMachineFiles.array('files'), controller.manager.uploadMachineFiles);
 
 module.exports = router

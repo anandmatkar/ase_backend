@@ -287,7 +287,9 @@ const db_sql = {
                         m.email_address;` ,
         "Q48":`INSERT INTO project_report(project_id, tech_id, manager_id, date, description)
                VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
-        "Q49":`UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`                       
+        "Q49":`UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q50":`SELECT * FROM project_report WHERE project_id = '{var1} AND tech_id = '{var2}' AND deleted_at IS NULL` ,
+        "Q51":`UPDATE project_report SET is_approved = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,                      
 
 
 }

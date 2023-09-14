@@ -24,4 +24,8 @@ router.get('/timesheetAttachList', verifyTokenTechnician, controller.technician.
 router.post('/uploadTimesheetAttachements', verifyTokenTechnician, uploadTimesheet.array('files'), controller.technician.uploadTimesheetAttachements)
 router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.technician.requestForTimesheetApproval)
 
+//================================================Report routes===========================================================//
+router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
+router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.report.requestForTimesheetApproval)
+
 module.exports = router
