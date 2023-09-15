@@ -23,6 +23,7 @@ router.get('/timesheetList', verifyTokenTechnician, controller.technician.timesh
 router.get('/timesheetAttachList', verifyTokenTechnician, controller.technician.timesheetAttachList)
 router.post('/uploadTimesheetAttachements', verifyTokenTechnician, uploadTimesheet.array('files'), controller.technician.uploadTimesheetAttachements)
 router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.technician.requestForTimesheetApproval)
+router.put('/deleteTimesheet', verifyTokenTechnician, controller.technician.deleteTimesheet)
 
 //================================================Report routes===========================================================//
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
