@@ -27,6 +27,6 @@ router.put('/deleteTimesheet', verifyTokenTechnician, controller.technician.dele
 
 //================================================Report routes===========================================================//
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
-router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.report.requestForTimesheetApproval)
+router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.technician.requestForTimesheetApproval)
 
 module.exports = router
