@@ -93,7 +93,14 @@ const db_sql = {
                                 WHERE ts.tech_id = t.id
                                 AND ts.project_id = p.id
                                 AND ts.deleted_at IS NULL
-                        )
+                        ),
+                        'project_report_data', (
+                                SELECT JSON_AGG(pr.*)
+                                FROM project_report pr
+                                WHERE pr.project_id = p.id
+                                                    AND pr.tech_id = t.id
+                                AND pr.deleted_at IS NULL
+                            )
                         )
                 )
                         FROM technician t
