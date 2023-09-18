@@ -574,7 +574,10 @@ module.exports.requestForTimesheetApproval = async (req, res) => {
             let _dt = new Date().toISOString()
             let s2 = dbScript(db_sql['Q36'], { var1: true, var2: _dt, var3: projectId, var4: id })
             let requestforApproval = await connection.query(s2)
-            if (requestforApproval.rowCount > 0) {
+
+            let s3 = dbScript(db_sql['Q54'], { var1: true, var2: projectId })
+            let updateProject = await connection.query(s3)
+            if (requestforApproval.rowCount > 0 && updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
                     status: 200,

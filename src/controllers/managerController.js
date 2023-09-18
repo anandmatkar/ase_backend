@@ -512,15 +512,19 @@ module.exports.timesheetListsForApproval = async (req, res) => {
 module.exports.acceptTimesheetRequest = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { timesheetId } = req.query
+        let { projectId, techId } = req.query
 
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q46'], { var1: timesheetId })
+            let s2 = dbScript(db_sql['Q46'], { var1: true, var2: false, var3: projectId, var4: techId })
             let updateApprovalStatus = await connection.query(s2)
-            if (updateApprovalStatus.rowCount > 0) {
+
+            let s3 = dbScript(db_sql['Q55'], { var1: true, var2: false, var3: projectId, var3: id })
+            let updateprojectStatus = await connection.query(s3)
+            if (updateApprovalStatus.rowCount > 0 && updateprojectStatus.rowCount > 0) {
+                await connection.query("COMMIT")
                 res.json({
                     status: 200,
                     success: true,

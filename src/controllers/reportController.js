@@ -140,7 +140,7 @@ module.exports.validateReport = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q51'], { var1: true, var2: projectId, var3: techId })
+            let s2 = dbScript(db_sql['Q51'], { var1: true, var2: false, var3: projectId, var4: techId })
             let approveReport = await connection.query(s2)
             if (approveReport.rowCount > 0) {
                 await connection.query("COMMIT")

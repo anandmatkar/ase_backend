@@ -52,7 +52,7 @@ module.exports.createProject = async (req, res) => {
             }
             if (createProject.rowCount > 0) {
                 await this.sendProjectMail(createProject.rows[0].id)
-                // await connection.query("COMMIT")
+                await connection.query("COMMIT")
                 res.json({
                     status: 200,
                     success: true,
@@ -226,6 +226,7 @@ module.exports.deleteProject = async (req, res) => {
             let s7 = dbScript(db_sql['Q42'], { var1: _dt, var2: projectId })
             let deleteTimesheetAttach = await connection.query(s7)
             if (deleteProjectDetails.rowCount > 0) {
+                await connection.query("COMMIT")
                 res.json({
                     status: 200,
                     success: true,
