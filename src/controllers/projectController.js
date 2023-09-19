@@ -115,9 +115,9 @@ module.exports.projectList = async (req, res) => {
                 let projectInProgress = []
                 let projectRequestedForApproval = []
                 projectList.rows.forEach(row => {
-                    if (row.is_completed == true) {
+                    if (row.is_completed == true && row.is_requested_for_approval == false) {
                         completedProjects.push(row)
-                    }else if(row.is_completed == false) {
+                    }else if(row.is_completed == false && row.is_requested_for_approval == false) {
                         projectInProgress.push(row)
                     }else if(row.is_requested_for_approval == true){
                         projectRequestedForApproval.push(row)

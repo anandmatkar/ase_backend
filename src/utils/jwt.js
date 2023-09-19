@@ -65,6 +65,13 @@ const jwt = {
     },
     verifyTokenTechnician: async (req, res, next) => {
         var token = req.headers.authorization
+        console.log(token)
+        if(!token || token == undefined){
+            return res.status(401).json({
+                success: false,
+                message: "Please provide token.",
+            });
+        }
         jsonwebtoken.verify(token, 'KEy', function (err, decoded) {
             if (err) {
                 return res.status(401).json({

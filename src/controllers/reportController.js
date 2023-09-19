@@ -10,13 +10,14 @@ const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNo
 module.exports.createReport = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, date, description } = req.body
+        let { projectId, date, description, attachements } = req.body
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q48'], { var1: projectId, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description })
             let createReport = await connection.query(s2)
+            console.log(createReport.rows)
             if (createReport.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
@@ -54,17 +55,19 @@ module.exports.submitReportForApproval = async (req, res) => {
     try {
         let { id, position } = req.user
         let { projectId } = req.query
+        connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, vaar3: id })
-            let updaateReqForApproval = await connection.query(s2)
-            if (updaateReqForApproval.rowCount > 0) {
+            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, var3: id })
+            let updateReqForApproval = await connection.query(s2)
+console.log(updateReqForApproval.rows)
+            if (updateReqForApproval.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
                     status: 201,
                     success: true,
-                    message: "Report created successfully"
+                    message: "Requested for Report approval sent successfully"
                 })
             } else {
                 res.json({
@@ -105,13 +108,15 @@ module.exports.reportDetails = async (req, res) => {
                 res.json({
                     status: 200,
                     success: true,
-                    message: "Report Details."
+                    message: "Report Details.",
+                    data: reportDetails.rows
                 })
             } else {
                 res.json({
                     status: 200,
                     success: false,
-                    message: "Empty Report Details."
+                    message: "Empty Report Details.",
+                    data :[]
                 })
             }
         } else {
@@ -125,7 +130,7 @@ module.exports.reportDetails = async (req, res) => {
         res.json({
             status: 400,
             success: false,
-            message: error.message
+            message: error.stack
         });
     }
 }

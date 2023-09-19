@@ -620,7 +620,6 @@ module.exports.deleteTimesheet = async (req, res) => {
             _dt = new Date().toISOString()
             let s2 = dbScript(db_sql['Q52'], { var1: _dt, var2: projectId, var3: id })
             let deleteTimesheet = await connection.query(s2)
-
             let s3 = dbScript(db_sql['Q53'], { var1: _dt, var2: projectId, var3: id })
             let deleteTimesheetAttach = await connection.query(s3)
 
