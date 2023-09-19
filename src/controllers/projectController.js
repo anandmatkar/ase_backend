@@ -86,7 +86,6 @@ module.exports.createProject = async (req, res) => {
 
 module.exports.sendProjectMail = async (req, res) => {
     let s1 = dbScript(db_sql['Q47'], { var1: req })
-    console.log(s1)
     let selectProjectData = await connection.query(s1)
 
     if (selectProjectData.rowCount > 0) {
@@ -110,7 +109,6 @@ module.exports.projectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q22'], { var1: id })
             let projectList = await connection.query(s2)
             if (projectList.rowCount > 0) {
-                console.log(projectList.rows)
                 let completedProjects = []
                 let projectInProgress = []
                 let projectRequestedForApproval = []

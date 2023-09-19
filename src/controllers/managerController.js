@@ -523,7 +523,7 @@ module.exports.acceptTimesheetRequest = async (req, res) => {
 
             let s3 = dbScript(db_sql['Q55'], { var1: true, var2: false, var3: projectId, var4: id })
             let updateprojectStatus = await connection.query(s3)
-       
+
             if (updateApprovalStatus.rowCount > 0 && updateprojectStatus.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({

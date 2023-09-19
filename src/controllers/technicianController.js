@@ -312,7 +312,6 @@ module.exports.assignedProjectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
             if (findAssignedProjectList.rows.length > 0) {
-                console.log(findAssignedProjectList.rows)
                 const assignedProject = [];
                 const completedProject = [];
 
@@ -405,7 +404,6 @@ module.exports.createTimesheet = async (req, res) => {
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s0 = dbScript(db_sql['Q45'], { var1: projectId })
             let findProjectDetails = await connection.query(s0)
-            console.log(findProjectDetails.rows)
             let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7: findProjectDetails.rows[0].manager_id })
             let createTimeSheet = await connection.query(s2)
             if (createTimeSheet.rowCount > 0) {

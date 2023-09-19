@@ -17,7 +17,6 @@ module.exports.createReport = async (req, res) => {
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q48'], { var1: projectId, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description })
             let createReport = await connection.query(s2)
-            console.log(createReport.rows)
             if (createReport.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
@@ -61,7 +60,6 @@ module.exports.submitReportForApproval = async (req, res) => {
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, var3: id })
             let updateReqForApproval = await connection.query(s2)
-console.log(updateReqForApproval.rows)
             if (updateReqForApproval.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
@@ -116,7 +114,7 @@ module.exports.reportDetails = async (req, res) => {
                     status: 200,
                     success: false,
                     message: "Empty Report Details.",
-                    data :[]
+                    data: []
                 })
             }
         } else {

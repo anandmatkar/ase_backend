@@ -12,7 +12,7 @@ const jwt = {
         const jwtToken = jsonwebtoken.sign(payload, 'KEy')
         return jwtToken;
     },
-    
+
     verifyTokenAdmin: async (req, res, next) => {
         var token = req.headers.authorization
         jsonwebtoken.verify(token, 'KEy', function (err, decoded) {
@@ -65,8 +65,7 @@ const jwt = {
     },
     verifyTokenTechnician: async (req, res, next) => {
         var token = req.headers.authorization
-        console.log(token)
-        if(!token || token == undefined){
+        if (!token || token == undefined) {
             return res.status(401).json({
                 success: false,
                 message: "Please provide token.",
@@ -104,7 +103,6 @@ const jwt = {
                     message: "Session timed out. Please sign in again",
                 });
             } else {
-                console.log(decoded.position)
                 if (decoded.position == 'Manager' || decoded.position == 'Technician') {
                     req.user = {
                         id: decoded.id,

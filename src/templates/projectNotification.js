@@ -1,5 +1,4 @@
 module.exports.projectNotification = function (data) {
-    console.log(data, "in template")
     let projectNotificationTemplate =
         `<!DOCTYPE html>
     <html lang="en-US">

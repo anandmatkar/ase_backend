@@ -102,14 +102,12 @@ module.exports.approveManager = async (req, res) => {
     try {
         let { id, position } = req.user
         let { managerId } = req.query
-        console.log(id, position, managerId)
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q3'], { var1: id })
         let admin = await connection.query(s1)
         if (admin.rows.length > 0 && position == 'Admin') {
             let _dt = new Date().toISOString();
             let s2 = dbScript(db_sql['Q4'], { var1: 2, var2: managerId, var3: _dt })
-            console.log(s2, "s2222")
             let updateStatus = await connection.query(s2)
             if (updateStatus.rowCount > 0) {
                 await connection.query("COMMIT")

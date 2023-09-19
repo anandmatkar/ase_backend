@@ -1,5 +1,4 @@
 module.exports.adminNotification = function (data) {
-    console.log(data)
     let adminNotificationTemplate = 
     `<!DOCTYPE html>
     <html lang="en-US">
