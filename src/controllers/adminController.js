@@ -19,7 +19,8 @@ module.exports.adminLogin = async (req, res) => {
                     success: true,
                     message: "Login successfull",
                     data: {
-                        token: jwtToken
+                        token: jwtToken,
+                        expiresIn : 3600
                     }
                 });
             } else {
