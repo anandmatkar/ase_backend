@@ -622,7 +622,7 @@ module.exports.deleteTimesheet = async (req, res) => {
             let deleteTimesheetAttach = await connection.query(s3)
 
             if (deleteTimesheet.rowCount > 0) {
-                // await connection.query("COMMIT")
+                await connection.query("COMMIT")
                 res.json({
                     status: 200,
                     success: true,

@@ -90,7 +90,7 @@ module.exports.verifyManager = async (req, res) => {
                 let updateuser = await connection.query(s2)
                 if (updateuser.rowCount == 1) {
                     await connection.query('COMMIT')
-                    await notificationMailToAdmin(updateuser.rows[0])
+                   await notificationMailToAdmin(updateuser.rows[0])
                     res.json({
                         status: 200,
                         success: true,
