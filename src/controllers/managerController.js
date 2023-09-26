@@ -8,55 +8,74 @@ const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNo
 
 module.exports.createManager = async (req, res) => {
     try {
-        let { name, surname, company, position, emailAddress, password, phone, profilePic } = req.body
-        await connection.query("BEGIN")
-        let s1 = dbScript(db_sql['Q5'], { var1: emailAddress })
-        let findManager = await connection.query(s1)
-        if (findManager.rowCount == 0) {
-            profilePic = profilePic == "" ? process.env.DEFAULT_PROFILE_PIC_MANAGER : profilePic;
+        const { name, surname, company, position, emailAddress, password, phone, profilePic } = req.body;
 
-            const saltRounds = 10;
-            const salt = bcrypt.genSaltSync(saltRounds);
-            const encryptedPassword = bcrypt.hashSync(password, salt);
+        // Check if the email already exists in the database
+        const findManager = await connection.query(dbScript(db_sql['Q5'], { var1: emailAddress }));
 
-            let s2 = dbScript(db_sql['Q6'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(company), var4: mysql_real_escape_string(position), var5: mysql_real_escape_string(emailAddress), var6: encryptedPassword, var7: phone, var8: 0, var9: profilePic })
-            let insertManager = await connection.query(s2)
-            if (insertManager.rowCount > 0) {
-                await connection.query('COMMIT')
-                let token = await issueJWT(insertManager.rows[0], 'Manager')
-                link = `${process.env.AUTH_LINK}/verify-email/${token}`
-                await welcomeEmail2(emailAddress, link, name);
-                return res.json({
-                    status: 201,
-                    success: true,
-                    message: ` Manager Created Successfully and verification link send on ${emailAddress.toLowerCase()} `,
-                })
-            } else {
-                await connection.query("ROLLBACk")
-                res.json({
-                    status: 400,
-                    success: false,
-                    message: "Something went wrong"
-                })
-            }
-        } else {
-            await connection.query('ROLLBACK')
+        if (findManager.rowCount > 0) {
             return res.json({
-                status: 200,
+                status: 409,
                 success: false,
                 message: "Email already exists",
                 data: ""
+            });
+        }
+
+        // Hash the password asynchronously
+        const encryptedPassword = await bcrypt.hash(password, 10);
+
+        // Use transactions for database operations
+        await connection.query("BEGIN");
+
+        // Insert the manager data into the database
+        const insertManager = await connection.query(
+            dbScript(db_sql['Q6'], {
+                var1: mysql_real_escape_string(name),
+                var2: mysql_real_escape_string(surname),
+                var3: mysql_real_escape_string(company),
+                var4: mysql_real_escape_string(position),
+                var5: mysql_real_escape_string(emailAddress),
+                var6: encryptedPassword,
+                var7: phone,
+                var8: 0,
+                var9: profilePic || process.env.DEFAULT_PROFILE_PIC_MANAGER
             })
+        );
+
+        if (insertManager.rowCount > 0) {
+            // Commit the transaction
+            await connection.query('COMMIT');
+
+            // Send the email in the background
+            const token = await issueJWT(insertManager.rows[0], 'Manager');
+            const link = `${process.env.AUTH_LINK}/verify-email/${token}`;
+            welcomeEmail2(emailAddress, link, name);
+
+            return res.json({
+                status: 201,
+                success: true,
+                message: `Manager Created Successfully and verification link sent to ${emailAddress.toLowerCase()}`,
+            });
+        } else {
+            // Rollback the transaction
+            await connection.query("ROLLBACK");
+            return res.json({
+                status: 400,
+                success: false,
+                message: "Something went wrong"
+            });
         }
     } catch (error) {
-        await connection.query("ROLLBACK")
+        await connection.query("ROLLBACK");
         res.json({
             status: 400,
             success: false,
             message: error.message
-        })
+        });
     }
-}
+};
+
 
 module.exports.verifyManager = async (req, res) => {
     try {
