@@ -161,7 +161,8 @@ module.exports.verifyManager = async (req, res) => {
                     })
                 }
             } else {
-                res.status(403).json({
+                res.json({
+                    status: 400,
                     success: false,
                     message: "OTP is incorrect"
                 })
@@ -223,7 +224,8 @@ module.exports.managerLogin = async (req, res) => {
                     })
                 }
             } else if (findManager.rows[0].status == 1) {
-                res.status(403).json({
+                res.json({
+                    status: 402,
                     success: false,
                     message: "Account is not approved yet. Please wait..."
                 })
