@@ -34,7 +34,7 @@ module.exports.createReport = async (req, res) => {
         } else {
             await connection.query("ROLLBACK")
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -77,7 +77,7 @@ module.exports.submitReportForApproval = async (req, res) => {
         } else {
             await connection.query("ROLLBACK")
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -119,7 +119,7 @@ module.exports.reportDetails = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -128,7 +128,7 @@ module.exports.reportDetails = async (req, res) => {
         res.json({
             status: 400,
             success: false,
-            message: error.stack
+            message: error.message
         });
     }
 }
@@ -162,7 +162,7 @@ module.exports.validateReport = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })

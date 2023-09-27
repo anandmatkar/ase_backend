@@ -20,7 +20,7 @@ module.exports.adminLogin = async (req, res) => {
                     message: "Login successfull",
                     data: {
                         token: jwtToken,
-                        expiresIn : 3600
+                        expiresIn: 3600
                     }
                 });
             } else {
@@ -32,7 +32,7 @@ module.exports.adminLogin = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Admin not found"
             })
@@ -85,7 +85,7 @@ module.exports.managerListForApproval = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Admin not found"
             })
@@ -128,7 +128,7 @@ module.exports.approveManager = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Admin not found"
             })

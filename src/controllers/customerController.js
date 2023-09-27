@@ -35,7 +35,7 @@ module.exports.createCustomer = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -78,7 +78,7 @@ module.exports.customerList = async (req, res) => {
         }
         else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -117,7 +117,7 @@ module.exports.customerDetails = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -161,7 +161,7 @@ module.exports.updateCustomer = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -217,7 +217,7 @@ module.exports.deleteCustomer = async (req, res) => {
                 let deleteTimesheetAttach = await connection.query(s8)
 
                 if (deleteCustomer.rowCount > 0) {
-                    // await connection.query('COMMIT')
+                    await connection.query('COMMIT')
                     res.json({
                         status: 200,
                         success: true,
@@ -234,7 +234,7 @@ module.exports.deleteCustomer = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })

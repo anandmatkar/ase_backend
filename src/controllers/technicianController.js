@@ -52,7 +52,7 @@ module.exports.createTechnician = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -90,7 +90,7 @@ module.exports.uploadTechnicianDocuments = async (req, res) => {
         res.json({
             status: 400,
             success: false,
-            message: error.stack,
+            message: error.message,
             data: []
         });
     }
@@ -143,7 +143,7 @@ module.exports.techLogin = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -182,7 +182,7 @@ module.exports.technicianLists = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -223,7 +223,7 @@ module.exports.technicianDetails = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager/Technician not found"
             })
@@ -288,7 +288,7 @@ module.exports.updateTechnicianProfile = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -340,7 +340,7 @@ module.exports.assignedProjectList = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -380,7 +380,7 @@ module.exports.assignedProjectDetails = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -423,7 +423,7 @@ module.exports.createTimesheet = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -464,7 +464,7 @@ module.exports.timesheetList = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -506,7 +506,7 @@ module.exports.uploadTimesheetAttachements = async (req, res) => {
 
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -547,7 +547,7 @@ module.exports.timesheetAttachList = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -592,7 +592,7 @@ module.exports.requestForTimesheetApproval = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })
@@ -638,7 +638,7 @@ module.exports.deleteTimesheet = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Technician not found"
             })

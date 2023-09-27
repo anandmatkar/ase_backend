@@ -69,7 +69,7 @@ module.exports.createProject = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -79,7 +79,7 @@ module.exports.createProject = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         })
     }
 }
@@ -115,9 +115,9 @@ module.exports.projectList = async (req, res) => {
                 projectList.rows.forEach(row => {
                     if (row.is_completed == true && row.is_requested_for_approval == false) {
                         completedProjects.push(row)
-                    }else if(row.is_completed == false && row.is_requested_for_approval == false) {
+                    } else if (row.is_completed == false && row.is_requested_for_approval == false) {
                         projectInProgress.push(row)
-                    }else if(row.is_requested_for_approval == true){
+                    } else if (row.is_requested_for_approval == true) {
                         projectRequestedForApproval.push(row)
                     }
                 })
@@ -141,7 +141,7 @@ module.exports.projectList = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -183,7 +183,7 @@ module.exports.projectDetails = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -240,7 +240,7 @@ module.exports.deleteProject = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })

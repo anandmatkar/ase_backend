@@ -90,7 +90,7 @@ module.exports.verifyManager = async (req, res) => {
                 let updateuser = await connection.query(s2)
                 if (updateuser.rowCount == 1) {
                     await connection.query('COMMIT')
-                   await notificationMailToAdmin(updateuser.rows[0])
+                    await notificationMailToAdmin(updateuser.rows[0])
                     res.json({
                         status: 200,
                         success: true,
@@ -106,7 +106,7 @@ module.exports.verifyManager = async (req, res) => {
                 }
             } else {
                 res.json({
-                    status: 400,
+                    status: 404,
                     success: false,
                     message: "This User Is Not Exits"
                 })
@@ -181,7 +181,7 @@ module.exports.managerLogin = async (req, res) => {
 
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -243,7 +243,7 @@ module.exports.showProfile = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -287,7 +287,7 @@ module.exports.updateProfile = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -346,7 +346,7 @@ module.exports.changePassword = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Admin not found"
             })
@@ -436,7 +436,7 @@ module.exports.resetPassword = async (req, res) => {
 
             } else {
                 res.json({
-                    status: 400,
+                    status: 404,
                     success: false,
                     message: "This user is not exits",
                     data: ""
@@ -514,7 +514,7 @@ module.exports.timesheetListsForApproval = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
@@ -560,7 +560,7 @@ module.exports.acceptTimesheetRequest = async (req, res) => {
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
                 message: "Manager not found"
             })
