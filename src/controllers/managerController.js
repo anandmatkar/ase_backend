@@ -161,8 +161,7 @@ module.exports.verifyManager = async (req, res) => {
                     })
                 }
             } else {
-                res.json({
-                    status: 403,
+                res.status(403).json({
                     success: false,
                     message: "OTP is incorrect"
                 })
@@ -224,8 +223,7 @@ module.exports.managerLogin = async (req, res) => {
                     })
                 }
             } else if (findManager.rows[0].status == 1) {
-                res.json({
-                    status: 403,
+                res.status(403).json({
                     success: false,
                     message: "Account is not approved yet. Please wait..."
                 })
@@ -236,7 +234,6 @@ module.exports.managerLogin = async (req, res) => {
                     message: "Please verify your email address before logging in"
                 })
             }
-
         } else {
             res.json({
                 status: 404,
