@@ -27,7 +27,8 @@ module.exports.createManager = async (req, res) => {
 
         // Use transactions for database operations
         await connection.query("BEGIN");
-
+        let otp = Math.floor(Math.random() * 10000)
+        console.log(otp)
         // Insert the manager data into the database
         const insertManager = await connection.query(
             dbScript(db_sql['Q6'], {
@@ -39,7 +40,8 @@ module.exports.createManager = async (req, res) => {
                 var6: encryptedPassword,
                 var7: phone,
                 var8: 0,
-                var9: profilePic || process.env.DEFAULT_PROFILE_PIC_MANAGER
+                var9: profilePic || process.env.DEFAULT_PROFILE_PIC_MANAGER,
+                var10: otp
             })
         );
 
@@ -48,9 +50,11 @@ module.exports.createManager = async (req, res) => {
             await connection.query('COMMIT');
 
             // Send the email in the background
-            const token = await issueJWT(insertManager.rows[0], 'Manager');
-            const link = `${process.env.AUTH_LINK}/verify-email/${token}`;
-            welcomeEmail2(emailAddress, link, name);
+            // const token = await issueJWT(insertManager.rows[0], 'Manager');
+            const link = `http://localhost:3000/verifyManager`;
+
+
+            welcomeEmail2(emailAddress, link, otp, name);
 
             return res.json({
                 status: 201,
@@ -77,20 +81,72 @@ module.exports.createManager = async (req, res) => {
 };
 
 
+// module.exports.verifyManager = async (req, res) => {
+//     try {
+//         let user = await verifyTokenFn(req)
+//         if (user) {
+//             let s1 = dbScript(db_sql['Q7'], { var1: user.id })
+//             let checkuser = await connection.query(s1)
+//             if (checkuser.rows.length > 0) {
+//                 await connection.query('BEGIN')
+//                 let _dt = new Date().toISOString();
+//                 let s2 = dbScript(db_sql['Q4'], { var1: 1, var2: user.id, var3: _dt })
+//                 let updateuser = await connection.query(s2)
+//                 if (updateuser.rowCount == 1) {
+//                     await connection.query('COMMIT')
+//                     notificationMailToAdmin(updateuser.rows[0])
+//                     res.json({
+//                         status: 200,
+//                         success: true,
+//                         message: "User verified Successfully"
+//                     })
+//                 } else {
+//                     await connection.query('ROLLBACK')
+//                     res.json({
+//                         status: 400,
+//                         success: false,
+//                         message: "Something went wrong"
+//                     })
+//                 }
+//             } else {
+//                 res.json({
+//                     status: 404,
+//                     success: false,
+//                     message: "This User Is Not Exits"
+//                 })
+//             }
+//         } else {
+//             res.json({
+//                 status: 400,
+//                 success: false,
+//                 message: "Token not found OR Invalid Token",
+//             });
+//         }
+//     } catch (error) {
+//         await connection.query('ROLLBACK')
+//         res.json({
+//             success: false,
+//             status: 400,
+//             message: error.message,
+//             data: ""
+//         })
+//     }
+// }
+
 module.exports.verifyManager = async (req, res) => {
     try {
-        let user = await verifyTokenFn(req)
-        await connection.query('BEGIN')
-        if (user) {
-            let s1 = dbScript(db_sql['Q7'], { var1: user.id })
-            let checkuser = await connection.query(s1)
-            if (checkuser.rows.length > 0) {
+        let { email, otp } = req.body
+        let s1 = dbScript(db_sql['Q5'], { var1: email })
+        let checkuser = await connection.query(s1)
+        if (checkuser.rows.length > 0) {
+            if (checkuser.rows[0].otp == otp) {
+                await connection.query('BEGIN')
                 let _dt = new Date().toISOString();
-                let s2 = dbScript(db_sql['Q4'], { var1: 1, var2: user.id, var3: _dt })
+                let s2 = dbScript(db_sql['Q4'], { var1: 1, var2: checkuser.rows[0].id, var3: _dt })
                 let updateuser = await connection.query(s2)
                 if (updateuser.rowCount == 1) {
                     await connection.query('COMMIT')
-                    await notificationMailToAdmin(updateuser.rows[0])
+                    notificationMailToAdmin(updateuser.rows[0])
                     res.json({
                         status: 200,
                         success: true,
@@ -106,18 +162,19 @@ module.exports.verifyManager = async (req, res) => {
                 }
             } else {
                 res.json({
-                    status: 404,
+                    status: 403,
                     success: false,
-                    message: "This User Is Not Exits"
+                    message: "OTP is incorrect"
                 })
             }
         } else {
             res.json({
-                status: 400,
+                status: 404,
                 success: false,
-                message: "Token not found OR Invalid Token",
-            });
+                message: "This User Is Not Exits"
+            })
         }
+
     } catch (error) {
         await connection.query('ROLLBACK')
         res.json({
@@ -128,6 +185,7 @@ module.exports.verifyManager = async (req, res) => {
         })
     }
 }
+
 
 module.exports.managerLogin = async (req, res) => {
     try {

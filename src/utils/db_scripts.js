@@ -7,8 +7,8 @@ const db_sql = {
         "Q4": `UPDATE manager SET status = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q5": `SELECT * FROM manager WHERE email_address = '{var1}' AND deleted_at IS NULL`,
         "Q6": `INSERT INTO manager
-         (name, surname, company, position, email_address, encrypted_password, phone_number, status, avatar) 
-         VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}','{var8}', '{var9}') RETURNING *`,
+         (name, surname, company, position, email_address, encrypted_password, phone_number, status, avatar, otp) 
+         VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}','{var8}', '{var9}', '{var10}') RETURNING *`,
         "Q7": `SELECT id, name, surname, company, position, email_address, phone_number, status, avatar, created_at, updated_at, deleted_at 
          FROM  manager WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q8": `SELECT id, name, surname, company, position, email_address, phone_number, status, created_at, updated_at, deleted_at 

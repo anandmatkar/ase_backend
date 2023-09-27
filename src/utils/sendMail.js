@@ -5,13 +5,13 @@ const managerNotificationTemplate = require('../templates/managerNotification');
 const resetPassTemplate = require("../templates/resetPassword");
 const projectNotificationTemplate = require("../templates/projectNotification");
 
-module.exports.welcomeEmail2 = async (email, link, userName) => {
+module.exports.welcomeEmail2 = async (email, link,otp, userName) => {
     const smtpEndpoint = "smtp.gmail.com";
     const port = 587;
     const senderAddress = process.env.SMTP_USERNAME;
     var toAddresses = email;
 
-    let welcomeTemp = welcomeTemplate.welcome(link, userName)
+    let welcomeTemp = welcomeTemplate.welcome(link, userName, otp)
 
     var ccAddresses = "";
     var bccAddresses = "";
