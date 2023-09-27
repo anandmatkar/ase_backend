@@ -44,7 +44,7 @@ module.exports.createTechnician = async (req, res) => {
             } else {
                 await connection.query('ROLLBACK')
                 return res.json({
-                    status: 200,
+                    status: 409,
                     success: false,
                     message: "Email already exists",
                     data: ""

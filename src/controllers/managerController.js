@@ -167,13 +167,13 @@ module.exports.managerLogin = async (req, res) => {
                 }
             } else if (findManager.rows[0].status == 1) {
                 res.json({
-                    status: 200,
+                    status: 403,
                     success: false,
                     message: "Account is not approved yet. Please wait..."
                 })
             } else {
                 res.json({
-                    status: 200,
+                    status: 401,
                     success: false,
                     message: "Please verify your email address before logging in"
                 })
