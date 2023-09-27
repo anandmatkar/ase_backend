@@ -156,13 +156,13 @@ module.exports.notificationMailToManager = async (userData) => {
 
 }
 
-module.exports.resetPasswordMail = async (email, link, userName) => {
+module.exports.resetPasswordMail = async (email, otp, userName) => {
     const smtpEndpoint = "smtp.gmail.com";
     const port = 587;
     const senderAddress = process.env.SMTP_USERNAME;
     var toAddresses = email;
 
-    let resetPass = resetPassTemplate.resetPassword(link, email, userName)
+    let resetPass = resetPassTemplate.resetPassword(otp, email, userName)
 
     var ccAddresses = "";
     var bccAddresses = "";
@@ -208,7 +208,6 @@ module.exports.resetPasswordMail = async (email, link, userName) => {
 }
 
 module.exports.sendProjectNotificationEmail = async (emails, data) => {
-    console.log(emails, data, "in sendProjectNotificationEmail")
     const smtpEndpoint = "smtp.gmail.com"
     const senderAddress = data.manager_email_address;
     let toAddresses = emails;

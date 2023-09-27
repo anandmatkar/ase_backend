@@ -1,4 +1,4 @@
-module.exports.resetPassword = function (link, email, userName) {
+module.exports.resetPassword = function (otp, email, userName) {
     let resetPass = `
     <!doctype html>
     <html lang="en-US">
@@ -43,10 +43,7 @@ module.exports.resetPassword = function (link, email, userName) {
 
 
                                             We got a request to reset a password for the following account:<br>
-                                            To reset your password, please click the below blue button <br>
-                                             
-                                            <a href= ${link} style="background:#4285f4;text-decoration:none !important; font-weight:500; margin-top:15px; color:#ededed;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:8px;">Click here to reset your password</a><br>
-                                             <p>Your email:<a href="" style="color:#1bb2cc;"><u>${email}</u></a></p>
+                                             Here is Your password reset OTP : ${otp}<br>
                                                 <br>
                                              <p>If this was a mistake, then just ignore this email.</p>
                                             <br>

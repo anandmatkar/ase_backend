@@ -28,7 +28,6 @@ module.exports.createManager = async (req, res) => {
         // Use transactions for database operations
         await connection.query("BEGIN");
         let otp = Math.floor(Math.random() * 10000)
-        console.log(otp)
         // Insert the manager data into the database
         const insertManager = await connection.query(
             dbScript(db_sql['Q6'], {
@@ -136,7 +135,7 @@ module.exports.createManager = async (req, res) => {
 module.exports.verifyManager = async (req, res) => {
     try {
         let { email, otp } = req.body
-        if(!otp){
+        if (!otp) {
             res.json({
                 status: 400,
                 success: false,
@@ -197,7 +196,7 @@ module.exports.verifyManager = async (req, res) => {
 module.exports.managerLogin = async (req, res) => {
     try {
         let { email, password } = req.body
-        if(!email || !password) {
+        if (!email || !password) {
             res.json({
                 status: 400,
                 success: false,
@@ -441,14 +440,27 @@ module.exports.forgotPassword = async (req, res) => {
         let s1 = dbScript(db_sql['Q5'], { var1: mysql_real_escape_string(emailAddress) })
         let findManager = await connection.query(s1);
         if (findManager.rows.length > 0) {
-            let token = await issueJWT(findManager.rows[0], 'Manager')
-            let link = `${process.env.AUTH_LINK}/reset-password/${token}`
-            await resetPasswordMail(emailAddress, link, findManager.rows[0].name);
-            res.json({
-                status: 200,
-                success: true,
-                message: `Password reset link has sent on your registered ${emailAddress} account`,
-            })
+            await connection.query("BEGIN")
+            let otp = Math.floor(Math.random() * 10000)
+            let s2 = dbScript(db_sql['Q56'], { var1: otp, var2: findManager.rows[0].id })
+            let updateOtp = await connection.query(s2);
+            if (updateOtp.rowCount > 0) {
+                await connection.query("COMMIT")
+                await resetPasswordMail(emailAddress, otp, findManager.rows[0].name);
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: `Password reset link has sent on your registered ${emailAddress} account`,
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+
         } else {
             res.json({
                 status: 400,
@@ -470,40 +482,47 @@ module.exports.forgotPassword = async (req, res) => {
 module.exports.resetPassword = async (req, res) => {
     try {
         let {
+            email,
+            otp,
             password
         } = req.body
         await connection.query('BEGIN')
-        let user = await verifyTokenFn(req)
-        if (user) {
-            let s1 = dbScript(db_sql['Q7'], { var1: user.id })
+            let s1 = dbScript(db_sql['Q5'], { var1: email })
             let findManager = await connection.query(s1);
             if (findManager.rows.length > 0) {
+                if (findManager.rows[0].otp == otp) {
+                    const saltRounds = 10;
+                    const salt = bcrypt.genSaltSync(saltRounds);
+                    const encryptedPassword = bcrypt.hashSync(password, salt);
+                    let _dt = new Date().toISOString();
 
-                const saltRounds = 10;
-                const salt = bcrypt.genSaltSync(saltRounds);
-                const encryptedPassword = bcrypt.hashSync(password, salt);
-                let _dt = new Date().toISOString();
+                    let s2 = dbScript(db_sql['Q13'], { var1: encryptedPassword, var2: findManager.rows[0].id, var3: _dt })
+                    let updatePassword = await connection.query(s2)
 
-                let s2 = dbScript(db_sql['Q13'], { var1: encryptedPassword, var2: user.id, var3: _dt })
-                let updatePassword = await connection.query(s2)
-
-                if (updatePassword.rowCount == 1) {
-                    await connection.query('COMMIT')
-                    res.json({
-                        status: 200,
-                        success: true,
-                        message: "Password changed successfully",
-                        data: ""
-                    })
-                } else {
+                    if (updatePassword.rowCount == 1) {
+                        await connection.query('COMMIT')
+                        res.json({
+                            status: 200,
+                            success: true,
+                            message: "Password changed successfully"
+                        })
+                    } else {
+                        await connection.query('ROLLBACK')
+                        res.json({
+                            status: 400,
+                            success: false,
+                            message: "Something went wrong"
+                        })
+                    }
+                }else{
                     await connection.query('ROLLBACK')
-                    res.json({
-                        status: 400,
-                        success: false,
-                        message: "Something went wrong",
-                        data: ""
-                    })
+                        res.json({
+                            status: 400,
+                            success: false,
+                            message: "Please Enter correct OTP"
+                        })
                 }
+
 
             } else {
                 res.json({
@@ -513,13 +532,7 @@ module.exports.resetPassword = async (req, res) => {
                     data: ""
                 })
             }
-        } else {
-            res.json({
-                status: 400,
-                success: false,
-                message: "Token not found",
-            });
-        }
+        
     } catch (error) {
         await connection.query('ROLLBACK')
         res.json({
