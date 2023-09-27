@@ -136,6 +136,13 @@ module.exports.createManager = async (req, res) => {
 module.exports.verifyManager = async (req, res) => {
     try {
         let { email, otp } = req.body
+        if(!otp){
+            res.json({
+                status: 400,
+                success: false,
+                message: "Please provide OTP."
+            })
+        }
         let s1 = dbScript(db_sql['Q5'], { var1: email })
         let checkuser = await connection.query(s1)
         if (checkuser.rows.length > 0) {
@@ -190,6 +197,13 @@ module.exports.verifyManager = async (req, res) => {
 module.exports.managerLogin = async (req, res) => {
     try {
         let { email, password } = req.body
+        if(!email || !password) {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Please Provide all credentials."
+            })
+        }
         let s1 = dbScript(db_sql['Q5'], { var1: email })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0) {
