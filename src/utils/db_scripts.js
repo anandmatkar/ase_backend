@@ -302,6 +302,7 @@ const db_sql = {
         "Q54":`UPDATE project SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q55":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}' WHERE id = '{var3}' AND manager_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q56":`UPDATE manager SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q57":`SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`
                               
 
 

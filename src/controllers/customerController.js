@@ -14,23 +14,32 @@ module.exports.createCustomer = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q57'], { var1: email })
+            let findCustomer = await connection.query(s2)
+            if (findCustomer.rowCount == 0) {
+                let s2 = dbScript(db_sql['Q9'], { var1: mysql_real_escape_string(customerName), var2: mysql_real_escape_string(customerContactName), var3: customerAccount, var4: mysql_real_escape_string(email), var5: phone, var6: mysql_real_escape_string(country), var7: mysql_real_escape_string(city), var8: mysql_real_escape_string(address), var9: mysql_real_escape_string(scopeOfWork), var10: id })
+                let createCustomer = await connection.query(s2)
 
-            let s2 = dbScript(db_sql['Q9'], { var1: mysql_real_escape_string(customerName), var2: mysql_real_escape_string(customerContactName), var3: customerAccount, var4: mysql_real_escape_string(email), var5: phone, var6: mysql_real_escape_string(country), var7: mysql_real_escape_string(city), var8: mysql_real_escape_string(address), var9: mysql_real_escape_string(scopeOfWork), var10: id })
-            let createCustomer = await connection.query(s2)
-
-            if (createCustomer.rowCount > 0) {
-                await connection.query('COMMIT')
-                res.json({
-                    status: 201,
-                    success: true,
-                    message: "Customer created successfully"
-                })
+                if (createCustomer.rowCount > 0) {
+                    await connection.query('COMMIT')
+                    res.json({
+                        status: 201,
+                        success: true,
+                        message: "Customer created successfully"
+                    })
+                } else {
+                    await connection.query('ROLLBACK')
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    })
+                }
             } else {
-                await connection.query('ROLLBACK')
                 res.json({
                     status: 400,
                     success: false,
-                    message: "Something went wrong"
+                    message: "Email address is already Exists"
                 })
             }
         } else {
