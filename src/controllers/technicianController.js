@@ -305,12 +305,12 @@ module.exports.assignedProjectList = async (req, res) => {
                 const completedProject = [];
                 const projectWaitingApproval = []
                 findAssignedProjectList.rows.forEach((project) => {
-                    if (project.is_completed === false) {
+                    if (project.is_requested_for_approval === true) {
+                        projectWaitingApproval.push(project)
+                    } else if (project.is_completed === false) {
                         assignedProject.push(project);
                     } else if (project.is_completed === true) {
                         completedProject.push(project);
-                    } else if (project.is_requested_for_approval === true) {
-                        projectWaitingApproval.push(project)
                     }
                 });
                 res.json({
