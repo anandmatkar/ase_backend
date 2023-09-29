@@ -251,13 +251,13 @@ module.exports.uploadProfilePic = async (req, res) => {
 module.exports.updateTechnicianProfile = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { name, surname, emailAddress, phoneNumber, nationality, qualification, level, avatar } = req.body
+        let { name, surname, emailAddress, phoneNumber, nationality, qualification, level, profilePic } = req.body
         await connection.query("BEGIN")
         let s2 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s2)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let _dt = new Date().toISOString()
-            let s3 = dbScript(db_sql['Q29'], { var1: name, var2: surname, var3: emailAddress, var4: phoneNumber, var5: nationality, var6: qualification, var7: level, var8: avatar, var9: _dt, var10: id })
+            let s3 = dbScript(db_sql['Q29'], { var1: name, var2: surname, var3: emailAddress, var4: phoneNumber, var5: nationality, var6: qualification, var7: level, var8: profilePic, var9: _dt, var10: id })
             let updateTechnician = await connection.query(s3)
 
             if (updateTechnician.rowCount > 0) {

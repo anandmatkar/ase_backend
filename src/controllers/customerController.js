@@ -258,6 +258,7 @@ module.exports.deleteCustomer = async (req, res) => {
                         let s8 = dbScript(db_sql['Q42'], { var1: _dt, var2: project.id })
                         let deleteTimesheetAttach = await connection.query(s8)
                     }
+                    await connection.query('COMMIT')
                     res.json({
                         status: 200,
                         success: true,
@@ -271,7 +272,7 @@ module.exports.deleteCustomer = async (req, res) => {
                 let deleteCustomer = await connection.query(s2)
                 console.log(deleteCustomer.rows)
                 if (deleteCustomer.rowCount > 0) {
-                    // await connection.query('COMMIT')
+                    await connection.query('COMMIT')
                     res.json({
                         status: 200,
                         success: true,
