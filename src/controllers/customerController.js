@@ -142,48 +142,71 @@ module.exports.customerDetails = async (req, res) => {
 
 module.exports.updateCustomer = async (req, res) => {
     try {
-        let { id, position } = req.user
-        let { customerId, customerName, customerContactName, customerAccount, email, phone, country, city, address, scopeOfWork } = req.body
-        await connection.query('BEGIN')
-
-        let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let findManager = await connection.query(s1)
-        if (findManager.rowCount > 0 && position == 'Manager') {
-            let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q19'], { var1: mysql_real_escape_string(customerName), var2: mysql_real_escape_string(customerContactName), var3: customerAccount, var4: mysql_real_escape_string(email), var5: phone, var6: mysql_real_escape_string(country), var7: mysql_real_escape_string(city), var8: mysql_real_escape_string(address), var9: mysql_real_escape_string(scopeOfWork), var10: _dt, var11: customerId })
-            let updateCustomer = await connection.query(s2)
-
-            if (updateCustomer.rowCount > 0) {
-                await connection.query('COMMIT')
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Customer updated successfully"
-                })
-            } else {
-                await connection.query('ROLLBACK')
-                res.json({
-                    status: 400,
-                    success: false,
-                    message: "Something went wrong"
-                })
-            }
+      let { id, position } = req.user;
+      let {
+        customer_id,
+        customer_name,
+        customer_contact,
+        customer_account,
+        email_address,
+        phone_number,
+        country,
+        city,
+        address,
+        scope_of_work,
+      } = req.body;
+      await connection.query('BEGIN');
+  
+      let s1 = dbScript(db_sql['Q7'], { var1: id });
+      let findManager = await connection.query(s1);
+      if (findManager.rowCount > 0 && position == 'Manager') {
+        let _dt = new Date().toISOString();
+        let s2 = dbScript(db_sql['Q19'], {
+          var1: mysql_real_escape_string(customer_name),
+          var2: mysql_real_escape_string(customer_contact),
+          var3: customer_account,
+          var4: mysql_real_escape_string(email_address),
+          var5: phone_number,
+          var6: mysql_real_escape_string(country),
+          var7: mysql_real_escape_string(city),
+          var8: mysql_real_escape_string(address),
+          var9: mysql_real_escape_string(scope_of_work),
+          var10: _dt,
+          var11: customer_id,
+        });
+        let updateCustomer = await connection.query(s2);
+  
+        if (updateCustomer.rowCount > 0) {
+          await connection.query('COMMIT');
+          res.json({
+            status: 200,
+            success: true,
+            message: 'Customer updated successfully',
+          });
         } else {
-            res.json({
-                status: 404,
-                success: false,
-                message: "Manager not found"
-            })
-        }
-    } catch (error) {
-        await connection.query('ROLLBACK')
-        res.json({
-            success: false,
+          await connection.query('ROLLBACK');
+          res.json({
             status: 400,
-            message: error.message,
-        })
+            success: false,
+            message: 'Something went wrong',
+          });
+        }
+      } else {
+        res.json({
+          status: 404,
+          success: false,
+          message: 'Manager not found',
+        });
+      }
+    } catch (error) {
+      await connection.query('ROLLBACK');
+      res.json({
+        success: false,
+        status: 400,
+        message: error.message,
+      });
     }
-}
+  };
 
 module.exports.deleteCustomer = async (req, res) => {
     try {

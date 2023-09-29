@@ -34,7 +34,7 @@ const db_sql = {
         "Q18": `INSERT INTO machine_attach(project_id,machine_id,file_path,file_type,file_size, manager_id)
          VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}') RETURNING *`,
         "Q19": `UPDATE customer SET customer_name = '{var1}', customer_contact = '{var2}', customer_account = '{var3}', email_address = '{var4}', phone_number = '{var5}', country = '{var6}', city = '{var7}', address = '{var8}', scope_of_work = '{var9}', updated_at = '{var10}' WHERE id = '{var11}' AND deleted_at IS NULL RETURNING *`,
-        "Q20": `SELECT customer_name,customer_contact,customer_account,email_address,phone_number,country,city,address, scope_of_work,  manager_id, created_at, updated_at, deleted_at
+        "Q20": `SELECT id as customer_id customer_name,customer_contact,customer_account,email_address,phone_number,country,city,address, scope_of_work,  manager_id, created_at, updated_at, deleted_at
           FROM customer WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q21": `UPDATE customer SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL`,
         "Q22": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, created_at, is_requested_for_approval, is_completed, manager_id
