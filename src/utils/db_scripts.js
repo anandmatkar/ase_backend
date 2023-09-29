@@ -143,6 +143,7 @@ const db_sql = {
                   p.end_date,
                   p.created_at,
                   p.is_completed,
+                  p.is_requested_for_approval,
                   p.manager_id,
                   c.id AS customer_id,
                   c.customer_name,
