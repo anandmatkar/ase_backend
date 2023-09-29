@@ -10,6 +10,7 @@ router.post('/techLogin', controller.technician.techLogin)
 router.post('/updateTechnicianProfile', verifyTokenTechnician, controller.technician.updateTechnicianProfile)
 router.post('/uploadProfilePic', verifyTokenTechnician, uploadProfile.single('image'), controller.technician.uploadProfilePic)
 router.post('/uploadTechnicianDocuments', verifyTokenTechnician, uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
+router.get('/showProfile', verifyTokenTechnician, controller.technician.showProfile)
 
 //================================================Technician Peroject routes===========================================================//
 

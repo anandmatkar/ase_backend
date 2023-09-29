@@ -35,7 +35,7 @@ router.put('/deleteProject', verifyTokenManager, controller.project.deleteProjec
 
 router.post('/createTechnician', verifyTokenManager, controller.technician.createTechnician)
 router.get('/technicianLists', verifyTokenManager, controller.technician.technicianLists)
-router.get('/technicianDetails', verifyTokenManagerORTechnician, controller.technician.technicianDetails)
+router.get('/technicianDetailsForManager', verifyTokenManagerORTechnician, controller.manager.technicianDetailsForManager)
 
 //---------------------------------------------------------- TImesheet Routes ------------------------------------------------------//
 

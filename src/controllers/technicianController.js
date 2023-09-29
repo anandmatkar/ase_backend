@@ -67,6 +67,7 @@ module.exports.createTechnician = async (req, res) => {
     }
 }
 
+//by technician
 module.exports.uploadTechnicianDocuments = async (req, res) => {
     try {
         let files = req.files;
@@ -196,36 +197,24 @@ module.exports.technicianLists = async (req, res) => {
     }
 }
 
-//for both manager and technician
-module.exports.technicianDetails = async (req, res) => {
+//for bothtechnician
+module.exports.showProfile = async (req, res) => {
     try {
-        let { id } = req.user
-        let { techId } = req.query
-        let s1 = dbScript(db_sql['Q28'], { var1: id })
+        let { id, position } = req.user
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findUser = await connection.query(s1)
-        if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql['Q27'], { var1: techId })
-            let technicianDetails = await connection.query(s2)
-            if (technicianDetails.rowCount > 0) {
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: `Technicians Details`,
-                    data: technicianDetails.rows
-                })
-            } else {
-                return res.json({
-                    status: 200,
-                    success: false,
-                    message: `Empty Technicians Details`,
-                    data: []
-                })
-            }
+        if (findUser.rowCount > 0 && position == "Technician") {
+            res.json({
+                status: 200,
+                success: true,
+                message: `Technicians Details`,
+                data: findUser.rows
+            })
         } else {
             res.json({
                 status: 404,
                 success: false,
-                message: "Manager/Technician not found"
+                message: "Technician not found"
             })
         }
     } catch (error) {

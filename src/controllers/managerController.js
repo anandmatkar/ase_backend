@@ -659,5 +659,46 @@ module.exports.acceptTimesheetRequest = async (req, res) => {
     }
 }
 
+//technicianDetails for manager
+module.exports.technicianDetailsForManager = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { techId } = req.query
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findUser = await connection.query(s1)
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql['Q27'], { var1: techId })
+            let technicianDetails = await connection.query(s2)
+            if (technicianDetails.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: `Technicians Details`,
+                    data: technicianDetails.rows
+                })
+            } else {
+                return res.json({
+                    status: 200,
+                    success: false,
+                    message: `Empty Technicians Details`,
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 
 
