@@ -36,7 +36,7 @@ const db_sql = {
         "Q19": `UPDATE customer SET customer_name = '{var1}', customer_contact = '{var2}', customer_account = '{var3}', email_address = '{var4}', phone_number = '{var5}', country = '{var6}', city = '{var7}', address = '{var8}', scope_of_work = '{var9}', updated_at = '{var10}' WHERE id = '{var11}' AND deleted_at IS NULL RETURNING *`,
         "Q20": `SELECT id as customer_id, customer_name,customer_contact,customer_account,email_address,phone_number,country,city,address, scope_of_work,  manager_id, created_at, updated_at, deleted_at
           FROM customer WHERE id = '{var1}' AND deleted_at IS NULL`,
-        "Q21": `UPDATE customer SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL`,
+        "Q21": `UPDATE customer SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q22": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, created_at, is_requested_for_approval, is_completed, manager_id
           FROM project WHERE manager_id = '{var1}' AND deleted_at IS NULL`,
         "Q23": `SELECT
@@ -225,7 +225,7 @@ const db_sql = {
         "Q40":`UPDATE machine_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q41":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q42":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q43":`SELECT id, order_id, customer_id, project_type, description, start_date, end_date, manager_id, is_completed, created_at, updated_at, deleted_at FROM project WHERE customer_id = '{var1}' AND is_completed = '{var2}' AND deleted_at IS NULL`,
+        "Q43":`SELECT id, order_id, customer_id, project_type, description, start_date, end_date, manager_id, is_completed, created_at, updated_at, deleted_at FROM project WHERE customer_id = '{var1}' AND deleted_at IS NULL`,
         "Q44":`SELECT id, project_id, tech_id, date, start_time, end_time, comments, is_timesheet_approved, is_timesheet_requested_for_approval, created_at, updated_at FROM timesheet WHERE is_timesheet_requested_for_approval = true AND manager_id = '{var1}'`,
         "Q45":`SELECT * FROM project WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q46":`UPDATE timesheet SET is_timesheet_approved = '{var1}', is_timesheet_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
