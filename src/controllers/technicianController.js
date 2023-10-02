@@ -247,6 +247,118 @@ module.exports.uploadProfilePic = async (req, res) => {
     }
 }
 
+module.exports.forgotPassword = async (req, res) => {
+    try {
+        let {
+            emailAddress
+        } = req.body
+        let s1 = dbScript(db_sql['Q25'], { var1: mysql_real_escape_string(emailAddress) })
+        let findTechnician = await connection.query(s1);
+        if (findTechnician.rows.length > 0) {
+            await connection.query("BEGIN")
+            let otp = Math.floor(Math.random() * 10000)
+            let s2 = dbScript(db_sql['Q58'], { var1: otp, var2: findTechnician.rows[0].id })
+            let updateOtp = await connection.query(s2);
+            if (updateOtp.rowCount > 0) {
+                await connection.query("COMMIT")
+                await resetPasswordMail(emailAddress, otp, findTechnician.rows[0].name);
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: `Password reset link has sent on your registered ${emailAddress} account`,
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "This user is not exits",
+                data: ""
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+            data: ""
+        })
+    }
+}
+
+module.exports.resetPassword = async (req, res) => {
+    try {
+        let {
+            emailAddress,
+            otp,
+            password
+        } = req.body
+        await connection.query('BEGIN')
+            let s1 = dbScript(db_sql['Q25'], { var1: emailAddress })
+            let findTechnician = await connection.query(s1);
+            if (findTechnician.rows.length > 0) {
+                if (findTechnician.rows[0].otp == otp) {
+                    const saltRounds = 10;
+                    const salt = bcrypt.genSaltSync(saltRounds);
+                    const encryptedPassword = bcrypt.hashSync(password, salt);
+                    let _dt = new Date().toISOString();
+
+                    let s2 = dbScript(db_sql['Q59'], { var1: encryptedPassword, var2: findTechnician.rows[0].id, var3: _dt })
+                    let updatePassword = await connection.query(s2)
+
+                    if (updatePassword.rowCount == 1) {
+                        await connection.query('COMMIT')
+                        res.json({
+                            status: 200,
+                            success: true,
+                            message: "Password changed successfully"
+                        })
+                    } else {
+                        await connection.query('ROLLBACK')
+                        res.json({
+                            status: 400,
+                            success: false,
+                            message: "Something went wrong"
+                        })
+                    }
+                }else{
+                    await connection.query('ROLLBACK')
+                        res.json({
+                            status: 400,
+                            success: false,
+                            message: "Please Enter correct OTP"
+                        })
+                }
+
+
+            } else {
+                res.json({
+                    status: 404,
+                    success: false,
+                    message: "This user is not exits",
+                    data: ""
+                })
+            }
+        
+    } catch (error) {
+        await connection.query('ROLLBACK')
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+            data: ""
+        })
+    }
+}
+
 //only for Technician
 module.exports.updateTechnicianProfile = async (req, res) => {
     try {

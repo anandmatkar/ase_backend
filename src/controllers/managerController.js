@@ -330,14 +330,14 @@ module.exports.showProfile = async (req, res) => {
 module.exports.updateProfile = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { name, surname, emailAddress, phone, profilePic } = req.body
+        let { name, surname, email_address, phone_number, profilePic } = req.body
         await connection.query('BEGIN')
 
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let _dt = new Date.toISOString()
-            let s2 = dbScript(db_sql['Q14'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(emailAddress), var4: phone, var5: profilePic, var6: id, var7: _dt })
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql['Q14'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(email_address), var4: phone_number, var5: profilePic, var6: id, var7: _dt })
             let updateProfile = await connection.query(s2)
 
             if (updateProfile.rowCount > 0) {

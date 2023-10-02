@@ -22,7 +22,7 @@ const db_sql = {
           VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}') RETURNING *`,
         "Q12": `SELECT * FROM project ORDER BY created_at DESC `,
         "Q13": `UPDATE manager SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q14": `UPDATE manager SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', avatar = '{var5}'. updated_at = '{var7}' WHERE id = '{var6}' AND deleted_at IS NULL`,
+        "Q14": `UPDATE manager SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', avatar = '{var5}', updated_at = '{var7}' WHERE id = '{var6}' AND deleted_at IS NULL`,
         "Q15": `INSERT INTO machine
           (customer_id,project_id,order_id,machine_type, serial,hour_count,nom_speed,act_speed,description,manager_id) 
           VALUES('{var1}','{var2}','{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}', '{var9}', '{var10}') RETURNING *`,
@@ -329,7 +329,9 @@ const db_sql = {
         "Q54":`UPDATE project SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q55":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}' WHERE id = '{var3}' AND manager_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q56":`UPDATE manager SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q57":`SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`
+        "Q57":`SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`,
+        "Q58":`UPDATE technician SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q59": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
                               
 
 

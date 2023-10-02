@@ -11,6 +11,8 @@ router.post('/updateTechnicianProfile', verifyTokenTechnician, controller.techni
 router.post('/uploadProfilePic', verifyTokenTechnician, uploadProfile.single('image'), controller.technician.uploadProfilePic)
 router.post('/uploadTechnicianDocuments', verifyTokenTechnician, uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
 router.get('/showProfile', verifyTokenTechnician, controller.technician.showProfile)
+router.post('/forgotPassword', controller.technician.forgotPassword)
+router.put('/resetPassword', controller.technician.resetPassword)
 
 //================================================Technician Peroject routes===========================================================//
 
