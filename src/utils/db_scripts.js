@@ -37,8 +37,30 @@ const db_sql = {
         "Q20": `SELECT id as customer_id, customer_name,customer_contact,customer_account,email_address,phone_number,country,city,address, scope_of_work,  manager_id, created_at, updated_at, deleted_at
           FROM customer WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q21": `UPDATE customer SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q22": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, created_at, is_requested_for_approval, is_completed, manager_id
-          FROM project WHERE manager_id = '{var1}' AND deleted_at IS NULL`,
+        "Q22": `SELECT
+        p.id AS project_id,
+        p.order_id,
+        p.project_type,
+        p.description,
+        p.start_date,
+        p.end_date,
+        p.created_at,
+        p.is_completed,
+        p.is_requested_for_approval,
+        p.manager_id,
+        c.id AS customer_id,
+        c.customer_name,
+        c.customer_contact,
+        c.customer_account,
+        c.email_address,
+        c.phone_number,
+        c.country,
+        c.city,
+        c.address,
+        c.scope_of_work
+      FROM project as p
+      INNER JOIN customer as c on c.id = p.customer_id
+      WHERE p.manager_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`,
         "Q23": `SELECT
                    p.id AS project_id,
                    p.order_id,
