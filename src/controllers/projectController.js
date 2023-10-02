@@ -165,7 +165,7 @@ module.exports.projectDetails = async (req, res) => {
         if (findManager.rowCount > 0 && position == 'Manager') {
             let s2 = dbScript(db_sql['Q23'], { var1: projectId })
             let projectDetails = await connection.query(s2)
-
+console.log(s2, "s2222")
             if (projectDetails.rowCount > 0) {
                 res.json({
                     status: 200,

@@ -354,6 +354,7 @@ module.exports.assignedProjectDetails = async (req, res) => {
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q31'], { var1: projectId, var2: id })
+            console.log(s2,"sssssssss2222222")
             let projectDetails = await connection.query(s2)
             if (projectDetails.rowCount > 0) {
                 res.json({
