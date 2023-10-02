@@ -1,7 +1,7 @@
 const express = require('express');
 const controller = require('../controllers');
 const { verifyTokenManagerORTechnician, verifyTokenTechnician } = require('../utils/jwt');
-const { uploadMachineFiles, uploadProfile, uploadTechnicianDocuments, uploadTimesheet } = require('../utils/uploadFiles');
+const { uploadMachineFiles, uploadProfile, uploadTechnicianDocuments, uploadTimesheet, uploadReportAttach } = require('../utils/uploadFiles');
 const router = express.Router();
 
 //================================================Technician Auth routes==============================================================//
@@ -31,5 +31,6 @@ router.put('/deleteTimesheet', verifyTokenTechnician, controller.technician.dele
 //================================================Report routes===========================================================//
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
 router.put('/submitReportForApproval', verifyTokenTechnician, controller.report.submitReportForApproval)
+router.post('/uploadReportAttach', verifyTokenTechnician, uploadReportAttach.array('files'), controller.report.uploadReportAttach)
 
 module.exports = router

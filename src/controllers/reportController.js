@@ -49,6 +49,32 @@ module.exports.createReport = async (req, res) => {
     }
 }
 
+module.exports.uploadReportAttach = async (req, res) => {
+    try {
+        let files = req.files;
+        let fileDetails = [];
+        // Iterate through the uploaded files and gather their details
+        for (const file of files) {
+            let path = `${process.env.REPORT_ATTACHEMENTS}/${file.filename}`;
+            let size = file.size;
+            let mimetype = file.mimetype;
+            fileDetails.push({ path, size, mimetype });
+        }
+        res.json({
+            status: 201,
+            success: true,
+            message: "Files Uploaded successfully!",
+            data: fileDetails
+        });
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+        });
+    }
+}
+
 //submit approval request for the report by technician
 module.exports.submitReportForApproval = async (req, res) => {
     try {

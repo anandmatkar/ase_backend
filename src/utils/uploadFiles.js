@@ -56,10 +56,25 @@ const uploadTimesheet = multer({
     storage: storage4
 })
 
+const storage5 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/reportAttacehments')
+    },
+    filename: function (req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const fileName = `${Date.now()}.${ext}`
+        cb(null, fileName)
+    }
+})
+const uploadReportAttach = multer({
+    storage: storage5
+})
+
 
 module.exports = {
     uploadMachineFiles,
     uploadProfile,
     uploadTechnicianDocuments,
-    uploadTimesheet
+    uploadTimesheet,
+    uploadReportAttach
 };
