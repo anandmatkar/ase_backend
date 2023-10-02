@@ -389,7 +389,7 @@ module.exports.assignedProjectDetails = async (req, res) => {
 module.exports.createTimesheet = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, date, startTime, endTime, comments } = req.body
+        let { projectId, date, startTime, endTime, comments, attachment } = req.body
         await connection.query("BEGIN")
         let s0 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s0)
@@ -399,6 +399,12 @@ module.exports.createTimesheet = async (req, res) => {
             let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7: findProjectDetails.rows[0].manager_id })
             let createTimeSheet = await connection.query(s2)
             if (createTimeSheet.rowCount > 0) {
+                if (attachment.length > 0) {
+                    for (let files of attachment) {
+                        let s3 = dbScript(db_sql['Q34'], { var1: projectId, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createTimeSheet.rows[0].id })
+                        let uploadAttach = await connection.query(s3)
+                    }
+                }
                 await connection.query('COMMIT')
                 res.json({
                     status: 201,
@@ -470,41 +476,67 @@ module.exports.timesheetList = async (req, res) => {
     }
 }
 
+// module.exports.uploadTimesheetAttachements = async (req, res) => {
+//     try {
+//         let files = req.files;
+//         let { id, position } = req.user
+//         let { projectId } = req.query
+//         let fileDetails = [];
+//         await connection.query("BEGIN")
+//         let s1 = dbScript(db_sql['Q27'], { var1: id })
+//         let findTechnician = await connection.query(s1)
+//         if (findTechnician.rowCount > 0 && position == "Technician") {
+//             // Iterate through the uploaded files and gather their details
+//             for (const file of files) {
+//                 let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
+//                 let size = file.size;
+//                 let mimetype = file.mimetype;
+//                 fileDetails.push({ path, size, mimetype });
+//                 let s2 = dbScript(db_sql['Q34'], { var1: projectId, var2: id, var3: path, var4: mimetype, var5: size })
+//                 let uploadAttach = await connection.query(s2)
+//             }
+//             await connection.query("COMMIT")
+//             res.json({
+//                 status: 201,
+//                 success: true,
+//                 message: "Files Uploaded successfully!"
+//             });
+
+//         } else {
+//             res.json({
+//                 status: 404,
+//                 success: false,
+//                 message: "Technician not found"
+//             })
+//         }
+//     } catch (error) {
+//         await connection.query("ROLLBACK")
+//         res.json({
+//             status: 400,
+//             success: false,
+//             message: error.message,
+//         });
+//     }
+// }
+
 module.exports.uploadTimesheetAttachements = async (req, res) => {
     try {
         let files = req.files;
-        let { id, position } = req.user
-        let { projectId } = req.query
         let fileDetails = [];
-        await connection.query("BEGIN")
-        let s1 = dbScript(db_sql['Q27'], { var1: id })
-        let findTechnician = await connection.query(s1)
-        if (findTechnician.rowCount > 0 && position == "Technician") {
-            // Iterate through the uploaded files and gather their details
-            for (const file of files) {
-                let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
-                let size = file.size;
-                let mimetype = file.mimetype;
-                fileDetails.push({ path, size, mimetype });
-                let s2 = dbScript(db_sql['Q34'], { var1: projectId, var2: id, var3: path, var4: mimetype, var5: size })
-                let uploadAttach = await connection.query(s2)
-            }
-            await connection.query("COMMIT")
-            res.json({
-                status: 201,
-                success: true,
-                message: "Files Uploaded successfully!"
-            });
-
-        } else {
-            res.json({
-                status: 404,
-                success: false,
-                message: "Technician not found"
-            })
+        // Iterate through the uploaded files and gather their details
+        for (const file of files) {
+            let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
+            let size = file.size;
+            let mimetype = file.mimetype;
+            fileDetails.push({ path, size, mimetype });
         }
+        res.json({
+            status: 201,
+            success: true,
+            message: "Files Uploaded successfully!",
+            data: fileDetails
+        });
     } catch (error) {
-        await connection.query("ROLLBACK")
         res.json({
             status: 400,
             success: false,

@@ -215,8 +215,8 @@ const db_sql = {
                VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}') RETURNING *` ,
         "Q33": `SELECT id, project_id, tech_id, date, start_time, end_time, comments, created_at, is_timesheet_approved FROM timesheet WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
         "Q34": `INSERT INTO timesheet_attach
-               (project_id,tech_id,file_path,file_type,file_size)
-               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}') RETURNING *`,
+               (project_id,tech_id,file_path,file_type,file_size, timesheet_id)
+               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
         "Q35": `SELECT id, project_id, tech_id, file_path, file_type, file_size, created_at FROM timesheet_attach WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
         "Q36": `UPDATE timesheet SET is_timesheet_requested_for_approval = '{var1}', updated_at = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q37":`UPDATE project SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
