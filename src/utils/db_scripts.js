@@ -146,9 +146,7 @@ const db_sql = {
                 LEFT JOIN customer c ON c.id = p.customer_id
                 WHERE p.id = '{var1}'
                 AND p.deleted_at IS NULL
-                AND c.deleted_at IS NULL;
-    
-    `,
+                AND c.deleted_at IS NULL;`,
         "Q24": `INSERT INTO technician
           (name, surname, position, email_address, encrypted_password, phone_number, nationality, qualification,level, avatar, manager_id)
           VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}', '{var9}', '{var10}', '{var11}') RETURNING *`,
@@ -366,6 +364,7 @@ const db_sql = {
         "Q57":`SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`,
         "Q58":`UPDATE technician SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q59": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q60": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
                               
 
 

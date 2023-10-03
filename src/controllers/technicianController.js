@@ -247,6 +247,65 @@ module.exports.uploadProfilePic = async (req, res) => {
     }
 }
 
+module.exports.changePassword = async (req, res) => {
+    try {
+        let userEmail = req.user.email
+        const { oldPassword, newPassword } = req.body;
+        await connection.query('BEGIN')
+        let s1 = dbScript(db_sql['Q25'], { var1: userEmail })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0) {
+            const result = await bcrypt.compare(oldPassword, findTechnician.rows[0].encrypted_password);
+            if (result) {
+                const saltRounds = 10;
+                const salt = bcrypt.genSaltSync(saltRounds);
+                const encryptedPassword = bcrypt.hashSync(newPassword, salt);
+                let _dt = new Date().toISOString();
+                let s2 = dbScript(db_sql['Q60'], { var1: encryptedPassword, var2: findTechnician.rows[0].id, var3: _dt })
+                let updatePass = await connection.query(s2)
+
+                if (updatePass.rowCount > 0) {
+                    await connection.query('COMMIT')
+                    res.send({
+                        status: 201,
+                        success: true,
+                        message: "Password Changed Successfully!",
+                    });
+                } else {
+                    await connection.query('ROLLBACK')
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    })
+                }
+
+            } else {
+                await connection.query('ROLLBACK')
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Incorrect Old Password"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    }
+    catch (error) {
+        await connection.query('ROLLBACK')
+        res.json({
+            status: 500,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 module.exports.forgotPassword = async (req, res) => {
     try {
         let {
@@ -472,7 +531,7 @@ module.exports.assignedProjectDetails = async (req, res) => {
                 res.json({
                     status: 200,
                     success: true,
-                    message: "empty project details",
+                    message: "project details",
                     data: projectDetails.rows
                 })
             } else {
