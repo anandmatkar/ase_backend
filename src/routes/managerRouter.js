@@ -1,7 +1,7 @@
 const express = require('express');
 const controller = require('../controllers');
 const { verifyTokenAdmin, verifyTokenManager, verifyTokenManagerORTechnician } = require('../utils/jwt');
-const { uploadMachineFiles, uploadProfile } = require('../utils/uploadFiles');
+const { uploadMachineFiles, uploadProfile, uploadProjectAttachments } = require('../utils/uploadFiles');
 const router = express.Router();
 
 //---------------------------------------------------------- Manager Auth Routes------------------------------------------------------//
@@ -30,6 +30,7 @@ router.post('/createProject', verifyTokenManager, controller.project.createProje
 router.get('/projectList', verifyTokenManager, controller.project.projectList)
 router.get('/projectDetails', verifyTokenManager, controller.project.projectDetails)
 router.put('/deleteProject', verifyTokenManager, controller.project.deleteProject)
+router.post('/uploadProjectAttach', uploadProjectAttachments.array('files'), controller.project.uploadProjectAttach)
 
 //---------------------------------------------------------- Technician Routes ------------------------------------------------------//
 
