@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.post('/techLogin', controller.technician.techLogin)
 router.post('/updateTechnicianProfile', verifyTokenTechnician, controller.technician.updateTechnicianProfile)
-router.post('/uploadProfilePic', verifyTokenTechnician, uploadProfile.single('image'), controller.technician.uploadProfilePic)
-router.post('/uploadTechnicianDocuments', verifyTokenTechnician, uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
+router.post('/uploadProfilePic', uploadProfile.single('image'), controller.technician.uploadProfilePic)
+router.post('/uploadTechnicianDocuments', uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
 router.get('/showProfile', verifyTokenTechnician, controller.technician.showProfile)
 router.post('/forgotPassword', controller.technician.forgotPassword)
 router.put('/resetPassword', controller.technician.resetPassword)
@@ -24,13 +24,13 @@ router.get('/assignedProjectDetails', verifyTokenTechnician, controller.technici
 router.post('/createTimesheet', verifyTokenTechnician, controller.technician.createTimesheet)
 router.get('/timesheetList', verifyTokenTechnician, controller.technician.timesheetList)
 router.get('/timesheetAttachList', verifyTokenTechnician, controller.technician.timesheetAttachList)
-router.post('/uploadTimesheetAttachements', verifyTokenTechnician, uploadTimesheet.array('files'), controller.technician.uploadTimesheetAttachements)
+router.post('/uploadTimesheetAttachements', uploadTimesheet.array('files'), controller.technician.uploadTimesheetAttachements)
 router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.technician.requestForTimesheetApproval)
 router.put('/deleteTimesheet', verifyTokenTechnician, controller.technician.deleteTimesheet)
 
 //================================================Report routes===========================================================//
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
 router.put('/submitReportForApproval', verifyTokenTechnician, controller.report.submitReportForApproval)
-router.post('/uploadReportAttach', verifyTokenTechnician, uploadReportAttach.array('files'), controller.report.uploadReportAttach)
+router.post('/uploadReportAttach', uploadReportAttach.array('files'), controller.report.uploadReportAttach)
 
 module.exports = router
