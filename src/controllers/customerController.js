@@ -222,7 +222,6 @@ module.exports.deleteCustomer = async (req, res) => {
                 let isInProgress = false;
 
                 for (let project of findProject.rows) {
-                    console.log(project)
                     if (project.is_completed === false) {
                         isInProgress = true;
                         break; // Exit the loop as soon as we find a project in progress
@@ -270,7 +269,6 @@ module.exports.deleteCustomer = async (req, res) => {
 
                 let s2 = dbScript(db_sql['Q21'], { var1: _dt, var2: customerId })
                 let deleteCustomer = await connection.query(s2)
-                console.log(deleteCustomer.rows)
                 if (deleteCustomer.rowCount > 0) {
                     await connection.query('COMMIT')
                     res.json({
