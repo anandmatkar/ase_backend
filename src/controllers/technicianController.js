@@ -561,19 +561,19 @@ module.exports.assignedProjectDetails = async (req, res) => {
 module.exports.createTimesheet = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, date, startTime, endTime, comments, attachment } = req.body
+        let { projectID, date, startTime, endTime, comments, attachment } = req.body
         await connection.query("BEGIN")
         let s0 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s0)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s0 = dbScript(db_sql['Q45'], { var1: projectId })
+            let s0 = dbScript(db_sql['Q45'], { var1: projectID })
             let findProjectDetails = await connection.query(s0)
-            let s2 = dbScript(db_sql['Q32'], { var1: projectId, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7: findProjectDetails.rows[0].manager_id })
+            let s2 = dbScript(db_sql['Q32'], { var1: projectID, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7: findProjectDetails.rows[0].manager_id })
             let createTimeSheet = await connection.query(s2)
             if (createTimeSheet.rowCount > 0) {
                 if (attachment.length > 0) {
                     for (let files of attachment) {
-                        let s3 = dbScript(db_sql['Q34'], { var1: projectId, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createTimeSheet.rows[0].id })
+                        let s3 = dbScript(db_sql['Q34'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createTimeSheet.rows[0].id })
                         let uploadAttach = await connection.query(s3)
                     }
                 }
