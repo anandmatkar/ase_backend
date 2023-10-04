@@ -248,6 +248,7 @@ module.exports.uploadProfilePic = async (req, res) => {
 }
 
 module.exports.changePassword = async (req, res) => {
+    
     try {
         let userEmail = req.user.email
         const { oldPassword, newPassword } = req.body;
