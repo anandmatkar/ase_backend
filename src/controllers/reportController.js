@@ -18,6 +18,13 @@ module.exports.createReport = async (req, res) => {
             let s2 = dbScript(db_sql['Q48'], { var1: projectID, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description })
             let createReport = await connection.query(s2)
             if (createReport.rowCount > 0) {
+                if (attachements.length > 0) {
+                    for (let files of attachements) {
+                        let s3 = dbScript(db_sql['Q61'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6 : createReport.rows[0].id })
+                        let createReportAttach = await connection.query(s3)
+                        console.log(createReportAttach.rows, "1111111111");
+                    }
+                }
                 await connection.query("COMMIT")
                 res.json({
                     status: 201,
