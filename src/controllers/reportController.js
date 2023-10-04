@@ -165,6 +165,52 @@ module.exports.reportDetails = async (req, res) => {
     }
 }
 
+module.exports.deleteReport = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, reportId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql['Q62'], { var1: _dt, var2: projectId, var3: id, var4 : reportId })
+            let deleteReport = await connection.query(s2)
+            let s3 = dbScript(db_sql['Q63'], { var1: _dt, var2: projectId, var3: id, var4 : reportId })
+            let deletereportAttach = await connection.query(s3)
+
+            if (deleteReport.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Timesheet deleted successfully"
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.stack
+        });
+    }
+}
+
 //validate report for manager
 module.exports.validateReport = async (req, res) => {
     try {

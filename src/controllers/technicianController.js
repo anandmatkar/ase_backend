@@ -805,15 +805,15 @@ module.exports.requestForTimesheetApproval = async (req, res) => {
 module.exports.deleteTimesheet = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId } = req.query
+        let { projectId, timeSheetId } = req.query
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q52'], { var1: _dt, var2: projectId, var3: id })
+            let s2 = dbScript(db_sql['Q52'], { var1: _dt, var2: projectId, var3: id, var4 : timeSheetId })
             let deleteTimesheet = await connection.query(s2)
-            let s3 = dbScript(db_sql['Q53'], { var1: _dt, var2: projectId, var3: id })
+            let s3 = dbScript(db_sql['Q53'], { var1: _dt, var2: projectId, var3: id, var4 : timeSheetId })
             let deleteTimesheetAttach = await connection.query(s3)
 
             if (deleteTimesheet.rowCount > 0) {

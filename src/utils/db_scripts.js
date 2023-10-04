@@ -110,16 +110,18 @@ const db_sql = {
                                         SELECT JSON_AGG(
                                         json_build_object(
                                                 'id', ts.id,
-                                                'date',ts.date,
+                                                'date', ts.date,
                                                 'start_time', ts.start_time,
-                                                'end_time',ts.end_time,
-                                                'comments',ts.comments,
-                                                'timesheet_attach_data', (
-                                                SELECT COALESCE(JSON_AGG(ta.*), '[]'::json)
+                                                'end_time', ts.end_time,
+                                                'comments', ts.comments,
+                                                                        'is_timesheet_requested_for_approval',ts.is_timesheet_requested_for_approval,
+                                                                        'is_timesheet_approved',ts.is_timesheet_approved,
+                                                'timesheet_attach_data', COALESCE((
+                                                SELECT JSON_AGG(ta.*)
                                                 FROM timesheet_attach ta
                                                 WHERE ta.timesheet_id = ts.id
                                                 AND ta.deleted_at IS NULL
-                                                )::json
+                                                )::json, '[]'::json)
                                         )
                                         )
                                         FROM timesheet ts
@@ -128,7 +130,21 @@ const db_sql = {
                                         AND ts.deleted_at IS NULL
                                 )::json, '[]'::json),
                                 'project_report_data', COALESCE((
-                                        SELECT JSON_AGG(pr.*)
+                                        SELECT JSON_AGG(
+                                        json_build_object(
+                                                'id', pr.id,
+                                                'date', pr.date,
+                                                                        'description',pr.description,
+                                                                        'is_requested_for_approval',pr.is_requested_for_approval,
+                                                                        'is_approved',pr.is_approved,
+                                                'report_attach_data', COALESCE((
+                                                SELECT JSON_AGG(ra.*)
+                                                FROM report_attach ra
+                                                WHERE ra.report_id = pr.id
+                                                AND ra.deleted_at IS NULL
+                                                )::json, '[]'::json)
+                                        )
+                                        )
                                         FROM project_report pr
                                         WHERE pr.project_id = p.id
                                         AND pr.tech_id = t.id
@@ -146,7 +162,8 @@ const db_sql = {
                 LEFT JOIN customer c ON c.id = p.customer_id
                 WHERE p.id = '{var1}'
                 AND p.deleted_at IS NULL
-                AND c.deleted_at IS NULL;`,
+                AND c.deleted_at IS NULL;
+    `,
         "Q24": `INSERT INTO technician
           (name, surname, position, email_address, encrypted_password, phone_number, nationality, qualification,level, avatar, manager_id)
           VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}', '{var9}', '{var10}', '{var11}') RETURNING *`,
@@ -383,8 +400,8 @@ const db_sql = {
         "Q49":`UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q50":`SELECT * FROM project_report WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL` ,
         "Q51":`UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q52":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-        "Q53":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q52":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q53":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND timesheet_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q54":`UPDATE project SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q55":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}' WHERE id = '{var3}' AND manager_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q56":`UPDATE manager SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
@@ -395,6 +412,8 @@ const db_sql = {
         "Q61": `INSERT INTO report_attach
                (project_id,tech_id,file_path,file_type,file_size, report_id)
                VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
+        "Q62":`UPDATE project_report SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q63":`UPDATE report_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,       
                               
 
 

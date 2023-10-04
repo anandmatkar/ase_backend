@@ -27,11 +27,12 @@ router.get('/timesheetList', verifyTokenTechnician, controller.technician.timesh
 router.get('/timesheetAttachList', verifyTokenTechnician, controller.technician.timesheetAttachList)
 router.post('/uploadTimesheetAttachements', uploadTimesheet.array('files'), controller.technician.uploadTimesheetAttachements)
 router.put('/requestForTimesheetApproval', verifyTokenTechnician, controller.technician.requestForTimesheetApproval)
-router.put('/deleteTimesheet', verifyTokenTechnician, controller.technician.deleteTimesheet)
+router.get('/deleteTimesheet', verifyTokenTechnician, controller.technician.deleteTimesheet)
 
 //================================================Report routes===========================================================//
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
 router.put('/submitReportForApproval', verifyTokenTechnician, controller.report.submitReportForApproval)
 router.post('/uploadReportAttach', uploadReportAttach.array('files'), controller.report.uploadReportAttach)
+router.put('/deleteReport',verifyTokenTechnician, controller.report.deleteReport)
 
 module.exports = router
