@@ -33,6 +33,6 @@ router.get('/deleteTimesheet', verifyTokenTechnician, controller.technician.dele
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
 router.put('/submitReportForApproval', verifyTokenTechnician, controller.report.submitReportForApproval)
 router.post('/uploadReportAttach', uploadReportAttach.array('files'), controller.report.uploadReportAttach)
-router.put('/deleteReport',verifyTokenTechnician, controller.report.deleteReport)
+router.get('/deleteReport',verifyTokenTechnician, controller.report.deleteReport)
 
 module.exports = router
