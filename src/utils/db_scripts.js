@@ -450,7 +450,7 @@ const db_sql = {
                 t.nationality,
                 t.qualification,
                 t.level,
-                t.avatar,
+                t.avatar as profilePic,
                 t.manager_id,
                 t.created_at,
                 t.updated_at,
