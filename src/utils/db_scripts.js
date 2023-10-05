@@ -413,7 +413,32 @@ const db_sql = {
                (project_id,tech_id,file_path,file_type,file_size, report_id)
                VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
         "Q62":`UPDATE project_report SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q63":`UPDATE report_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,       
+        "Q63":`UPDATE report_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q64":`SELECT 
+        ts.id, 
+        ts.project_id, 
+        ts.tech_id, 
+        ts.date, 
+        ts.start_time, 
+        ts.end_time, 
+        ts.comments, 
+        ts.is_timesheet_approved, 
+        ts.is_timesheet_requested_for_approval, 
+        ts.created_at, 
+        ts.updated_at,
+        COALESCE(
+            (
+                SELECT json_agg(ta.*)
+                FROM timesheet_attach ta
+                WHERE ta.timesheet_id = ts.id
+                AND ta.deleted_at IS NULL
+            ), '[]'::json
+        ) AS timesheet_attach
+    FROM timesheet ts
+    WHERE ts.tech_id = '{var1}' 
+        AND ts.project_id = '{var2}' 
+        AND ts.deleted_at IS NULL;
+    `,       
                               
 
 

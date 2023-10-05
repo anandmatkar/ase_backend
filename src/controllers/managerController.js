@@ -573,6 +573,7 @@ module.exports.uploadMachineFiles = async (req, res) => {
     }
 };
 
+//not used anywhere in project
 module.exports.timesheetListsForApproval = async (req, res) => {
     try {
         let { id, position } = req.user
@@ -593,6 +594,46 @@ module.exports.timesheetListsForApproval = async (req, res) => {
                     status: 200,
                     success: false,
                     message: "Empty Timesheet list for approval",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+module.exports.timesheetDetails = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, techId } = req.query
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q64'], { var1: techId, var2 : projectId })
+            let timesheetListTobeApproved = await connection.query(s2)
+            if (timesheetListTobeApproved.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Timesheet Details",
+                    data: timesheetListTobeApproved.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Timesheet",
                     data: []
                 })
             }

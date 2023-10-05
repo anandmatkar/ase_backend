@@ -42,6 +42,7 @@ router.get('/technicianDetailsForManager', verifyTokenManagerORTechnician, contr
 
 router.get('/timesheetListsForApproval', verifyTokenManager, controller.manager.timesheetListsForApproval)
 router.put('/acceptTimesheetRequest', verifyTokenManager, controller.manager.acceptTimesheetRequest)
+router.get('/timesheetDetails', verifyTokenManager, controller.manager.timesheetDetails)
 
 
 //-------------------------------------------------------- Report Routes ----------------------------------------------------//
