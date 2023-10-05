@@ -7,6 +7,7 @@ const router = express.Router();
 //================================================Technician Auth routes==============================================================//
 
 router.post('/techLogin', controller.technician.techLogin)
+router.get('/techLogout', controller.technician.techLogout)
 router.post('/updateTechnicianProfile', verifyTokenTechnician, controller.technician.updateTechnicianProfile)
 router.post('/uploadProfilePic', uploadProfile.single('image'), controller.technician.uploadProfilePic)
 // router.post('/uploadTechnicianDocuments', uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
