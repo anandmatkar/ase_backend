@@ -465,7 +465,14 @@ const db_sql = {
                 technician t
         WHERE
                 t.id = '{var1}' AND
-                t.deleted_at IS NULL; `,                   
+                t.deleted_at IS NULL; `,
+        "Q67":`SELECT pr.id, pr.tech_id, pr.project_id, pr.manager_id,pr.date,pr.description, pr.is_requested_for_approval, pr.is_approved, pr.created_at, pr.updated_at,(
+                SELECT JSON_AGG(ra.*)
+                FROM report_attach ra
+                WHERE ra.report_id = pr.id
+                        AND pr.deleted_at IS NULL
+                ) AS tech_documents
+        FROM project_report pr WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`                           
                               
 
 

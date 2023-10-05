@@ -133,7 +133,7 @@ module.exports.reportDetails = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q50'], { var1: projectId, var2: techId })
+            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: techId })
             let reportDetails = await connection.query(s2)
             if (reportDetails.rowCount > 0) {
                 res.json({
