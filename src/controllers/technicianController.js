@@ -165,6 +165,17 @@ module.exports.techLogin = async (req, res) => {
     }
 }
 
+module.exports.techLogout = async (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+          console.error('Error destroying session:', err);
+        } else {
+          console.log('User logged out');
+          res.redirect('/techLogin'); // Redirect to the homepage or any other appropriate page
+        }
+      });
+}
+
 module.exports.technicianLists = async (req, res) => {
     try {
         let { id, position } = req.user

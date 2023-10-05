@@ -7,6 +7,7 @@ const helmet = require('helmet');
 require('dotenv').config();
 const connection = require('./src/database/connection')
 const Router = require('./src/routes/index');
+const session = require('express-session');
 // Check if the current process is the master process
 if (cluster.isMaster) {
   // Get the number of CPU cores
@@ -34,6 +35,13 @@ if (cluster.isMaster) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static('uploads'));
+
+  app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true } // Use secure: true for HTTPS
+  }));
 
   app.listen(process.env.LISTEN_PORT, () => {
     console.log(`Worker ${cluster.worker.id} | PORT ${process.env.LISTEN_PORT}`);
