@@ -215,7 +215,7 @@ CREATE TABLE public.project_report (
 );
 ALTER TABLE public.project_report OWNER TO postgres;
 
--- timesheet_attach Table
+-- report_attach Table
 CREATE TABLE public.report_attach (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     project_id uuid,
@@ -229,4 +229,18 @@ CREATE TABLE public.report_attach (
     deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
 );
 ALTER TABLE public.report_attach OWNER TO postgres;
+
+-- tech_documents Table
+CREATE TABLE public.tech_documents (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    manager_id uuid,
+    tech_id uuid,
+    file_path character varying,
+    file_type character varying,
+    file_size character varying,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+);
+ALTER TABLE public.tech_documents OWNER TO postgres;
 

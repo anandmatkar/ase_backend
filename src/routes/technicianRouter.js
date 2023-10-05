@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/techLogin', controller.technician.techLogin)
 router.post('/updateTechnicianProfile', verifyTokenTechnician, controller.technician.updateTechnicianProfile)
 router.post('/uploadProfilePic', uploadProfile.single('image'), controller.technician.uploadProfilePic)
-router.post('/uploadTechnicianDocuments', uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
+// router.post('/uploadTechnicianDocuments', uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
 router.get('/showProfile', verifyTokenTechnician, controller.technician.showProfile)
 router.post('/forgotPassword', controller.technician.forgotPassword)
 router.put('/resetPassword', controller.technician.resetPassword)

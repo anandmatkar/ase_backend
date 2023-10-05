@@ -9,7 +9,7 @@ const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNo
 module.exports.createTechnician = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { name, surname, emailAddress, password, phone, nationality, qualification, level, profilePic } = req.body
+        let { name, surname, emailAddress, password, phone, nationality, qualification, level, profilePic, documents } = req.body
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
@@ -27,6 +27,13 @@ module.exports.createTechnician = async (req, res) => {
                 let insertTechnician = await connection.query(s2)
 
                 if (insertTechnician.rowCount > 0) {
+                    if (documents.length > 0) {
+                        for (let file of documents) {
+                            let s3 = dbScript(db_sql['Q65'], { var1 : id, var2 : insertTechnician.rows[0].id, var3 : file.path, var4 : file.type, var5: file.size})
+                            let uploadDocs = await connection.query(s3)
+                            console.log(uploadDocs.rows)
+                        }
+                    }
                     await connection.query('COMMIT')
                     return res.json({
                         status: 201,
@@ -67,7 +74,7 @@ module.exports.createTechnician = async (req, res) => {
     }
 }
 
-//by technician
+//by manager
 module.exports.uploadTechnicianDocuments = async (req, res) => {
     try {
         let files = req.files;
@@ -201,7 +208,7 @@ module.exports.technicianLists = async (req, res) => {
 module.exports.showProfile = async (req, res) => {
     try {
         let { id, position } = req.user
-        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let s1 = dbScript(db_sql['Q66'], { var1: id })
         let findUser = await connection.query(s1)
         if (findUser.rowCount > 0 && position == "Technician") {
             res.json({
@@ -248,7 +255,7 @@ module.exports.uploadProfilePic = async (req, res) => {
 }
 
 module.exports.changePassword = async (req, res) => {
-    
+
     try {
         let userEmail = req.user.email
         const { oldPassword, newPassword } = req.body;
@@ -362,52 +369,52 @@ module.exports.resetPassword = async (req, res) => {
             password
         } = req.body
         await connection.query('BEGIN')
-            let s1 = dbScript(db_sql['Q25'], { var1: emailAddress })
-            let findTechnician = await connection.query(s1);
-            if (findTechnician.rows.length > 0) {
-                if (findTechnician.rows[0].otp == otp) {
-                    const saltRounds = 10;
-                    const salt = bcrypt.genSaltSync(saltRounds);
-                    const encryptedPassword = bcrypt.hashSync(password, salt);
-                    let _dt = new Date().toISOString();
+        let s1 = dbScript(db_sql['Q25'], { var1: emailAddress })
+        let findTechnician = await connection.query(s1);
+        if (findTechnician.rows.length > 0) {
+            if (findTechnician.rows[0].otp == otp) {
+                const saltRounds = 10;
+                const salt = bcrypt.genSaltSync(saltRounds);
+                const encryptedPassword = bcrypt.hashSync(password, salt);
+                let _dt = new Date().toISOString();
 
-                    let s2 = dbScript(db_sql['Q59'], { var1: encryptedPassword, var2: findTechnician.rows[0].id, var3: _dt })
-                    let updatePassword = await connection.query(s2)
+                let s2 = dbScript(db_sql['Q59'], { var1: encryptedPassword, var2: findTechnician.rows[0].id, var3: _dt })
+                let updatePassword = await connection.query(s2)
 
-                    if (updatePassword.rowCount == 1) {
-                        await connection.query('COMMIT')
-                        res.json({
-                            status: 200,
-                            success: true,
-                            message: "Password changed successfully"
-                        })
-                    } else {
-                        await connection.query('ROLLBACK')
-                        res.json({
-                            status: 400,
-                            success: false,
-                            message: "Something went wrong"
-                        })
-                    }
-                }else{
+                if (updatePassword.rowCount == 1) {
+                    await connection.query('COMMIT')
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "Password changed successfully"
+                    })
+                } else {
                     await connection.query('ROLLBACK')
-                        res.json({
-                            status: 400,
-                            success: false,
-                            message: "Please Enter correct OTP"
-                        })
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    })
                 }
-
-
             } else {
+                await connection.query('ROLLBACK')
                 res.json({
-                    status: 404,
+                    status: 400,
                     success: false,
-                    message: "This user is not exits",
-                    data: ""
+                    message: "Please Enter correct OTP"
                 })
             }
-        
+
+
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "This user is not exits",
+                data: ""
+            })
+        }
+
     } catch (error) {
         await connection.query('ROLLBACK')
         res.json({
@@ -812,9 +819,9 @@ module.exports.deleteTimesheet = async (req, res) => {
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q52'], { var1: _dt, var2: projectId, var3: id, var4 : timeSheetId })
+            let s2 = dbScript(db_sql['Q52'], { var1: _dt, var2: projectId, var3: id, var4: timeSheetId })
             let deleteTimesheet = await connection.query(s2)
-            let s3 = dbScript(db_sql['Q53'], { var1: _dt, var2: projectId, var3: id, var4 : timeSheetId })
+            let s3 = dbScript(db_sql['Q53'], { var1: _dt, var2: projectId, var3: id, var4: timeSheetId })
             let deleteTimesheetAttach = await connection.query(s3)
 
             if (deleteTimesheet.rowCount > 0) {
