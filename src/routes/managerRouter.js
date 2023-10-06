@@ -51,6 +51,10 @@ router.get('/timesheetDetails', verifyTokenManager, controller.manager.timesheet
 router.get('/reportDetails', verifyTokenManager, controller.report.reportDetails)
 router.put('/validateReport', verifyTokenManager, controller.report.validateReport)
 
+//-------------------------------------------------------- Machine Routes ----------------------------------------------------//
+
+router.get('/machineDetails', verifyTokenManager, controller.machine.machineDetails)
+
 
 
 router.post('/uploadMachineFiles', uploadMachineFiles.array('files'), controller.manager.uploadMachineFiles);

@@ -4,7 +4,7 @@ const customer = require('./customerController')
 const project = require('./projectController')
 const technician = require('./technicianController')
 const report = require('./reportController')
-
+const machine = require('./machineController')
 
 const controller = {
     admin,
@@ -12,7 +12,8 @@ const controller = {
     customer,
     project,
     technician,
-    report
+    report,
+    machine
 }
 
 module.exports = controller

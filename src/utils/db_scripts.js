@@ -515,31 +515,69 @@ const db_sql = {
                 t.id = '{var1}' AND
                 t.deleted_at IS NULL; `,
         "Q67":`SELECT
-        pr.id,
-        pr.tech_id,
-        pr.project_id,
-        pr.manager_id,
-        pr.date,
-        pr.description,
-        pr.is_requested_for_approval,
-        pr.is_approved,
-        pr.created_at,
-        pr.updated_at,
-        COALESCE(
-            (
-                SELECT JSON_AGG(ra.*)
-                FROM report_attach ra
-                WHERE ra.report_id = pr.id
-            ),
-            '[]'::json
-        ) AS project_documents
-    FROM
-        project_report pr
-    WHERE
-        project_id = '{var1}' AND
-        tech_id = '{var2}' AND
-        pr.deleted_at IS NULL;
-    `                           
+                        pr.id,
+                        pr.tech_id,
+                        pr.project_id,
+                        pr.manager_id,
+                        pr.date,
+                        pr.description,
+                        pr.is_requested_for_approval,
+                        pr.is_approved,
+                        pr.created_at,
+                        pr.updated_at,
+                        COALESCE(
+                        (
+                                SELECT JSON_AGG(ra.*)
+                                FROM report_attach ra
+                                WHERE ra.report_id = pr.id
+                        ),
+                        '[]'::json
+                        ) AS project_documents
+                FROM
+                        project_report pr
+                WHERE
+                        project_id = '{var1}' AND
+                        tech_id = '{var2}' AND
+                        pr.deleted_at IS NULL;`,
+        "Q68":`SELECT
+                        p.id AS project_id,
+                        p.order_id,
+                        p.customer_id,
+                        p.project_type,
+                        p.description,
+                        p.start_date,
+                        p.end_date,
+                        p.created_at,
+                        p.is_completed,
+                        p.manager_id,
+                        json_agg(
+                        json_build_object(
+                                'machine_id', m.id,
+                                'machine_type', m.machine_type,
+                                        'serial',m.serial,
+                                        'hour_count',m.hour_count,
+                                        'nom_speed',m.nom_speed,
+                                        'act_speed',m.act_speed,
+                                        'description',m.description,
+                                'machine_attach', (
+                                SELECT json_agg(ma.*)
+                                FROM machine_attach ma
+                                WHERE ma.machine_id = m.id
+                                AND m.deleted_at IS NULL
+                                AND ma.deleted_at IS NULL
+                                )
+                        )
+                        ) AS machine_data
+                FROM
+                        project p
+                JOIN
+                        machine m
+                ON
+                        p.id = m.project_id
+                WHERE
+                        p.deleted_at IS NULL
+                GROUP BY
+                        p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;`                           
                               
 
 
