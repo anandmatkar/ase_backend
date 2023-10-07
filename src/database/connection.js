@@ -1,7 +1,7 @@
 const { Pool } = require('pg')
 var connection = new Pool({
     host: "localhost",
-    user:"fse",
+    user:"postgres",
     password:"Developer123#",
     database: "fse_project",
     charset: 'utf8mb4'
