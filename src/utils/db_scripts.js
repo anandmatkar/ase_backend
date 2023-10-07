@@ -577,7 +577,8 @@ const db_sql = {
                 WHERE
                         p.deleted_at IS NULL
                 GROUP BY
-                        p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;`                           
+                        p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;`,
+        "Q69":`UPDATE machine SET machine_type = '{var1}', serial = '{var2}', hour_count = '{var3}', nom_speed = '{var4}', act_speed = '{var5}', description = '{var6}', updated_at = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`                                           
                               
 
 
