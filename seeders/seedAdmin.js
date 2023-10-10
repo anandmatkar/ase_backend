@@ -7,8 +7,8 @@ require('dotenv').config()
 var connection = new Pool({
     host: "localhost",
     user:"postgres",
-    password:"Chetan@123",
-    database: "ase_project",
+    password:"Developer123#",
+    database: "fse_project",
     charset: 'utf8mb4'
 });
 

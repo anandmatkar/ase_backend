@@ -50,7 +50,7 @@ module.exports.createManager = async (req, res) => {
 
             // Send the email in the background
             // const token = await issueJWT(insertManager.rows[0], 'Manager');
-            const link = `http://localhost:3000/verifyManager`;
+            const link = `http://3.110.86.245/verifyManager`;
 
 
             welcomeEmail2(emailAddress, link, otp, name);
