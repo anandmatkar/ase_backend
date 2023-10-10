@@ -16,10 +16,11 @@ router.post('/forgotPassword', controller.technician.forgotPassword)
 router.put('/resetPassword', controller.technician.resetPassword)
 router.put('/changePassword',verifyTokenTechnician, controller.technician.changePassword)
 
-//================================================Technician Peroject routes===========================================================//
+//================================================Technician Project routes===========================================================//
 
 router.get('/assignedProjectList', verifyTokenTechnician, controller.technician.assignedProjectList)
 router.get('/assignedProjectDetails', verifyTokenTechnician, controller.technician.assignedProjectDetails)
+router.get('/assignedProjectCounts', verifyTokenTechnician, controller.technician.assignedProjectCounts)
 
 //================================================Technician timesheet routes===========================================================//
 

@@ -536,6 +536,61 @@ module.exports.assignedProjectList = async (req, res) => {
     }
 }
 
+module.exports.assignedProjectCounts = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s2 = dbScript(db_sql['Q30'], { var1: id })
+            let findAssignedProjectList = await connection.query(s2)
+            if (findAssignedProjectList.rows.length > 0) {
+                let assignedProjectCount = 0;
+                let completedProjectCount = 0;
+                let projectWaitingApprovalCount = 0;
+                findAssignedProjectList.rows.forEach((project) => {
+                    if (project.is_requested_for_approval === true) {
+                        projectWaitingApprovalCount++;
+                    } else if (project.is_completed === false) {
+                        assignedProjectCount++;
+                    } else if (project.is_completed === true) {
+                        completedProjectCount++;
+                    }
+                });
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Project Counts",
+                    data: {
+                        assignedProjectCount,
+                        completedProjectCount,
+                        projectWaitingApprovalCount
+                    }
+                });
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "No Projects Found on your dashboard"
+                });
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+
 module.exports.assignedProjectDetails = async (req, res) => {
     try {
         let { id, position } = req.user
