@@ -27,7 +27,7 @@ if (cluster.isMaster) {
   // This code will be executed in worker processes
   const frontendIP = 'http://3.110.86.245';
   const corsOptions = {
-    origin: frontendIP,
+    origin: "*",
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // enable credentials (if needed)
     optionsSuccessStatus: 204,
