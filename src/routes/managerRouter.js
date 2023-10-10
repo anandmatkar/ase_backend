@@ -28,6 +28,7 @@ router.put('/deleteCustomer', verifyTokenManager, controller.customer.deleteCust
 
 router.post('/createProject', verifyTokenManager, controller.project.createProject)
 router.get('/projectList', verifyTokenManager, controller.project.projectList)
+router.get('/projectCount', verifyTokenManager, controller.project.projectCount)
 router.get('/projectDetails', verifyTokenManager, controller.project.projectDetails)
 router.put('/deleteProject', verifyTokenManager, controller.project.deleteProject)
 router.post('/uploadProjectAttach', uploadProjectAttachments.array('files'), controller.project.uploadProjectAttach)

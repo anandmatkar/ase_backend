@@ -181,6 +181,64 @@ module.exports.projectList = async (req, res) => {
     }
 }
 
+module.exports.projectCount = async (req, res) => {
+    try {
+        let { id, position } = req.user;
+        let s1 = dbScript(db_sql['Q7'], { var1: id });
+        let findManager = await connection.query(s1);
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q22'], { var1: id });
+            let projectList = await connection.query(s2);
+            if (projectList.rowCount > 0) {
+                let completedProjectsCount = 0;
+                let projectInProgressCount = 0;
+                let projectRequestedForApprovalCount = 0;
+
+                projectList.rows.forEach(row => {
+                    if (row.is_completed == true && row.is_requested_for_approval == false) {
+                        completedProjectsCount++;
+                    } else if (row.is_completed == false && row.is_requested_for_approval == false) {
+                        projectInProgressCount++;
+                    } else if (row.is_requested_for_approval == true) {
+                        projectRequestedForApprovalCount++;
+                    }
+                });
+
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Project Counts",
+                    data: {
+                        completedProjectsCount,
+                        projectInProgressCount,
+                        projectRequestedForApprovalCount
+                    }
+                });
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty project list",
+                    data: {}
+                });
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 400,
+            message: error.message,
+        });
+    }
+}
+
+
 //Project Details for Manager
 module.exports.projectDetails = async (req, res) => {
     try {
