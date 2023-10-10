@@ -25,8 +25,14 @@ if (cluster.isMaster) {
   });
 } else {
   // This code will be executed in worker processes
-
-  app.use(cors());
+  const frontendIP = 'http://3.110.86.245';
+  const corsOptions = {
+    origin: frontendIP,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // enable credentials (if needed)
+    optionsSuccessStatus: 204,
+  };
+  app.use(cors(corsOptions));
   app.use(
     helmet({
       crossOriginResourcePolicy: false,
