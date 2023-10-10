@@ -84,3 +84,52 @@ module.exports.editMachineDetails = async (req, res) => {
     }
 }
 
+module.exports.deleteMachine = async (req, res) => {
+    try {
+        let { id, position, email } = req.user
+        let { machineId, projectId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql['Q70'], { var1: _dt, var2: machineId, var3: projectId })
+            let deleteMachine = await connection.query(s2)
+
+            let s4 = dbScript(db_sql['Q72'], { var1: _dt, var2: machineId, var3: projectId })
+            let deleteMachineAttach = await connection.query(s4)
+
+            let s3 = dbScript(db_sql['Q71'], { var1: _dt, var2: machineId, var3: projectId })
+            let deleteTechMachine = await connection.query(s3)
+
+            if (deleteTechMachine.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Machine Deleted Successfully."
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            success: false,
+            status: 400,
+            message: error.message,
+        })
+    }
+}
+
