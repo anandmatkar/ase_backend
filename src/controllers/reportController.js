@@ -11,7 +11,7 @@ module.exports.createReport = async (req, res) => {
     try {
         let { id, position } = req.user
         let { projectID, date, description, attachment } = req.body
-        console.log(attachment.length,"11111111")
+        
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)

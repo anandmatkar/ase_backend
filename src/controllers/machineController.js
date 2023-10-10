@@ -101,7 +101,7 @@ module.exports.deleteMachine = async (req, res) => {
 
             let s3 = dbScript(db_sql['Q71'], { var1: _dt, var2: machineId, var3: projectId })
             let deleteTechMachine = await connection.query(s3)
-
+            
             if (deleteTechMachine.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({

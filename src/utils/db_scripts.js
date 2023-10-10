@@ -540,44 +540,46 @@ const db_sql = {
                         tech_id = '{var2}' AND
                         pr.deleted_at IS NULL;`,
         "Q68":`SELECT
-                        p.id AS project_id,
-                        p.order_id,
-                        p.customer_id,
-                        p.project_type,
-                        p.description,
-                        p.start_date,
-                        p.end_date,
-                        p.created_at,
-                        p.is_completed,
-                        p.manager_id,
-                        json_agg(
-                        json_build_object(
-                                'machine_id', m.id,
-                                'machine_type', m.machine_type,
-                                        'serial',m.serial,
-                                        'hour_count',m.hour_count,
-                                        'nom_speed',m.nom_speed,
-                                        'act_speed',m.act_speed,
-                                        'description',m.description,
-                                'machine_attach', (
-                                SELECT json_agg(ma.*)
-                                FROM machine_attach ma
-                                WHERE ma.machine_id = m.id
-                                AND m.deleted_at IS NULL
-                                AND ma.deleted_at IS NULL
-                                )
-                        )
-                        ) AS machine_data
-                FROM
-                        project p
-                JOIN
-                        machine m
-                ON
-                        p.id = m.project_id
-                WHERE
-                        p.deleted_at IS NULL
-                GROUP BY
-                        p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;`,
+        p.id AS project_id,
+        p.order_id,
+        p.customer_id,
+        p.project_type,
+        p.description,
+        p.start_date,
+        p.end_date,
+        p.created_at,
+        p.is_completed,
+        p.manager_id,
+        json_agg(
+            json_build_object(
+                'machine_id', m.id,
+                'machine_type', m.machine_type,
+                'serial',m.serial,
+                'hour_count',m.hour_count,
+                'nom_speed',m.nom_speed,
+                'act_speed',m.act_speed,
+                'description',m.description,
+                'machine_attach', (
+                    SELECT json_agg(ma.*)
+                    FROM machine_attach ma
+                    WHERE ma.machine_id = m.id
+                    AND ma.deleted_at IS NULL
+                )
+            )
+        ) AS machine_data
+    FROM
+        project p
+    JOIN
+        machine m
+    ON
+        p.id = m.project_id
+    AND
+        m.deleted_at IS NULL
+    WHERE
+        p.deleted_at IS NULL
+    GROUP BY
+        p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;
+    `,
         "Q69":`UPDATE machine SET machine_type = '{var1}', serial = '{var2}', hour_count = '{var3}', nom_speed = '{var4}', act_speed = '{var5}', description = '{var6}', updated_at = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
         "Q70":`UPDATE machine SET deleted_at = '{var1}' WHERE id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q71":`UPDATE tech_machine SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,

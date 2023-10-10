@@ -31,7 +31,6 @@ module.exports.createTechnician = async (req, res) => {
                         for (let file of documents) {
                             let s3 = dbScript(db_sql['Q65'], { var1 : id, var2 : insertTechnician.rows[0].id, var3 : file.path, var4 : file.type, var5: file.size})
                             let uploadDocs = await connection.query(s3)
-                            console.log(uploadDocs.rows)
                         }
                     }
                     await connection.query('COMMIT')
@@ -170,7 +169,6 @@ module.exports.techLogout = async (req, res) => {
         if (err) {
           console.error('Error destroying session:', err);
         } else {
-          console.log('User logged out');
           res.redirect('/techLogin'); // Redirect to the homepage or any other appropriate page
         }
       });
