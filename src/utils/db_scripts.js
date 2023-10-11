@@ -273,8 +273,8 @@ const db_sql = {
                     t.created_at,
                     t.updated_at,
                     t.deleted_at,
-                    (
-                        SELECT JSON_AGG(json_build_object(
+                    COALESCE(
+                        (SELECT JSON_AGG(json_build_object(
                             'id', ts.id,
                             'date', ts.date,
                             'start_time', ts.start_time,
@@ -282,39 +282,39 @@ const db_sql = {
                             'comments', ts.comments,
                             'is_timesheet_requested_for_approval', ts.is_timesheet_requested_for_approval,
                             'is_timesheet_approved', ts.is_timesheet_approved,
-                            'timesheet_attach_data', COALESCE((
-                                SELECT JSON_AGG(ta.*)
+                            'timesheet_attach_data', COALESCE(
+                                (SELECT JSON_AGG(ta.*)
                                 FROM timesheet_attach ta
                                 WHERE ta.timesheet_id = ts.id
                                 AND ta.deleted_at IS NULL
-                            ), '[]'::json)
+                                ), '[]')
                         ))
                         FROM timesheet ts
                         WHERE ts.tech_id = t.id
                         AND ts.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                         AND ts.deleted_at IS NULL
-                    ) AS timesheet_data,
-                    (
-                        SELECT JSON_AGG(json_build_object(
+                        ), '[]') AS timesheet_data,
+                        COALESCE(
+                        (SELECT JSON_AGG(json_build_object(
                             'id', pr.id,
                             'date', pr.date,
                             'description', pr.description,
                             'is_requested_for_approval', pr.is_requested_for_approval,
                             'is_approved', pr.is_approved,
-                            'report_attach_data', COALESCE((
-                                SELECT JSON_AGG(ra.*)
+                            'report_attach_data', COALESCE(
+                                (SELECT JSON_AGG(ra.*)
                                 FROM report_attach ra
                                 WHERE ra.report_id = pr.id
                                 AND ra.deleted_at IS NULL
-                            ), '[]'::json)
+                                ), '[]')
                         ))
                         FROM project_report pr
                         WHERE pr.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                         AND pr.tech_id = t.id
                         AND pr.deleted_at IS NULL
-                    ) AS project_report_data,
-                    (
-                        SELECT JSON_AGG(json_build_object(
+                        ), '[]') AS project_report_data,
+                        COALESCE(
+                        (SELECT JSON_AGG(json_build_object(
                             'id', m.id,
                             'machine_type', m.machine_type,
                             'hour_count', m.hour_count,
@@ -322,12 +322,12 @@ const db_sql = {
                             'nom_speed', m.nom_speed,
                             'act_speed', m.act_speed,
                             'description', m.description,
-                            'machine_attach_data', COALESCE((
-                                SELECT JSON_AGG(ma.*)
+                            'machine_attach_data', COALESCE(
+                                (SELECT JSON_AGG(ma.*)
                                 FROM machine_attach ma
                                 WHERE ma.machine_id = m.id
                                 AND ma.deleted_at IS NULL
-                            ), '[]'::json)
+                                ), '[]')
                         ))
                         FROM machine m
                         INNER JOIN tech_machine tm ON m.id = tm.machine_id
@@ -335,43 +335,43 @@ const db_sql = {
                         AND tm.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                         AND tm.deleted_at IS NULL
                         AND m.deleted_at IS NULL
-                    ) AS machine_data
-                FROM unique_technicians t
-            ) AS tech_data
-        )
-        SELECT
-            p.id AS project_id,
-            p.order_id,
-            p.customer_id,
-            p.project_type,
-            p.description,
-            p.start_date,
-            p.end_date,
-            p.created_at,
-            p.is_completed,
-            p.manager_id,
-            c.id AS customer_id,
-            c.customer_name,
-            c.customer_contact,
-            c.customer_account,
-            c.email_address,
-            c.phone_number,
-            c.country,
-            c.city,
-            c.address,
-            c.scope_of_work,
-            COALESCE((
-                SELECT JSON_AGG(pa.*)
+                        ), '[]') AS machine_data
+                    FROM unique_technicians t
+                ) AS tech_data
+            )
+            SELECT
+                p.id AS project_id,
+                p.order_id,
+                p.customer_id,
+                p.project_type,
+                p.description,
+                p.start_date,
+                p.end_date,
+                p.created_at,
+                p.is_completed,
+                p.manager_id,
+                c.id AS customer_id,
+                c.customer_name,
+                c.customer_contact,
+                c.customer_account,
+                c.email_address,
+                c.phone_number,
+                c.country,
+                c.city,
+                c.address,
+                c.scope_of_work,
+                COALESCE(
+                (SELECT JSON_AGG(pa.*)
                 FROM project_attach pa
                 WHERE pa.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                 AND pa.deleted_at IS NULL
-            ), '[]'::json) AS project_attach_data,
-            COALESCE((SELECT * FROM technician_data), '[]'::json) AS technician_data
-        FROM project AS p
-        LEFT JOIN customer c ON c.id = p.customer_id
-        WHERE p.id = '{var1}'
-        AND p.deleted_at IS NULL
-        AND c.deleted_at IS NULL;
+                ), '[]') AS project_attach_data,
+                (SELECT * FROM technician_data) AS technician_data
+            FROM project AS p
+            LEFT JOIN customer c ON c.id = p.customer_id
+            WHERE p.id = '{var1}'
+            AND p.deleted_at IS NULL
+            AND c.deleted_at IS NULL;
         `,
         "Q32": `INSERT INTO timesheet
                (project_id, tech_id, date, start_time, end_time, comments, manager_id)
