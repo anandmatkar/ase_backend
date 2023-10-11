@@ -16,7 +16,7 @@ module.exports.createProject = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q12'], {})
+            let s2 = dbScript(db_sql['Q12'], { var1 : id})
             let findProject = await connection.query(s2)
 
             let orderId = findProject.rowCount > 0 ? Number(findProject.rows[0].order_id) + 1 : 1

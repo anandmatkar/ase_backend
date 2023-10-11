@@ -20,7 +20,7 @@ const db_sql = {
         "Q11": `INSERT INTO project
           (order_id,customer_id,project_type,description,start_date,end_date,manager_id) 
           VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}') RETURNING *`,
-        "Q12": `SELECT * FROM project ORDER BY created_at DESC `,
+        "Q12": `SELECT * FROM project WHERE manager_id = '{var1}' ORDER BY created_at DESC `,
         "Q13": `UPDATE manager SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q14": `UPDATE manager SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', avatar = '{var5}', updated_at = '{var7}' WHERE id = '{var6}' AND deleted_at IS NULL`,
         "Q15": `INSERT INTO machine
