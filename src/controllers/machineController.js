@@ -133,3 +133,44 @@ module.exports.deleteMachine = async (req, res) => {
     }
 }
 
+module.exports.machineData = async(req,res) => {
+    try {
+        let { id, position, email } = req.user
+        let { machineId, projectId } = req.query
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q73'], { var1: machineId, var2 : projectId })
+            console.log(s2)
+            let findMachineData = await connection.query(s2)
+            if(findMachineData.rowCount > 0){
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Machine Data",
+                    data: findMachineData.rows
+                }) 
+            }else{
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Machine Data",
+                    data: []
+                })   
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 400,
+            message: error.message,
+        })
+    }
+}
+

@@ -55,6 +55,7 @@ router.put('/validateReport', verifyTokenManager, controller.report.validateRepo
 //-------------------------------------------------------- Machine Routes ----------------------------------------------------//
 
 router.get('/machineDetails', verifyTokenManager, controller.machine.machineDetails)
+router.get('/machineData', verifyTokenManager, controller.machine.machineData)
 router.put('/editMachineDetails', verifyTokenManager, controller.machine.editMachineDetails)
 router.put('/deleteMachine', verifyTokenManager, controller.machine.deleteMachine)
 

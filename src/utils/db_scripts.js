@@ -585,7 +585,33 @@ const db_sql = {
         "Q69":`UPDATE machine SET machine_type = '{var1}', serial = '{var2}', hour_count = '{var3}', nom_speed = '{var4}', act_speed = '{var5}', description = '{var6}', updated_at = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
         "Q70":`UPDATE machine SET deleted_at = '{var1}' WHERE id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q71":`UPDATE tech_machine SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-        "Q72":`UPDATE machine_attach SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,                                            
+        "Q72":`UPDATE machine_attach SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q73": `SELECT
+        m.id AS machine_id,
+        m.order_id,
+        m.project_id,
+        m.machine_type,
+        m.serial,
+        m.hour_count,
+        m.nom_speed,
+        m.act_speed,
+        m.description,
+        m.created_at,
+        m.updated_at,
+        m.deleted_at,
+        'machine_attach',
+        COALESCE(
+            (
+                SELECT json_agg(ma.*)
+                FROM machine_attach ma
+                WHERE ma.machine_id = m.id
+                AND ma.deleted_at IS NULL
+            ),
+            '[]'::json
+        ) AS machine_attach
+    FROM machine m
+    WHERE m.id = '{var1}' AND m.project_id = '{var2}' AND m.deleted_at IS NULL;
+    `                                           
                               
 
 
