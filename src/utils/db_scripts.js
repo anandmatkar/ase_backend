@@ -251,7 +251,7 @@ const db_sql = {
                 t.deleted_at
             FROM technician t
             JOIN tech_machine tm ON t.id = tm.tech_id
-            WHERE t.id = '29abc70b-a61f-423c-ac0e-8f5e7aeb8d78'
+            WHERE t.id = '{var2}'
             AND t.deleted_at IS NULL
         )
         , technician_data AS (
@@ -287,11 +287,11 @@ const db_sql = {
                                 FROM timesheet_attach ta
                                 WHERE ta.timesheet_id = ts.id
                                 AND ta.deleted_at IS NULL
-                            ), '[]')
+                            ), '[]'::json)
                         ))
                         FROM timesheet ts
                         WHERE ts.tech_id = t.id
-                        AND ts.project_id = (SELECT id FROM project WHERE project.id = '32732260-19b7-4631-8789-cd45f6ebca3d')
+                        AND ts.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                         AND ts.deleted_at IS NULL
                     ) AS timesheet_data,
                     (
@@ -306,10 +306,10 @@ const db_sql = {
                                 FROM report_attach ra
                                 WHERE ra.report_id = pr.id
                                 AND ra.deleted_at IS NULL
-                            ), '[]')
+                            ), '[]'::json)
                         ))
                         FROM project_report pr
-                        WHERE pr.project_id = (SELECT id FROM project WHERE project.id = '32732260-19b7-4631-8789-cd45f6ebca3d')
+                        WHERE pr.project_id = (SELECT id FROM project WHERE project.id = 'var1')
                         AND pr.tech_id = t.id
                         AND pr.deleted_at IS NULL
                     ) AS project_report_data,
@@ -327,12 +327,12 @@ const db_sql = {
                                 FROM machine_attach ma
                                 WHERE ma.machine_id = m.id
                                 AND ma.deleted_at IS NULL
-                            ), '[]')
+                            ), '[]'::json)
                         ))
                         FROM machine m
                         INNER JOIN tech_machine tm ON m.id = tm.machine_id
                         WHERE tm.tech_id = t.id
-                        AND tm.project_id = (SELECT id FROM project WHERE project.id = '32732260-19b7-4631-8789-cd45f6ebca3d')
+                        AND tm.project_id = (SELECT id FROM project WHERE project.id = 'var1')
                         AND tm.deleted_at IS NULL
                         AND m.deleted_at IS NULL
                     ) AS machine_data
@@ -363,13 +363,13 @@ const db_sql = {
             COALESCE((
                 SELECT JSON_AGG(pa.*)
                 FROM project_attach pa
-                WHERE pa.project_id = (SELECT id FROM project WHERE project.id = '32732260-19b7-4631-8789-cd45f6ebca3d')
+                WHERE pa.project_id = (SELECT id FROM project WHERE project.id = 'var1')
                 AND pa.deleted_at IS NULL
-            ), '[]') AS project_attach_data,
-            (SELECT * FROM technician_data) AS technician_data
+            ), '[]'::json) AS project_attach_data,
+            COALESCE((SELECT * FROM technician_data), '[]'::json) AS technician_data
         FROM project AS p
         LEFT JOIN customer c ON c.id = p.customer_id
-        WHERE p.id = '32732260-19b7-4631-8789-cd45f6ebca3d'
+        WHERE p.id = '{var1}'
         AND p.deleted_at IS NULL
         AND c.deleted_at IS NULL;
         `,
