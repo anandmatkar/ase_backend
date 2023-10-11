@@ -309,7 +309,7 @@ const db_sql = {
                             ), '[]'::json)
                         ))
                         FROM project_report pr
-                        WHERE pr.project_id = (SELECT id FROM project WHERE project.id = 'var1')
+                        WHERE pr.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                         AND pr.tech_id = t.id
                         AND pr.deleted_at IS NULL
                     ) AS project_report_data,
@@ -332,7 +332,7 @@ const db_sql = {
                         FROM machine m
                         INNER JOIN tech_machine tm ON m.id = tm.machine_id
                         WHERE tm.tech_id = t.id
-                        AND tm.project_id = (SELECT id FROM project WHERE project.id = 'var1')
+                        AND tm.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                         AND tm.deleted_at IS NULL
                         AND m.deleted_at IS NULL
                     ) AS machine_data
@@ -363,7 +363,7 @@ const db_sql = {
             COALESCE((
                 SELECT JSON_AGG(pa.*)
                 FROM project_attach pa
-                WHERE pa.project_id = (SELECT id FROM project WHERE project.id = 'var1')
+                WHERE pa.project_id = (SELECT id FROM project WHERE project.id = '{var1}')
                 AND pa.deleted_at IS NULL
             ), '[]'::json) AS project_attach_data,
             COALESCE((SELECT * FROM technician_data), '[]'::json) AS technician_data
