@@ -489,31 +489,32 @@ const db_sql = {
         "Q65":`INSERT INTO tech_documents(manager_id, tech_id,file_path, file_type, file_size)
                 VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
         "Q66":`SELECT
-                t.id,
-                t.name,
-                t.surname,
-                t.position,
-                t.email_address,
-                t.phone_number,
-                t.nationality,
-                t.qualification,
-                t.level,
-                t.avatar as profilePic,
-                t.manager_id,
-                t.created_at,
-                t.updated_at,
-                t.deleted_at,
-                (
+        t.id,
+        t.name,
+        t.surname,
+        t.position,
+        t.email_address,
+        t.phone_number,
+        t.nationality,
+        t.qualification,
+        t.level,
+        t.avatar as profilePic,
+        t.manager_id,
+        t.created_at,
+        t.updated_at,
+        t.deleted_at,
+        COALESCE(
+            (
                 SELECT JSON_AGG(td.*)
                 FROM tech_documents td
                 WHERE td.tech_id = t.id
-                        AND td.deleted_at IS NULL
-                ) AS tech_documents
-        FROM
-                technician t
-        WHERE
-                t.id = '{var1}' AND
-                t.deleted_at IS NULL; `,
+                    AND td.deleted_at IS NULL
+            ),
+            '[]'::json
+        ) AS tech_documents
+    FROM technician t
+    WHERE t.id = '{var1}' AND t.deleted_at IS NULL;
+     `,
         "Q67":`SELECT
                         pr.id,
                         pr.tech_id,

@@ -708,7 +708,7 @@ module.exports.technicianDetailsForManager = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findUser = await connection.query(s1)
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql['Q27'], { var1: techId })
+            let s2 = dbScript(db_sql['Q66'], { var1: techId })
             let technicianDetails = await connection.query(s2)
             if (technicianDetails.rowCount > 0) {
                 res.json({
