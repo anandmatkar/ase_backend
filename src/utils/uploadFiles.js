@@ -44,7 +44,7 @@ const uploadTechnicianDocuments = multer({
 
 const storage4 = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/technicianDocuments')
+        cb(null, 'uploads/timesheetAttachements')
     },
     filename: function (req, file, cb) {
         const ext = file.mimetype.split('/')[1];
