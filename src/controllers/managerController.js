@@ -27,7 +27,7 @@ module.exports.createManager = async (req, res) => {
 
         // Use transactions for database operations
         await connection.query("BEGIN");
-        let otp = Math.floor(Math.random() * 10000)
+        let otp = Math.floor(1000 + Math.random() * 9000);
         // Insert the manager data into the database
         const insertManager = await connection.query(
             dbScript(db_sql['Q6'], {
@@ -441,7 +441,7 @@ module.exports.forgotPassword = async (req, res) => {
         let findManager = await connection.query(s1);
         if (findManager.rows.length > 0) {
             await connection.query("BEGIN")
-            let otp = Math.floor(Math.random() * 10000)
+            let otp = Math.floor(1000 + Math.random() * 9000);
             let s2 = dbScript(db_sql['Q56'], { var1: otp, var2: findManager.rows[0].id })
             let updateOtp = await connection.query(s2);
             if (updateOtp.rowCount > 0) {

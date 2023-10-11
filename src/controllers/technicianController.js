@@ -332,7 +332,7 @@ module.exports.forgotPassword = async (req, res) => {
         let findTechnician = await connection.query(s1);
         if (findTechnician.rows.length > 0) {
             await connection.query("BEGIN")
-            let otp = Math.floor(Math.random() * 10000)
+            let otp = Math.floor(1000 + Math.random() * 9000);
             let s2 = dbScript(db_sql['Q58'], { var1: otp, var2: findTechnician.rows[0].id })
             let updateOtp = await connection.query(s2);
             if (updateOtp.rowCount > 0) {
