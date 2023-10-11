@@ -577,6 +577,7 @@ const db_sql = {
     AND
         m.deleted_at IS NULL
     WHERE
+        p.manager_id = '{var1}' AND
         p.deleted_at IS NULL
     GROUP BY
         p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;
