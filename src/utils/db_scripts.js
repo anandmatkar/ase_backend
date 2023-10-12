@@ -174,18 +174,21 @@ const db_sql = {
                     )::json, '[]'::json)
                 )
             )
-            FROM technician t
-            JOIN tech_machine tm ON t.id = tm.tech_id
-            WHERE tm.project_id = p.id
-            AND tm.deleted_at IS NULL
-            AND t.deleted_at IS NULL
+            FROM (
+                SELECT DISTINCT t.id
+                FROM technician t
+                JOIN tech_machine tm ON t.id = tm.tech_id
+                WHERE tm.project_id = p.id
+                AND tm.deleted_at IS NULL
+                AND t.deleted_at IS NULL
+            ) AS distinct_technicians
+            JOIN technician t ON distinct_technicians.id = t.id
         )::json, '[]'::json) AS technician_data
     FROM project AS p
     LEFT JOIN customer c ON c.id = p.customer_id
     WHERE p.id = '{var1}'
     AND p.deleted_at IS NULL
     AND c.deleted_at IS NULL;
-    
     `,
         "Q24": `INSERT INTO technician
           (name, surname, position, email_address, encrypted_password, phone_number, nationality, qualification,level, avatar, manager_id)
