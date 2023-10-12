@@ -22,7 +22,7 @@ module.exports.resetPassword = function (otp, email, userName) {
                         align="center" cellpadding="0" cellspacing="0">
                         <tr>
                             <td style="text-align:left; padding-top: 20px; padding-left: 50px;">
-                              <a href="https://app1.hirisetech.com/" title="logo" target="_blank">
+                              <a href="#" title="logo" target="_blank">
                                 <img src=${process.env.TEMPLATE_LOGO} alt="logo" 
                                 style=" width: 120px;">
                               </a>
@@ -38,7 +38,7 @@ module.exports.resetPassword = function (otp, email, userName) {
                                             <br style="color:#455056; font-size:15px;line-height:24px; margin:0;">
                                             Hello ${userName}, <br>
                                             <br/>
-                                            <center> <img  src="https://hirisetech.com/img/core-img/eyes.png" alt="eyes" style="width: 5%;" > </center>
+                                            <center> <img  src="#" alt="eyes" style="width: 5%;" > </center>
                                             <h4 style="text-align:center;">Password Reset</h4>
 
 

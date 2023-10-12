@@ -20,7 +20,7 @@ module.exports.welcomeEmail2 = async (email, link,otp, userName) => {
     const smtpPassword = process.env.SMTP_PASSWORD;
 
     // The subject line of the email
-    var subject = "Welcome to HiRise";
+    var subject = "Welcome to Fse";
     // The email body for recipients with non-HTML email clients.
     var body_text = `Please use the below link to activate your account and reset your password`;
 

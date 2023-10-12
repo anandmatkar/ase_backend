@@ -24,7 +24,7 @@ module.exports.projectNotification = function (data) {
                         width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
                         <tr>
                             <td style="text-align:left; padding-top: 20px; padding-left: 50px;">
-                                <a href="https://app1.hirisetech.com/" title="logo" target="_blank">
+                                <a href="#" title="logo" target="_blank">
                                     <img src="${process.env.TEMPLATE_LOGO}" alt="logo" style=" width: 120px;">
                                 </a>
                             </td>
