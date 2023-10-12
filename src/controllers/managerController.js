@@ -206,47 +206,55 @@ module.exports.managerLogin = async (req, res) => {
         let s1 = dbScript(db_sql['Q5'], { var1: email })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0) {
-            if (findManager.rows[0].status == 2) {
-                const result = await bcrypt.compare(password, findManager.rows[0].encrypted_password);
-                if (result) {
-                    let jwtToken = await issueJWT(findManager.rows[0], "Manager");
-                    res.send({
-                        status: 200,
-                        success: true,
-                        message: "Login successfull",
-                        data: {
-                            token: jwtToken,
-                            id: findManager.rows[0].id,
-                            name: findManager.rows[0].name,
-                            surname: findManager.rows[0].surname,
-                            company: findManager.rows[0].company,
-                            position: findManager.rows[0].position,
-                            email_address: findManager.rows[0].email_address,
-                            phone_number: findManager.rows[0].phone_number,
-                            avatar: findManager.rows[0].avatar,
-                            created_at: findManager.rows[0].created_at,
-                            updated_at: findManager.rows[0].updated_at,
-                            deleted_at: findManager.rows[0].deleted_at
-                        }
-                    });
+            if (findManager.rows[0].status != -1) {
+                if (findManager.rows[0].status == 2) {
+                    const result = await bcrypt.compare(password, findManager.rows[0].encrypted_password);
+                    if (result) {
+                        let jwtToken = await issueJWT(findManager.rows[0], "Manager");
+                        res.send({
+                            status: 200,
+                            success: true,
+                            message: "Login successfull",
+                            data: {
+                                token: jwtToken,
+                                id: findManager.rows[0].id,
+                                name: findManager.rows[0].name,
+                                surname: findManager.rows[0].surname,
+                                company: findManager.rows[0].company,
+                                position: findManager.rows[0].position,
+                                email_address: findManager.rows[0].email_address,
+                                phone_number: findManager.rows[0].phone_number,
+                                avatar: findManager.rows[0].avatar,
+                                created_at: findManager.rows[0].created_at,
+                                updated_at: findManager.rows[0].updated_at,
+                                deleted_at: findManager.rows[0].deleted_at
+                            }
+                        });
+                    } else {
+                        res.json({
+                            status: 401,
+                            success: false,
+                            message: "Incorrect Password"
+                        })
+                    }
+                } else if (findManager.rows[0].status == 1) {
+                    res.json({
+                        status: 402,
+                        success: false,
+                        message: "Account is not approved yet. Please wait..."
+                    })
                 } else {
                     res.json({
                         status: 401,
                         success: false,
-                        message: "Incorrect Password"
+                        message: "Please verify your email address before logging in"
                     })
                 }
-            } else if (findManager.rows[0].status == 1) {
-                res.json({
-                    status: 402,
-                    success: false,
-                    message: "Account is not approved yet. Please wait..."
-                })
             } else {
                 res.json({
-                    status: 401,
+                    status: 400,
                     success: false,
-                    message: "Please verify your email address before logging in"
+                    message: "You are deactivated, please contact the administrator"
                 })
             }
         } else {
@@ -487,52 +495,52 @@ module.exports.resetPassword = async (req, res) => {
             password
         } = req.body
         await connection.query('BEGIN')
-            let s1 = dbScript(db_sql['Q5'], { var1: email })
-            let findManager = await connection.query(s1);
-            if (findManager.rows.length > 0) {
-                if (findManager.rows[0].otp == otp) {
-                    const saltRounds = 10;
-                    const salt = bcrypt.genSaltSync(saltRounds);
-                    const encryptedPassword = bcrypt.hashSync(password, salt);
-                    let _dt = new Date().toISOString();
+        let s1 = dbScript(db_sql['Q5'], { var1: email })
+        let findManager = await connection.query(s1);
+        if (findManager.rows.length > 0) {
+            if (findManager.rows[0].otp == otp) {
+                const saltRounds = 10;
+                const salt = bcrypt.genSaltSync(saltRounds);
+                const encryptedPassword = bcrypt.hashSync(password, salt);
+                let _dt = new Date().toISOString();
 
-                    let s2 = dbScript(db_sql['Q13'], { var1: encryptedPassword, var2: findManager.rows[0].id, var3: _dt })
-                    let updatePassword = await connection.query(s2)
+                let s2 = dbScript(db_sql['Q13'], { var1: encryptedPassword, var2: findManager.rows[0].id, var3: _dt })
+                let updatePassword = await connection.query(s2)
 
-                    if (updatePassword.rowCount == 1) {
-                        await connection.query('COMMIT')
-                        res.json({
-                            status: 200,
-                            success: true,
-                            message: "Password changed successfully"
-                        })
-                    } else {
-                        await connection.query('ROLLBACK')
-                        res.json({
-                            status: 400,
-                            success: false,
-                            message: "Something went wrong"
-                        })
-                    }
-                }else{
+                if (updatePassword.rowCount == 1) {
+                    await connection.query('COMMIT')
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "Password changed successfully"
+                    })
+                } else {
                     await connection.query('ROLLBACK')
-                        res.json({
-                            status: 400,
-                            success: false,
-                            message: "Please Enter correct OTP"
-                        })
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    })
                 }
-
-
             } else {
+                await connection.query('ROLLBACK')
                 res.json({
-                    status: 404,
+                    status: 400,
                     success: false,
-                    message: "This user is not exits",
-                    data: ""
+                    message: "Please Enter correct OTP"
                 })
             }
-        
+
+
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "This user is not exits",
+                data: ""
+            })
+        }
+
     } catch (error) {
         await connection.query('ROLLBACK')
         res.json({
@@ -620,7 +628,7 @@ module.exports.timesheetDetails = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q64'], { var1: techId, var2 : projectId })
+            let s2 = dbScript(db_sql['Q64'], { var1: techId, var2: projectId })
             let timesheetListTobeApproved = await connection.query(s2)
             if (timesheetListTobeApproved.rowCount > 0) {
                 res.json({

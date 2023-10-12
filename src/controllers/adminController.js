@@ -102,21 +102,23 @@ module.exports.managerListForApproval = async (req, res) => {
 module.exports.approveManager = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { managerId } = req.query
+        let { managerId, status } = req.query
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q3'], { var1: id })
         let admin = await connection.query(s1)
         if (admin.rows.length > 0 && position == 'Admin') {
+            statusToUpdate = status == 1 ? 2 : -1
             let _dt = new Date().toISOString();
-            let s2 = dbScript(db_sql['Q4'], { var1: 2, var2: managerId, var3: _dt })
+            let s2 = dbScript(db_sql['Q4'], { var1: statusToUpdate, var2: managerId, var3: _dt })
             let updateStatus = await connection.query(s2)
             if (updateStatus.rowCount > 0) {
                 await connection.query("COMMIT")
-                await notificationMailToManager(updateStatus.rows[0])
+                let mail = (status == 1) ? await notificationMailToManager(updateStatus.rows[0]) : null;
+                let message = (status == 1) ? "Manager approved successfully" : "Manager Rejected successfully"
                 res.send({
                     status: 200,
                     success: true,
-                    message: "Manager Approved Successfully"
+                    message: message
                 });
             } else {
                 await connection.query("ROLLBACk")
