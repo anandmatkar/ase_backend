@@ -29,7 +29,7 @@ module.exports.createTechnician = async (req, res) => {
                 if (insertTechnician.rowCount > 0) {
                     if (documents.length > 0) {
                         for (let file of documents) {
-                            let s3 = dbScript(db_sql['Q65'], { var1 : id, var2 : insertTechnician.rows[0].id, var3 : file.path, var4 : file.type, var5: file.size})
+                            let s3 = dbScript(db_sql['Q65'], { var1: id, var2: insertTechnician.rows[0].id, var3: file.path, var4: file.type, var5: file.size })
                             let uploadDocs = await connection.query(s3)
                         }
                     }
@@ -167,11 +167,11 @@ module.exports.techLogin = async (req, res) => {
 module.exports.techLogout = async (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-          console.error('Error destroying session:', err);
+            console.error('Error destroying session:', err);
         } else {
-          res.redirect('/techLogin'); // Redirect to the homepage or any other appropriate page
+            res.redirect('/techLogin'); // Redirect to the homepage or any other appropriate page
         }
-      });
+    });
 }
 
 module.exports.technicianLists = async (req, res) => {
@@ -488,17 +488,33 @@ module.exports.assignedProjectList = async (req, res) => {
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
+            console.log(findAssignedProjectList.rows)
             if (findAssignedProjectList.rows.length > 0) {
                 const assignedProject = [];
                 const completedProject = [];
-                const projectWaitingApproval = []
-                findAssignedProjectList.rows.forEach((project) => {
-                    if (project.is_requested_for_approval === true) {
-                        projectWaitingApproval.push(project)
-                    } else if (project.is_completed === false) {
+                const projectWaitingApproval = [];
+                findAssignedProjectList.rows.forEach(project => {
+                    if (project.timesheet_data.length === 0) {
+                        // If timesheet_data is empty, push to assignedProject
                         assignedProject.push(project);
-                    } else if (project.is_completed === true) {
-                        completedProject.push(project);
+                    } else {
+                        const isRequestedForApproval = project.timesheet_data.some(
+                            timesheet => timesheet.is_timesheet_requested_for_approval
+                        );
+                        const isApproved = project.timesheet_data.every(
+                            timesheet => timesheet.is_timesheet_approved
+                        );
+
+                        if (!isRequestedForApproval && !isApproved) {
+                            // If none of the timesheets are requested for approval or approved, push to assignedProject
+                            assignedProject.push(project);
+                        } else if (isRequestedForApproval && !isApproved) {
+                            // If at least one timesheet is requested for approval and none are approved, push to projectWaitingApproval
+                            projectWaitingApproval.push(project);
+                        } else if (!isRequestedForApproval && isApproved) {
+                            // If none of the timesheets are requested for approval but all are approved, push to completedProject
+                            completedProject.push(project);
+                        }
                     }
                 });
                 res.json({
@@ -839,7 +855,7 @@ module.exports.requestForTimesheetApproval = async (req, res) => {
             let s2 = dbScript(db_sql['Q36'], { var1: true, var2: _dt, var3: projectId, var4: id })
             let requestforApproval = await connection.query(s2)
 
-            let s3 = dbScript(db_sql['Q54'], { var1: true, var2: projectId, var3 : false })
+            let s3 = dbScript(db_sql['Q54'], { var1: true, var2: projectId, var3: false })
             let updateProject = await connection.query(s3)
             if (requestforApproval.rowCount > 0 && updateProject.rowCount > 0) {
                 await connection.query("COMMIT")

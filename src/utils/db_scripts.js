@@ -205,7 +205,8 @@ const db_sql = {
           FROM technician 
           WHERE id = '{var1}' AND deleted_at IS NULL`,
         "Q29": ` UPDATE technician SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', nationality = '{var5}', qualification = '{var6}' , level = '{var7}', avatar = '{var8}',  updated_at = '{var9}' WHERE id = '{var10}' AND deleted_at IS NULL RETURNING *`,
-        "Q30": `SELECT p.id AS project_id,
+        "Q30": `SELECT
+        p.id AS project_id,
         p.order_id,
         p.customer_id,
         p.project_type,
@@ -226,44 +227,48 @@ const db_sql = {
         c.city,
         c.address,
         c.scope_of_work,
-        tm.tech_id
- FROM project AS p
- INNER JOIN customer AS c ON c.id = p.customer_id
- INNER JOIN tech_machine AS tm ON tm.project_id = p.id
- WHERE tm.tech_id = '{var1}'
-   AND p.deleted_at IS NULL
-   AND c.deleted_at IS NULL
-   AND tm.deleted_at IS NULL
-   AND (p.id, tm.tech_id) IN (
-     SELECT DISTINCT p.id, tm.tech_id
-     FROM project AS p
-     INNER JOIN tech_machine AS tm ON tm.project_id = p.id
-     WHERE tm.tech_id = '{var1}'
-     GROUP BY p.id, tm.tech_id  -- Use GROUP BY to ensure uniqueness
-   )
-GROUP BY
-    p.id,
-    p.order_id,
-    p.customer_id,
-    p.project_type,
-    p.description,
-    p.start_date,
-    p.end_date,
-    p.created_at,
-    p.is_completed,
-    p.is_requested_for_approval,
-    p.manager_id,
-    c.id,
-    c.customer_name,
-    c.customer_contact,
-    c.customer_account,
-    c.email_address,
-    c.phone_number,
-    c.country,
-    c.city,
-    c.address,
-    c.scope_of_work,
-    tm.tech_id;
+        tm.tech_id,
+        COALESCE(json_agg(ts.*) FILTER (WHERE ts.tech_id = tm.tech_id  AND ts.project_id = p.id), '[]') AS timesheet_data
+    FROM project AS p
+    INNER JOIN customer AS c ON c.id = p.customer_id
+    INNER JOIN tech_machine AS tm ON tm.project_id = p.id
+    LEFT JOIN timesheet AS ts ON tm.tech_id = ts.tech_id
+    WHERE
+        tm.tech_id = '{var1}'
+        AND p.deleted_at IS NULL
+        AND c.deleted_at IS NULL
+        AND tm.deleted_at IS NULL
+        AND (p.id, tm.tech_id) IN (
+            SELECT DISTINCT p.id, tm.tech_id
+            FROM project AS p
+            INNER JOIN tech_machine AS tm ON tm.project_id = p.id
+            WHERE tm.tech_id = '{var1}'
+            GROUP BY p.id, tm.tech_id
+        )
+    GROUP BY
+        p.id,
+        p.order_id,
+        p.customer_id,
+        p.project_type,
+        p.description,
+        p.start_date,
+        p.end_date,
+        p.created_at,
+        p.is_completed,
+        p.is_requested_for_approval,
+        p.manager_id,
+        c.id,
+        c.customer_name,
+        c.customer_contact,
+        c.customer_account,
+        c.email_address,
+        c.phone_number,
+        c.country,
+        c.city,
+        c.address,
+        c.scope_of_work,
+        tm.tech_id;
+    
 
  `,
         "Q31": `WITH unique_technicians AS (
