@@ -496,7 +496,7 @@ GROUP BY
         "Q51":`UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q52":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q53":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND timesheet_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q54":`UPDATE project SET is_requested_for_approval = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q54":`UPDATE project SET is_requested_for_approval = '{var1}', is_completed = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q55":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}' WHERE id = '{var3}' AND manager_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q56":`UPDATE manager SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q57":`SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`,
