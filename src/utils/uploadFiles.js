@@ -25,7 +25,8 @@ const storage2 = multer.diskStorage({
     }
 })
 const uploadProfile = multer({
-    storage: storage2
+    storage: storage2,
+    limits: { fileSize: 1024 * 1024 * 10 }, // 10 MB limit
 })
 
 const storage3 = multer.diskStorage({
