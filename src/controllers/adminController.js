@@ -99,6 +99,46 @@ module.exports.managerListForApproval = async (req, res) => {
     }
 }
 
+module.exports.waitingManagerCount = async(req,res) => {
+    try {
+        let { id, position } = req.user
+        let s1 = dbScript(db_sql['Q3'], { var1: id })
+        let admin = await connection.query(s1)
+        if (admin.rows.length > 0 && position == 'Admin') {
+            let s2 = dbScript(db_sql['Q74'], { var1 : 1})
+            let managerCounts = await connection.query(s2)
+            if (managerCounts.rowCount > 0) {
+                res.send({
+                    status: 200,
+                    success: true,
+                    message: "Manager Counts for approval",
+                    data: managerCounts.rows
+                });
+
+            } else {
+                res.send({
+                    status: 200,
+                    success: true,
+                    message: "Empty Manager Lists",
+                    data: 0
+                });
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 module.exports.approveManager = async (req, res) => {
     try {
         let { id, position } = req.user

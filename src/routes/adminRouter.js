@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post('/adminLogin', controller.admin.adminLogin)
 router.get('/managerListForApproval', verifyTokenAdmin, controller.admin.managerListForApproval)
+router.get('/waitingManagerCount', verifyTokenAdmin, controller.admin.waitingManagerCount)
 router.put('/approveManager', verifyTokenAdmin, controller.admin.approveManager)
 
 module.exports = router

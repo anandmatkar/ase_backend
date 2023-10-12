@@ -489,79 +489,83 @@ GROUP BY
                         c.scope_of_work,
                         c.manager_id,
                         m.email_address;` ,
-        "Q48":`INSERT INTO project_report(project_id, tech_id, manager_id, date, description)
-               VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
-        "Q49":`UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-        "Q50":`SELECT * FROM project_report WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL` ,
-        "Q51":`UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q52":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q53":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND timesheet_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q54":`UPDATE project SET is_requested_for_approval = '{var1}', is_completed = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q55":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}' WHERE id = '{var3}' AND manager_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q56":`UPDATE manager SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q57":`SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`,
-        "Q58":`UPDATE technician SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q59": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q60": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q61": `INSERT INTO report_attach
-               (project_id,tech_id,file_path,file_type,file_size, report_id)
-               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
-        "Q62":`UPDATE project_report SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q63":`UPDATE report_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-        "Q64":`SELECT 
-                ts.id, 
-                ts.project_id, 
-                ts.tech_id, 
-                ts.date, 
-                ts.start_time, 
-                ts.end_time, 
-                ts.comments, 
-                ts.is_timesheet_approved, 
-                ts.is_timesheet_requested_for_approval, 
-                ts.created_at, 
-                ts.updated_at,
-                COALESCE(
-                (
-                        SELECT json_agg(ta.*)
-                        FROM timesheet_attach ta
-                        WHERE ta.timesheet_id = ts.id
-                        AND ta.deleted_at IS NULL
-                ), '[]'::json
-                ) AS timesheet_attach
-           FROM timesheet ts
-           WHERE ts.tech_id = '{var1}' 
-                AND ts.project_id = '{var2}' 
-                AND ts.deleted_at IS NULL;`,
-        "Q65":`INSERT INTO tech_documents(manager_id, tech_id,file_path, file_type, file_size)
+        "Q48":` INSERT INTO project_report(project_id, tech_id, manager_id, date, description)
                 VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
-        "Q66":`SELECT
-        t.id,
-        t.name,
-        t.surname,
-        t.position,
-        t.email_address,
-        t.phone_number,
-        t.nationality,
-        t.qualification,
-        t.level,
-        t.avatar as profilePic,
-        t.manager_id,
-        t.created_at,
-        t.updated_at,
-        t.deleted_at,
-        COALESCE(
-            (
-                SELECT JSON_AGG(td.*)
-                FROM tech_documents td
-                WHERE td.tech_id = t.id
-                    AND td.deleted_at IS NULL
-            ),
-            '[]'::json
-        ) AS tech_documents
-    FROM technician t
-    WHERE t.id = '{var1}' AND t.deleted_at IS NULL;
-     `,
-        "Q67":`SELECT
+        "Q49":  `UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q50":  `SELECT * FROM project_report WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL` ,
+        "Q51":  `UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}'
+                 WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q52":  `UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q53":  `UPDATE timesheet_attach SET deleted_at = '{var1}'
+                 WHERE project_id = '{var2}' AND tech_id = '{var3}' AND timesheet_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q54":  `UPDATE project SET is_requested_for_approval = '{var1}', is_completed = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q55":  `UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}'
+                 WHERE id = '{var3}' AND manager_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q56":  `UPDATE manager SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q57":  `SELECT * FROM customer WHERE email_address = '{var1}' AND deleted_at IS NULL`,
+        "Q58":  `UPDATE technician SET otp = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q59":  `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q60":  `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q61":  `INSERT INTO report_attach
+                 (project_id,tech_id,file_path,file_type,file_size, report_id)
+                 VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
+        "Q62":  `UPDATE project_report SET deleted_at = '{var1}'
+                 WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q63":  `UPDATE report_attach SET deleted_at = '{var1}'
+                 WHERE project_id = '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+        "Q64":  `SELECT 
+                    ts.id, 
+                    ts.project_id, 
+                    ts.tech_id, 
+                    ts.date, 
+                    ts.start_time, 
+                    ts.end_time, 
+                    ts.comments, 
+                    ts.is_timesheet_approved, 
+                    ts.is_timesheet_requested_for_approval, 
+                    ts.created_at, 
+                    ts.updated_at,
+                    COALESCE(
+                    (
+                            SELECT json_agg(ta.*)
+                            FROM timesheet_attach ta
+                            WHERE ta.timesheet_id = ts.id
+                            AND ta.deleted_at IS NULL
+                    ), '[]'::json
+                    ) AS timesheet_attach
+                FROM timesheet ts
+                WHERE ts.tech_id = '{var1}' 
+                    AND ts.project_id = '{var2}' 
+                    AND ts.deleted_at IS NULL;`,
+        "Q65":  `INSERT INTO tech_documents(manager_id, tech_id,file_path, file_type, file_size)
+                 VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
+        "Q66":` SELECT
+                    t.id,
+                    t.name,
+                    t.surname,
+                    t.position,
+                    t.email_address,
+                    t.phone_number,
+                    t.nationality,
+                    t.qualification,
+                    t.level,
+                    t.avatar as profilePic,
+                    t.manager_id,
+                    t.created_at,
+                    t.updated_at,
+                    t.deleted_at,
+                    COALESCE(
+                        (
+                            SELECT JSON_AGG(td.*)
+                            FROM tech_documents td
+                            WHERE td.tech_id = t.id
+                                AND td.deleted_at IS NULL
+                        ),
+                        '[]'::json
+                    ) AS tech_documents
+                FROM technician t
+                WHERE t.id = '{var1}' AND t.deleted_at IS NULL;`,
+        "Q67":  `SELECT
                         pr.id,
                         pr.tech_id,
                         pr.project_id,
@@ -586,78 +590,83 @@ GROUP BY
                         project_id = '{var1}' AND
                         tech_id = '{var2}' AND
                         pr.deleted_at IS NULL;`,
-        "Q68":`SELECT
-        p.id AS project_id,
-        p.order_id,
-        p.customer_id,
-        p.project_type,
-        p.description,
-        p.start_date,
-        p.end_date,
-        p.created_at,
-        p.is_completed,
-        p.manager_id,
-        json_agg(
-            json_build_object(
-                'machine_id', m.id,
-                'machine_type', m.machine_type,
-                'serial',m.serial,
-                'hour_count',m.hour_count,
-                'nom_speed',m.nom_speed,
-                'act_speed',m.act_speed,
-                'description',m.description,
-                'machine_attach', (
-                    SELECT json_agg(ma.*)
-                    FROM machine_attach ma
-                    WHERE ma.machine_id = m.id
-                    AND ma.deleted_at IS NULL
-                )
-            )
-        ) AS machine_data
-    FROM
-        project p
-    JOIN
-        machine m
-    ON
-        p.id = m.project_id
-    AND
-        m.deleted_at IS NULL
-    WHERE
-        p.manager_id = '{var1}' AND
-        p.deleted_at IS NULL
-    GROUP BY
-        p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;
-    `,
-        "Q69":`UPDATE machine SET machine_type = '{var1}', serial = '{var2}', hour_count = '{var3}', nom_speed = '{var4}', act_speed = '{var5}', description = '{var6}', updated_at = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
-        "Q70":`UPDATE machine SET deleted_at = '{var1}' WHERE id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-        "Q71":`UPDATE tech_machine SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-        "Q72":`UPDATE machine_attach SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-        "Q73": `SELECT
-        m.id AS machine_id,
-        m.order_id,
-        m.project_id,
-        m.machine_type,
-        m.serial,
-        m.hour_count,
-        m.nom_speed,
-        m.act_speed,
-        m.description,
-        m.created_at,
-        m.updated_at,
-        m.deleted_at,
-        'machine_attach',
-        COALESCE(
-            (
-                SELECT json_agg(ma.*)
-                FROM machine_attach ma
-                WHERE ma.machine_id = m.id
-                AND ma.deleted_at IS NULL
-            ),
-            '[]'::json
-        ) AS machine_attach
-    FROM machine m
-    WHERE m.id = '{var1}' AND m.project_id = '{var2}' AND m.deleted_at IS NULL;
-    `                                           
+        "Q68":  `SELECT
+                    p.id AS project_id,
+                    p.order_id,
+                    p.customer_id,
+                    p.project_type,
+                    p.description,
+                    p.start_date,
+                    p.end_date,
+                    p.created_at,
+                    p.is_completed,
+                    p.manager_id,
+                    json_agg(
+                        json_build_object(
+                            'machine_id', m.id,
+                            'machine_type', m.machine_type,
+                            'serial',m.serial,
+                            'hour_count',m.hour_count,
+                            'nom_speed',m.nom_speed,
+                            'act_speed',m.act_speed,
+                            'description',m.description,
+                            'machine_attach', (
+                                SELECT json_agg(ma.*)
+                                FROM machine_attach ma
+                                WHERE ma.machine_id = m.id
+                                AND ma.deleted_at IS NULL
+                            )
+                        )
+                    ) AS machine_data
+                FROM
+                    project p
+                JOIN
+                    machine m
+                ON
+                    p.id = m.project_id
+                AND
+                    m.deleted_at IS NULL
+                WHERE
+                    p.manager_id = '{var1}' AND
+                    p.deleted_at IS NULL
+                GROUP BY
+                    p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;`,
+        "Q69":  `UPDATE machine 
+                 SET machine_type = '{var1}', serial = '{var2}', hour_count = '{var3}', nom_speed = '{var4}', act_speed = '{var5}', description = '{var6}', updated_at = '{var7}'
+                 WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
+        "Q70":  `UPDATE machine SET deleted_at = '{var1}' WHERE id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q71":  `UPDATE tech_machine SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q72":  `UPDATE machine_attach SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+        "Q73":  `SELECT
+                    m.id AS machine_id,
+                    m.order_id,
+                    m.project_id,
+                    m.machine_type,
+                    m.serial,
+                    m.hour_count,
+                    m.nom_speed,
+                    m.act_speed,
+                    m.description,
+                    m.created_at,
+                    m.updated_at,
+                    m.deleted_at,
+                    'machine_attach',
+                    COALESCE(
+                        (
+                            SELECT json_agg(ma.*)
+                            FROM machine_attach ma
+                            WHERE ma.machine_id = m.id
+                            AND ma.deleted_at IS NULL
+                        ),
+                        '[]'::json
+                    ) AS machine_attach
+                FROM machine m
+                WHERE m.id = '{var1}' AND m.project_id = '{var2}' AND m.deleted_at IS NULL;`,
+        "Q74":`SELECT COUNT(*) 
+               FROM manager 
+               WHERE status = {var1} AND deleted_at IS NULL;`        
+
+
                               
 
 
