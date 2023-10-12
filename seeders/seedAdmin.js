@@ -24,7 +24,7 @@ let avatar = process.env.DEFAULT_ADMIN_PIC
 
 console.log("running seed");
 
-connection.query(`insert into admin (id,name,email_address,encrypted_password, avatar) values('${id}','admin', 'aseadmin@yopmail.com', '${encryptedPassword}', '${avatar}')`, err => {
+connection.query(`insert into admin (id,name,email_address,encrypted_password, avatar) values('${id}','admin', 'fseadmin@yopmail.com', '${encryptedPassword}', '${avatar}')`, err => {
     if(err){
         throw err
     }
