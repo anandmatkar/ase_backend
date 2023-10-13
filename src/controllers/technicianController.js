@@ -109,7 +109,7 @@ module.exports.insertTechnician = async (req, res) => {
                 } = row;
 
                 await connection.query('BEGIN');
-                let s2 = dbScript(db_sql['Q57'], { var1: emailAddress });
+                let s2 = dbScript(db_sql['Q25'], { var1: emailAddress });
                 let findTechnician = await connection.query(s2);
 
                 if (findTechnician.rowCount == 0) {
@@ -122,6 +122,7 @@ module.exports.insertTechnician = async (req, res) => {
                     let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: (level), var10: profilePic, var11: id })
 
                     let insertTechnician = await connection.query(s2)
+                    console.log(insertTechnician.rows,"111111111111122222222222222")
                 } else {
                     duplicateEmails.push(emailAddress);
                 }
