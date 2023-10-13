@@ -1,7 +1,7 @@
 const express = require('express');
 const controller = require('../controllers');
 const { verifyTokenAdmin, verifyTokenManager, verifyTokenManagerORTechnician } = require('../utils/jwt');
-const { uploadMachineFiles, uploadProfile, uploadProjectAttachments,uploadTechnicianDocuments } = require('../utils/uploadFiles');
+const { uploadMachineFiles, uploadProfile, uploadProjectAttachments,uploadTechnicianDocuments, uploadCustomerFile } = require('../utils/uploadFiles');
 const router = express.Router();
 
 //---------------------------------------------------------- Manager Auth Routes------------------------------------------------------//
@@ -19,6 +19,7 @@ router.post('/uploadProfilePic', uploadProfile.single('image'), controller.manag
 //---------------------------------------------------------- Customer Routes ------------------------------------------------------//
 
 router.post('/createCustomer', verifyTokenManager, controller.customer.createCustomer)
+router.post('/insertCustomer', verifyTokenManager,uploadCustomerFile.single('file'), controller.customer.insertCustomer)
 router.get('/customerList', verifyTokenManager, controller.customer.customerList)
 router.get('/customerDetails', verifyTokenManager, controller.customer.customerDetails)
 router.put('/updateCustomer', verifyTokenManager, controller.customer.updateCustomer)

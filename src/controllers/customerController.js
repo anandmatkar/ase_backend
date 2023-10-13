@@ -4,6 +4,7 @@ const { mysql_real_escape_string, verifyTokenFn } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
 const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNotificationEmail } = require('../utils/sendMail');
+const XLSX = require('xlsx');
 
 module.exports.createCustomer = async (req, res) => {
     try {
@@ -17,8 +18,8 @@ module.exports.createCustomer = async (req, res) => {
             let s2 = dbScript(db_sql['Q57'], { var1: email })
             let findCustomer = await connection.query(s2)
             if (findCustomer.rowCount == 0) {
-                let s2 = dbScript(db_sql['Q9'], { var1: mysql_real_escape_string(customerName), var2: mysql_real_escape_string(customerContactName), var3: customerAccount, var4: mysql_real_escape_string(email), var5: phone, var6: mysql_real_escape_string(country), var7: mysql_real_escape_string(city), var8: mysql_real_escape_string(address), var9: mysql_real_escape_string(scopeOfWork), var10: id })
-                let createCustomer = await connection.query(s2)
+                let s3 = dbScript(db_sql['Q9'], { var1: mysql_real_escape_string(customerName), var2: mysql_real_escape_string(customerContactName), var3: customerAccount, var4: mysql_real_escape_string(email), var5: phone, var6: mysql_real_escape_string(country), var7: mysql_real_escape_string(city), var8: mysql_real_escape_string(address), var9: mysql_real_escape_string(scopeOfWork), var10: id })
+                let createCustomer = await connection.query(s3)
 
                 if (createCustomer.rowCount > 0) {
                     await connection.query('COMMIT')
@@ -301,5 +302,108 @@ module.exports.deleteCustomer = async (req, res) => {
         })
     }
 }
+
+module.exports.insertCustomer = async (req, res) => {
+    try {
+        let { id, position } = req.user;
+        let s1 = dbScript(db_sql['Q7'], { var1: id });
+        let findManager = await connection.query(s1);
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            if (!req.file) {
+                return res.status(400).send('No file was uploaded.');
+            }
+
+            const originalname = req.file.originalname;
+            const fileExtension = originalname.split('.').pop().toLowerCase();
+
+            if (fileExtension != 'xlsx' || fileExtension != 'xls') {
+                return res.status(400).json({
+                    success: false,
+                    message: "Only Excel files can be uploaded"
+                });
+            }
+            
+            let file = req.file
+            let path = file.path;
+            let workbook = XLSX.readFile(path);
+            let sheet_name_list = workbook.SheetNames;
+            let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            if (jsonData.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Excel sheet has no data",
+                });
+            }
+
+            const duplicateEmails = [];
+
+            for (const row of jsonData) {
+                const {
+                    'Customer Name': customerName,
+                    'Customer Contact': customerContactName,
+                    'Account Number': customerAccount,
+                    'Email Address': email,
+                    'Phone Number': phone,
+                    'Country': country,
+                    'City': city,
+                    'Address': address,
+                    'Scope of Work': scopeOfWork,
+                } = row;
+
+                await connection.query("BEGIN");
+                let s2 = dbScript(db_sql['Q57'], { var1: email });
+                let findCustomer = await connection.query(s2);
+
+                if (findCustomer.rowCount == 0) {
+                    let s3 = dbScript(db_sql['Q9'], {
+                        var1: mysql_real_escape_string(customerName),
+                        var2: mysql_real_escape_string(customerContactName),
+                        var3: customerAccount,
+                        var4: mysql_real_escape_string(email),
+                        var5: phone,
+                        var6: mysql_real_escape_string(country),
+                        var7: mysql_real_escape_string(city),
+                        var8: mysql_real_escape_string(address),
+                        var9: mysql_real_escape_string(scopeOfWork),
+                        var10: id
+                    });
+                    let createCustomer = await connection.query(s3);
+                } else {
+                    duplicateEmails.push(email);
+                }
+            }
+            if (duplicateEmails.length > 0) {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Duplicate email addresses found",
+                    duplicates: duplicateEmails,
+                });
+            } else {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Customers inserted successfully",
+                });
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            });
+        }
+    } catch (error) {
+        await connection.query('ROLLBACK');
+        res.json({
+            success: false,
+            status: 400,
+            message: error.stack,
+        });
+    }
+}
+
 
 
