@@ -73,7 +73,6 @@ module.exports.createTechnician = async (req, res) => {
         })
     }
 }
-
 //Inset techinician using file upload By manager Only
 module.exports.insertTechnician = async (req, res) => {
     try {
@@ -160,8 +159,6 @@ module.exports.insertTechnician = async (req, res) => {
         });
     }
 }
-
-
 //by manager
 module.exports.uploadTechnicianDocuments = async (req, res) => {
     try {
@@ -301,7 +298,6 @@ module.exports.technicianLists = async (req, res) => {
         })
     }
 }
-
 //for bothtechnician
 module.exports.showProfile = async (req, res) => {
     try {
@@ -523,7 +519,6 @@ module.exports.resetPassword = async (req, res) => {
         })
     }
 }
-
 //only for Technician
 module.exports.updateTechnicianProfile = async (req, res) => {
     try {
@@ -822,49 +817,6 @@ module.exports.timesheetList = async (req, res) => {
         })
     }
 }
-
-// module.exports.uploadTimesheetAttachements = async (req, res) => {
-//     try {
-//         let files = req.files;
-//         let { id, position } = req.user
-//         let { projectId } = req.query
-//         let fileDetails = [];
-//         await connection.query("BEGIN")
-//         let s1 = dbScript(db_sql['Q27'], { var1: id })
-//         let findTechnician = await connection.query(s1)
-//         if (findTechnician.rowCount > 0 && position == "Technician") {
-//             // Iterate through the uploaded files and gather their details
-//             for (const file of files) {
-//                 let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
-//                 let size = file.size;
-//                 let mimetype = file.mimetype;
-//                 fileDetails.push({ path, size, mimetype });
-//                 let s2 = dbScript(db_sql['Q34'], { var1: projectId, var2: id, var3: path, var4: mimetype, var5: size })
-//                 let uploadAttach = await connection.query(s2)
-//             }
-//             await connection.query("COMMIT")
-//             res.json({
-//                 status: 201,
-//                 success: true,
-//                 message: "Files Uploaded successfully!"
-//             });
-
-//         } else {
-//             res.json({
-//                 status: 404,
-//                 success: false,
-//                 message: "Technician not found"
-//             })
-//         }
-//     } catch (error) {
-//         await connection.query("ROLLBACK")
-//         res.json({
-//             status: 400,
-//             success: false,
-//             message: error.message,
-//         });
-//     }
-// }
 
 module.exports.uploadTimesheetAttachements = async (req, res) => {
     try {

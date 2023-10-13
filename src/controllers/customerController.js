@@ -315,8 +315,8 @@ module.exports.insertCustomer = async (req, res) => {
 
             const originalname = req.file.originalname;
             const fileExtension = originalname.split('.').pop().toLowerCase();
-
-            if (fileExtension != 'xlsx' || fileExtension != 'xls') {
+            
+            if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
                 return res.status(400).json({
                     success: false,
                     message: "Only Excel files can be uploaded"
