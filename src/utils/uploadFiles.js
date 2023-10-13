@@ -100,6 +100,21 @@ const uploadCustomerFile = multer({
     storage: storage7
 });
 
+const storage8 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/technicianFiles')
+    },
+    filename: function (req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const fileName = `${Date.now()}.${ext}`
+        cb(null, fileName)
+    }
+})
+
+const uploadTechnicianFile = multer({
+    storage: storage8
+});
+
 
 module.exports = {
     uploadMachineFiles,
@@ -108,5 +123,6 @@ module.exports = {
     uploadTimesheet,
     uploadReportAttach,
     uploadProjectAttachments,
-    uploadCustomerFile
+    uploadCustomerFile,
+    uploadTechnicianFile
 };

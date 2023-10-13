@@ -4,6 +4,7 @@ const { mysql_real_escape_string, verifyTokenFn } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
 const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNotificationEmail } = require('../utils/sendMail');
+const XLSX = require('xlsx');
 
 //Create New Technician By manager Only
 module.exports.createTechnician = async (req, res) => {
@@ -72,6 +73,94 @@ module.exports.createTechnician = async (req, res) => {
         })
     }
 }
+
+//Inset techinician using file upload By manager Only
+module.exports.insertTechnician = async (req, res) => {
+    try {
+        let { id, position } = req.user;
+        let s1 = dbScript(db_sql['Q7'], { var1: id });
+        let findManager = await connection.query(s1);
+        if (findManager.rowCount > 0 && position === 'Manager') {
+            if (!req.file) {
+                return res.status(400).send('No file was uploaded.');
+            }
+            let path = req.file.path;
+            var workbook = XLSX.readFile(path);
+            var sheet_name_list = workbook.SheetNames;
+            let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            if (jsonData.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Excel sheet has no data",
+                });
+            }
+
+            const duplicateEmails = [];
+
+            for (const row of jsonData) {
+                const {
+                    'Name': name,
+                    'Surname': surname,
+                    'Email Address': emailAddress,
+                    'Password': password,
+                    'Phone': phone,
+                    'Nationality': nationality,
+                    'Qualification': qualification,
+                    'Level': level,
+                } = row;
+
+                await connection.query('BEGIN');
+                let s2 = dbScript(db_sql['Q57'], { var1: emailAddress });
+                let findTechnician = await connection.query(s2);
+
+                if (findTechnician.rowCount == 0) {
+                  let profilePic = process.env.DEFAULT_PROFILE_PIC_TECHNICIAN;
+
+                    const saltRounds = 10;
+                    const salt = bcrypt.genSaltSync(saltRounds);
+                    const encryptedPassword = bcrypt.hashSync(password, salt);
+
+                    let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: (level), var10: profilePic, var11: id })
+
+                    let insertTechnician = await connection.query(s2)
+                } else {
+                    duplicateEmails.push(emailAddress);
+                }
+            }
+
+            if (duplicateEmails.length > 0) {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Duplicate email addresses found",
+                    duplicates: duplicateEmails,
+                });
+            } else {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Technicians inserted successfully",
+                });
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found",
+            });
+        }
+    } catch (error) {
+        await connection.query('ROLLBACK');
+        res.json({
+            success: false,
+            status: 400,
+            message: error.stack,
+        });
+    }
+}
+
 
 //by manager
 module.exports.uploadTechnicianDocuments = async (req, res) => {
