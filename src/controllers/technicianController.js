@@ -642,9 +642,9 @@ module.exports.assignedProjectCounts = async (req, res) => {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
             if (findAssignedProjectList.rows.length > 0) {
-                const assignedProjectCount = 0;
-                const completedProjectCount = 0;
-                const projectWaitingApprovalCount = 0;
+                let assignedProjectCount = 0;
+                let completedProjectCount = 0;
+                let projectWaitingApprovalCount = 0;
 
                 findAssignedProjectList.rows.forEach(project => {
                     if (project.timesheet_data.length === 0) {
