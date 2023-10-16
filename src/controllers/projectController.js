@@ -359,7 +359,8 @@ module.exports.completeProject = async (req, res) => {
             res.json({
                 status: 200,
                 success: true,
-                message: "Project approved successfully."
+                message: "Project approved successfully.",
+                data : projectDetails.rows
             })
         } else {
             res.json({
