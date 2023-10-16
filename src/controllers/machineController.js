@@ -141,7 +141,6 @@ module.exports.machineData = async(req,res) => {
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let s2 = dbScript(db_sql['Q73'], { var1: machineId, var2 : projectId })
-            console.log(s2)
             let findMachineData = await connection.query(s2)
             if(findMachineData.rowCount > 0){
                 res.json({

@@ -113,7 +113,7 @@ module.exports.insertTechnician = async (req, res) => {
                 let findTechnician = await connection.query(s2);
 
                 if (findTechnician.rowCount == 0) {
-                  let profilePic = process.env.DEFAULT_PROFILE_PIC_TECHNICIAN;
+                    let profilePic = process.env.DEFAULT_PROFILE_PIC_TECHNICIAN;
 
                     const saltRounds = 10;
                     const salt = bcrypt.genSaltSync(saltRounds);
@@ -122,7 +122,6 @@ module.exports.insertTechnician = async (req, res) => {
                     let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: (level), var10: profilePic, var11: id })
 
                     let insertTechnician = await connection.query(s2)
-                    console.log(insertTechnician.rows,"111111111111122222222222222")
                 } else {
                     duplicateEmails.push(emailAddress);
                 }
@@ -573,7 +572,6 @@ module.exports.assignedProjectList = async (req, res) => {
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
-            console.log(findAssignedProjectList.rows)
             if (findAssignedProjectList.rows.length > 0) {
                 const assignedProject = [];
                 const completedProject = [];
@@ -644,16 +642,32 @@ module.exports.assignedProjectCounts = async (req, res) => {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
             if (findAssignedProjectList.rows.length > 0) {
-                let assignedProjectCount = 0;
-                let completedProjectCount = 0;
-                let projectWaitingApprovalCount = 0;
-                findAssignedProjectList.rows.forEach((project) => {
-                    if (project.is_requested_for_approval === true) {
-                        projectWaitingApprovalCount++;
-                    } else if (project.is_completed === false) {
+                const assignedProjectCount = 0;
+                const completedProjectCount = 0;
+                const projectWaitingApprovalCount = 0;
+
+                findAssignedProjectList.rows.forEach(project => {
+                    if (project.timesheet_data.length === 0) {
+                        // If timesheet_data is empty, increment assignedProjectCount
                         assignedProjectCount++;
-                    } else if (project.is_completed === true) {
-                        completedProjectCount++;
+                    } else {
+                        const isRequestedForApproval = project.timesheet_data.some(
+                            timesheet => timesheet.is_timesheet_requested_for_approval
+                        );
+                        const isApproved = project.timesheet_data.every(
+                            timesheet => timesheet.is_timesheet_approved
+                        );
+
+                        if (!isRequestedForApproval && !isApproved) {
+                            // If none of the timesheets are requested for approval or approved, increment assignedProjectCount
+                            assignedProjectCount++;
+                        } else if (isRequestedForApproval && !isApproved) {
+                            // If at least one timesheet is requested for approval and none are approved, increment projectWaitingApprovalCount
+                            projectWaitingApprovalCount++;
+                        } else if (!isRequestedForApproval && isApproved) {
+                            // If none of the timesheets are requested for approval but all are approved, increment completedProjectCount
+                            completedProjectCount++;
+                        }
                     }
                 });
                 res.json({

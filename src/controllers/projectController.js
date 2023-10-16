@@ -1,9 +1,7 @@
 const connection = require('../database/connection');
-const { issueJWT } = require("../utils/jwt")
-const { mysql_real_escape_string, verifyTokenFn } = require('../utils/helper')
+const { mysql_real_escape_string, generatePDF, formatProjectData } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
-const bcrypt = require('bcrypt');
-const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNotificationEmail } = require('../utils/sendMail');
+const {sendProjectNotificationEmail, sendprojectDetails } = require('../utils/sendMail');
 
 
 //Create Project by Manager
@@ -16,7 +14,7 @@ module.exports.createProject = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q12'], { var1 : id})
+            let s2 = dbScript(db_sql['Q12'], { var1: id })
             let findProject = await connection.query(s2)
 
             let orderId = findProject.rowCount > 0 ? Number(findProject.rows[0].order_id) + 1 : 1
@@ -84,7 +82,7 @@ module.exports.createProject = async (req, res) => {
     }
 }
 
-module.exports.uploadProjectAttach = async(req,res) =>{
+module.exports.uploadProjectAttach = async (req, res) => {
     try {
         let files = req.files;
         let fileDetails = [];
@@ -238,7 +236,6 @@ module.exports.projectCount = async (req, res) => {
     }
 }
 
-
 //Project Details for Manager
 module.exports.projectDetails = async (req, res) => {
     try {
@@ -338,6 +335,48 @@ module.exports.deleteProject = async (req, res) => {
     }
 }
 
+module.exports.completeProject = async (req, res) => {
+    let { id, position } = req.user
+    let { projectId } = req.query
+    await connection.query("BEGIN")
+    let s1 = dbScript(db_sql['Q7'], { var1: id })
+    let findManager = await connection.query(s1)
+    if (findManager.rowCount > 0 && position == 'Manager') {
+        let _dt = new Date().toISOString()
+        let s2 = dbScript(db_sql['Q75'], { var1: true, var2 : false, var3: _dt, var4: projectId })
+        let approveProject = await connection.query(s2)
+        if (approveProject.rowCount > 0) {
+            // await connection.query("COMMIT")
+
+            let s3 = dbScript(db_sql['Q76'], { var1: projectId })
+            let projectDetails = await connection.query(s3)
+            // generatePDF(formatProjectData(projectDetails.rows), (pdfData) => {
+            //     sendprojectDetails('pchetan839@gmail.com', pdfData);
+            // });
+            generatePDF(projectDetails.rows, (pdfData) => {
+                sendprojectDetails('pchetan839@gmail.com', pdfData);
+              });
+            res.json({
+                status: 200,
+                success: true,
+                message: "Project approved successfully."
+            })
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Something went wrong."
+            })
+        }
+    } else {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 404,
+            success: false,
+            message: "Manager not found"
+        })
+    }
+}
 
 
 

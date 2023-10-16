@@ -253,3 +253,50 @@ module.exports.sendProjectNotificationEmail = async (emails, data) => {
     console.log("Message sent! Message ID: ", info.messageId);
 
 }
+
+module.exports.sendprojectDetails = async (emails, pdfData) => {
+    const smtpEndpoint = "smtp.gmail.com"
+    const senderAddress = process.env.SMTP_USERNAME;
+    let toAddresses = emails;
+
+    // let sendEmail = projectNotificationTemplate.projectNotification(data)
+
+    const smtpUsername = process.env.SMTP_USERNAME;
+    const smtpPassword = process.env.SMTP_PASSWORD;
+
+    let subject = "Project Details";
+
+    var body_text = `Project Details`;
+
+    let transporter = nodemailer.createTransport({
+        host: smtpEndpoint,
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: smtpUsername,
+            pass: smtpPassword
+        }
+    });
+
+    // Specify the fields in the email.
+    let mailOptions = {
+        from: senderAddress,
+        to: toAddresses,
+        subject: subject,
+        text: body_text,
+        // html: sendEmail,
+        attachments: [
+            {
+                filename: 'project_details.pdf',
+                content: pdfData,
+            },
+          ],
+        // Custom headers for configuration set and message tags.
+        headers: {}
+    };
+
+    // Send the email.
+    let info = await transporter.sendMail(mailOptions)
+    console.log("Message sent! Message ID: ", info.messageId);
+
+}
