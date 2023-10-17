@@ -255,8 +255,17 @@ module.exports.deleteCustomer = async (req, res) => {
                         let s7 = dbScript(db_sql['Q41'], { var1: _dt, var2: project.id })
                         let deleteTimesheet = await connection.query(s7)
 
-                        let s8 = dbScript(db_sql['Q42'], { var1: _dt, var2: project.id })
+                        let s8 = dbScript(db_sql['Q42'], { var1: 'timesheet_attach', var2: _dt, var3: project.id })
                         let deleteTimesheetAttach = await connection.query(s8)
+
+                        let s9 = dbScript(db_sql['Q42'], { var1: 'tech_machine', var2: _dt, var3: project.id })
+                        let deleteTechMachine = await connection.query(s9)
+                    
+                        let s10 = dbScript(db_sql['Q42'], { var1: 'project_report', var2: _dt, var3: project.id })
+                        let deleteReport = await connection.query(s10)
+                        
+                        let s11 = dbScript(db_sql['Q42'], { var1: 'report_attach', var2: _dt, var3: project.id })
+                        let deleteReportAttach = await connection.query(s11)
                     }
                     await connection.query('COMMIT')
                     res.json({

@@ -429,7 +429,7 @@ const db_sql = {
         "Q39":`UPDATE machine SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q40":`UPDATE machine_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
         "Q41":`UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-        "Q42":`UPDATE timesheet_attach SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+        "Q42":`UPDATE {var1} SET deleted_at = '{var2}' WHERE project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q43":`SELECT id, order_id, customer_id, project_type, description, start_date, end_date, manager_id, is_completed, created_at, updated_at, deleted_at FROM project WHERE customer_id = '{var1}' AND deleted_at IS NULL`,
         "Q44":`SELECT id, project_id, tech_id, date, start_time, end_time, comments, is_timesheet_approved, is_timesheet_requested_for_approval, created_at, updated_at FROM timesheet WHERE is_timesheet_requested_for_approval = true AND manager_id = '{var1}'`,
         "Q45":`SELECT * FROM project WHERE id = '{var1}' AND deleted_at IS NULL`,
@@ -588,11 +588,13 @@ const db_sql = {
                         pr.is_approved,
                         pr.created_at,
                         pr.updated_at,
+                        pr.deleted_at,
                         COALESCE(
                         (
                                 SELECT JSON_AGG(ra.*)
                                 FROM report_attach ra
                                 WHERE ra.report_id = pr.id
+                                AND ra.deleted_at is NULL
                         ),
                         '[]'::json
                         ) AS project_documents
