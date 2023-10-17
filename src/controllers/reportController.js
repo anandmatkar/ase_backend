@@ -10,18 +10,18 @@ const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNo
 module.exports.createReport = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectID, date, description, attachment } = req.body
-        
+        let { projectID, date, description, attachment, duration, comments, machineId } = req.body
+
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s2 = dbScript(db_sql['Q48'], { var1: projectID, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description })
+            let s2 = dbScript(db_sql['Q48'], { var1: projectID, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description, var6: duration, var7: comments, var8: machineId })
             let createReport = await connection.query(s2)
             if (createReport.rowCount > 0) {
                 if (attachment.length > 0) {
                     for (let files of attachment) {
-                        let s3 = dbScript(db_sql['Q61'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6 : createReport.rows[0].id })
+                        let s3 = dbScript(db_sql['Q61'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createReport.rows[0].id })
                         let createReportAttach = await connection.query(s3)
                     }
                 }
@@ -129,11 +129,11 @@ module.exports.submitReportForApproval = async (req, res) => {
 module.exports.reportDetails = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, techId } = req.query
+        let { projectId, techId, machineId } = req.query
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: techId })
+            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: techId, var3 : machineId })
             let reportDetails = await connection.query(s2)
             if (reportDetails.rowCount > 0) {
                 res.json({
@@ -175,9 +175,9 @@ module.exports.deleteReport = async (req, res) => {
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q62'], { var1: _dt, var2: projectId, var3: id, var4 : reportId })
+            let s2 = dbScript(db_sql['Q62'], { var1: _dt, var2: projectId, var3: id, var4: reportId })
             let deleteReport = await connection.query(s2)
-            let s3 = dbScript(db_sql['Q63'], { var1: _dt, var2: projectId, var3: id, var4 : reportId })
+            let s3 = dbScript(db_sql['Q63'], { var1: _dt, var2: projectId, var3: id, var4: reportId })
             let deletereportAttach = await connection.query(s3)
 
             if (deleteReport.rowCount > 0) {
@@ -248,6 +248,46 @@ module.exports.validateReport = async (req, res) => {
         }
     } catch (error) {
         await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+module.exports.reportDetailsForTech = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, machineId } = req.query
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: id, var3 : machineId })
+            let reportDetails = await connection.query(s2)
+            if (reportDetails.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Report Details.",
+                    data: reportDetails.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Report Details.",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
         res.json({
             status: 400,
             success: false,

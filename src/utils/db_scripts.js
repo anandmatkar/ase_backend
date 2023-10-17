@@ -338,6 +338,9 @@ const db_sql = {
                             'id', pr.id,
                             'date', pr.date,
                             'description', pr.description,
+                            'machine_id', pr.machine_id,
+                            'duration', pr.duration,
+                            'comments', pr.comments,
                             'is_requested_for_approval', pr.is_requested_for_approval,
                             'is_approved', pr.is_approved,
                             'report_attach_data', COALESCE(
@@ -495,8 +498,8 @@ const db_sql = {
                         c.scope_of_work,
                         c.manager_id,
                         m.email_address;` ,
-        "Q48":` INSERT INTO project_report(project_id, tech_id, manager_id, date, description)
-                VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}') RETURNING *`,
+        "Q48":` INSERT INTO project_report(project_id, tech_id, manager_id, date, description, duration, comments, machine_id)
+                VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}') RETURNING *`,
         "Q49":  `UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q50":  `SELECT * FROM project_report WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL` ,
         "Q51":  `UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}'
@@ -576,8 +579,11 @@ const db_sql = {
                         pr.tech_id,
                         pr.project_id,
                         pr.manager_id,
+                        pr.machine_id,
                         pr.date,
                         pr.description,
+                        pr.comments,
+                        pr.duration,
                         pr.is_requested_for_approval,
                         pr.is_approved,
                         pr.created_at,
@@ -595,6 +601,7 @@ const db_sql = {
                 WHERE
                         project_id = '{var1}' AND
                         tech_id = '{var2}' AND
+                        machine_id = '{var3}' AND
                         pr.deleted_at IS NULL;`,
         "Q68":  `SELECT
                     p.id AS project_id,

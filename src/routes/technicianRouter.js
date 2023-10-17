@@ -36,5 +36,6 @@ router.post('/createReport', verifyTokenTechnician, controller.report.createRepo
 router.put('/submitReportForApproval', verifyTokenTechnician, controller.report.submitReportForApproval)
 router.post('/uploadReportAttach', uploadReportAttach.array('files'), controller.report.uploadReportAttach)
 router.get('/deleteReport',verifyTokenTechnician, controller.report.deleteReport)
+router.get('/reportDetailsForTech',verifyTokenTechnician, controller.report.reportDetailsForTech)
 
 module.exports = router
