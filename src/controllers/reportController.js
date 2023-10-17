@@ -10,13 +10,13 @@ const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNo
 module.exports.createReport = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectID, date, description, attachment, duration, comments, machineId } = req.body
+        let { projectID, date, description, attachment, duration, comments, machineID } = req.body
 
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s2 = dbScript(db_sql['Q48'], { var1: projectID, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description, var6: duration, var7: comments, var8: machineId })
+            let s2 = dbScript(db_sql['Q48'], { var1: projectID, var2: id, var3: findTechnician.rows[0].manager_id, var4: date, var5: description, var6: duration, var7: comments, var8: machineID })
             let createReport = await connection.query(s2)
             if (createReport.rowCount > 0) {
                 if (attachment.length > 0) {

@@ -993,3 +993,119 @@ module.exports.deleteTimesheet = async (req, res) => {
     }
 }
 
+//for manager
+module.exports.deleteTechnician = async (req, res) => {
+    try {
+        let { id, position } = req.user;
+        let { techId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id });
+        let findManager = await connection.query(s1);
+        if (findManager.rowCount > 0 && position === 'Manager') {
+            let s2 = dbScript(db_sql['Q77'], { var1: techId });
+            let findProject = await connection.query(s2);
+            let _dt = new Date().toISOString()
+            if (findProject.rowCount > 0) {
+                const canDeleteTechnician = findProject.rows.some(project => project.is_completed === false);
+
+                if (canDeleteTechnician) {
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Can not delete technician since he is currently assigned to a project",
+                    });
+                } else {
+
+                    let s3 = dbScript(db_sql['Q78'], { var1: 'technician', var2: _dt, var3: techId });
+                    let deleteTechnician = await connection.query(s3);
+
+                    let s4 = dbScript(db_sql['Q78'], { var1: 'tech_documents', var2: _dt, var3: techId });
+                    let deleteTecDocs = await connection.query(s4);
+
+                    let s5 = dbScript(db_sql['Q78'], { var1: 'tech_machine', var2: _dt, var3: techId });
+                    let deleteTechMachine = await connection.query(s5);
+
+                    let s6 = dbScript(db_sql['Q78'], { var1: 'timesheet', var2: _dt, var3: techId });
+                    let deleteTimesheet = await connection.query(s6);
+
+                    let s7 = dbScript(db_sql['Q78'], { var1: 'timesheet_attach', var2: _dt, var3: techId });
+                    let deleteTimesheetAttach = await connection.query(s7);
+
+                    let s8 = dbScript(db_sql['Q78'], { var1: 'project_report', var2: _dt, var3: techId });
+                    let deleteReport = await connection.query(s8);
+
+                    let s9 = dbScript(db_sql['Q78'], { var1: 'report_attach', var2: _dt, var3: techId });
+                    let deleteReportAttach = await connection.query(s9);
+
+                    if (deleteTechnician.rowCount > 0) {
+                        await connection.query("COMMIT")
+                        res.json({
+                            status: 200,
+                            success: true,
+                            message: "technician deleted successfully",
+                        });
+                    } else {
+                        await connection.query("ROLLBACK")
+                        res.json({
+                            status: 400,
+                            success: false,
+                            message: "Something went wrong.",
+                        });
+                    }
+
+                }
+            } else {
+                let s3 = dbScript(db_sql['Q78'], { var1: 'technician', var2: _dt, var3: techId });
+                let deleteTechnician = await connection.query(s3);
+
+                let s4 = dbScript(db_sql['Q78'], { var1: 'tech_documents', var2: _dt, var3: techId });
+                let deleteTecDocs = await connection.query(s4);
+
+                let s5 = dbScript(db_sql['Q78'], { var1: 'tech_machine', var2: _dt, var3: techId });
+                let deleteTechMachine = await connection.query(s5);
+
+                let s6 = dbScript(db_sql['Q78'], { var1: 'timesheet', var2: _dt, var3: techId });
+                let deleteTimesheet = await connection.query(s6);
+
+                let s7 = dbScript(db_sql['Q78'], { var1: 'timesheet_attach', var2: _dt, var3: techId });
+                let deleteTimesheetAttach = await connection.query(s7);
+
+                let s8 = dbScript(db_sql['Q78'], { var1: 'project_report', var2: _dt, var3: techId });
+                let deleteReport = await connection.query(s8);
+
+                let s9 = dbScript(db_sql['Q78'], { var1: 'report_attach', var2: _dt, var3: techId });
+                let deleteReportAttach = await connection.query(s9);
+
+                if (deleteTechnician.rowCount > 0) {
+                    await connection.query("COMMIT")
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "technician deleted successfully",
+                    });
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong.",
+                    });
+                }
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found",
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+

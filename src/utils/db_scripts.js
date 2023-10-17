@@ -680,93 +680,99 @@ const db_sql = {
                WHERE status = {var1} AND deleted_at IS NULL;`,
         "Q75":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}', updated_at = '{var3}' WHERE id = '{var4}' AND deleted_at IS NULL RETURNING *;`,
         "Q76": `SELECT
-        p.order_id,
-        p.project_type,
-        p.description,
-        p.start_date,
-        p.end_date,
-        c.customer_name,
-        c.customer_contact,
-        c.customer_account,
-        c.email_address,
-        c.phone_number,
-        c.country,
-        c.city,
-        c.address,
-        c.scope_of_work,
-        COALESCE((
-            SELECT JSON_AGG(
-                json_build_object(
-                    'name', t.name,
-                    'surname', t.surname,
-                    'position', t.position,
-                    'email_address', t.email_address,
-                    'phone_number', t.phone_number,
-                    'nationality', t.nationality,
-                    'qualification', t.qualification,
-                    'level', t.level,
-                    'avatar', t.avatar,
-                    'timesheet_data', COALESCE((
-                        SELECT JSON_AGG(
-                            json_build_object(
-                                'id', ts.id,
-                                'date', ts.date,
-                                'start_time', ts.start_time,
-                                'end_time', ts.end_time,
-                                'comments', ts.comments
-                            )
+                p.order_id,
+                p.project_type,
+                p.description,
+                p.start_date,
+                p.end_date,
+                c.customer_name,
+                c.customer_contact,
+                c.customer_account,
+                c.email_address,
+                c.phone_number,
+                c.country,
+                c.city,
+                c.address,
+                c.scope_of_work,
+                COALESCE((
+                    SELECT JSON_AGG(
+                        json_build_object(
+                            'name', t.name,
+                            'surname', t.surname,
+                            'position', t.position,
+                            'email_address', t.email_address,
+                            'phone_number', t.phone_number,
+                            'nationality', t.nationality,
+                            'qualification', t.qualification,
+                            'level', t.level,
+                            'avatar', t.avatar,
+                            'timesheet_data', COALESCE((
+                                SELECT JSON_AGG(
+                                    json_build_object(
+                                        'id', ts.id,
+                                        'date', ts.date,
+                                        'start_time', ts.start_time,
+                                        'end_time', ts.end_time,
+                                        'comments', ts.comments
+                                    )
+                                )
+                                FROM timesheet ts
+                                WHERE ts.tech_id = t.id
+                                AND ts.project_id = p.id
+                                AND ts.deleted_at IS NULL
+                            )::json, '[]'::json),
+                            'project_report_data', COALESCE((
+                                SELECT JSON_AGG(
+                                    json_build_object(
+                                        'id', pr.id,
+                                        'date', pr.date,
+                                        'description', pr.description
+                                    )
+                                )
+                                FROM project_report pr
+                                WHERE pr.project_id = p.id
+                                AND pr.tech_id = t.id
+                                AND pr.deleted_at IS NULL
+                            )::json, '[]'::json),
+                            'machine_data', COALESCE((
+                                SELECT JSON_AGG(
+                                    json_build_object(
+                                        'machine_type', m.machine_type,
+                                        'description', m.description,
+                                        'serial', m.serial
+                                    )
+                                )
+                                FROM machine m
+                                INNER JOIN tech_machine tm ON m.id = tm.machine_id
+                                WHERE tm.tech_id = t.id
+                                AND tm.project_id = p.id
+                                AND tm.deleted_at IS NULL
+                                AND m.deleted_at IS NULL
+                            )::json, '[]'::json)
                         )
-                        FROM timesheet ts
-                        WHERE ts.tech_id = t.id
-                        AND ts.project_id = p.id
-                        AND ts.deleted_at IS NULL
-                    )::json, '[]'::json),
-                    'project_report_data', COALESCE((
-                        SELECT JSON_AGG(
-                            json_build_object(
-                                'id', pr.id,
-                                'date', pr.date,
-                                'description', pr.description
-                            )
-                        )
-                        FROM project_report pr
-                        WHERE pr.project_id = p.id
-                        AND pr.tech_id = t.id
-                        AND pr.deleted_at IS NULL
-                    )::json, '[]'::json),
-                    'machine_data', COALESCE((
-                        SELECT JSON_AGG(
-                            json_build_object(
-                                'machine_type', m.machine_type,
-                                'description', m.description,
-                                'serial', m.serial
-                            )
-                        )
-                        FROM machine m
-                        INNER JOIN tech_machine tm ON m.id = tm.machine_id
-                        WHERE tm.tech_id = t.id
-                        AND tm.project_id = p.id
+                    )
+                    FROM (
+                        SELECT DISTINCT t.id
+                        FROM technician t
+                        JOIN tech_machine tm ON t.id = tm.tech_id
+                        WHERE tm.project_id = p.id
                         AND tm.deleted_at IS NULL
-                        AND m.deleted_at IS NULL
-                    )::json, '[]'::json)
-                )
-            )
-            FROM (
-                SELECT DISTINCT t.id
-                FROM technician t
-                JOIN tech_machine tm ON t.id = tm.tech_id
-                WHERE tm.project_id = p.id
-                AND tm.deleted_at IS NULL
-                AND t.deleted_at IS NULL
-            ) AS distinct_technicians
-            JOIN technician t ON distinct_technicians.id = t.id
-        )::json, '[]'::json) AS technician_data
-    FROM project AS p
-    LEFT JOIN customer c ON c.id = p.customer_id
-    WHERE p.id = '{var1}'
-    AND p.deleted_at IS NULL
-    AND c.deleted_at IS NULL;
-    `               
+                        AND t.deleted_at IS NULL
+                    ) AS distinct_technicians
+                    JOIN technician t ON distinct_technicians.id = t.id
+                )::json, '[]'::json) AS technician_data
+                FROM project AS p
+                LEFT JOIN customer c ON c.id = p.customer_id
+                WHERE p.id = '{var1}'
+                AND p.deleted_at IS NULL
+                AND c.deleted_at IS NULL;
+                `,
+            "Q77": `SELECT tm.*, p.*
+                    FROM tech_machine AS tm
+                    LEFT JOIN project AS p ON tm.project_id = p.id
+                    WHERE tm.tech_id = '{var1}' AND tm.deleted_at IS NULL AND p.deleted_at IS NULL;
+                    `,
+            "Q78": `UPDATE {var1} SET deleted_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`                           
 
 }
 

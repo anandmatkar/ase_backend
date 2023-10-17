@@ -42,6 +42,7 @@ router.get('/technicianLists', verifyTokenManager, controller.technician.technic
 router.get('/technicianDetailsForManager', verifyTokenManagerORTechnician, controller.manager.technicianDetailsForManager)
 router.post('/uploadTechnicianDocuments', uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
 router.post('/insertTechnician',verifyTokenManager, uploadTechnicianFile.single('file'), controller.technician.insertTechnician)
+router.put('/deleteTechnician',verifyTokenManager, controller.technician.deleteTechnician)
 
 //---------------------------------------------------------- TImesheet Routes ------------------------------------------------------//
 

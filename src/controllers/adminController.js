@@ -78,7 +78,7 @@ module.exports.managerListForApproval = async (req, res) => {
             } else {
                 res.send({
                     status: 200,
-                    success: true,
+                    success: false,
                     message: "Empty Manager Lists",
                     data: []
                 });
