@@ -211,6 +211,7 @@ module.exports.techLogin = async (req, res) => {
                     message: "Login successfull",
                     data: {
                         token: jwtToken,
+                        role: "Technician",
                         id: findTechnician.rows[0].id,
                         name: findTechnician.rows[0].name,
                         surname: findTechnician.rows[0].surname,

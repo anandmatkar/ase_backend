@@ -217,6 +217,7 @@ module.exports.managerLogin = async (req, res) => {
                             message: "Login successfull",
                             data: {
                                 token: jwtToken,
+                                role: "Manager",
                                 id: findManager.rows[0].id,
                                 name: findManager.rows[0].name,
                                 surname: findManager.rows[0].surname,

@@ -20,7 +20,7 @@ module.exports.adminLogin = async (req, res) => {
                     message: "Login successfull",
                     data: {
                         token: jwtToken,
-                        expiresIn: 3600
+                        role : 'Admin'
                     }
                 });
             } else {
