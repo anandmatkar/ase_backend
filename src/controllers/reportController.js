@@ -216,13 +216,13 @@ module.exports.deleteReport = async (req, res) => {
 module.exports.validateReport = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, techId } = req.query
+        let { projectId, techId, machineId } = req.query
 
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q51'], { var1: true, var2: false, var3: projectId, var4: techId })
+            let s2 = dbScript(db_sql['Q51'], { var1: true, var2: false, var3: projectId, var4: techId, var5 : machineId })
             let approveReport = await connection.query(s2)
             if (approveReport.rowCount > 0) {
                 await connection.query("COMMIT")

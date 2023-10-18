@@ -505,7 +505,7 @@ const db_sql = {
         "Q49":  `UPDATE project_report SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q50":  `SELECT * FROM project_report WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL` ,
         "Q51":  `UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}'
-                 WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+                 WHERE project_id = '{var3}' AND tech_id = '{var4}' AND machine_id = '{var5}' AND deleted_at IS NULL RETURNING *`,
         "Q52":  `UPDATE timesheet SET deleted_at = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
         "Q53":  `UPDATE timesheet_attach SET deleted_at = '{var1}'
                  WHERE project_id = '{var2}' AND tech_id = '{var3}' AND timesheet_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
