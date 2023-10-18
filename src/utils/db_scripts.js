@@ -653,31 +653,41 @@ const db_sql = {
         "Q71":  `UPDATE tech_machine SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q72":  `UPDATE machine_attach SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
         "Q73":  `SELECT
-        m.id AS machine_id,
-        m.order_id,
-        m.project_id,
-        m.machine_type,
-        m.serial,
-        m.hour_count,
-        m.nom_speed,
-        m.act_speed,
-        m.description,
-        m.created_at,
-        m.updated_at,
-        m.deleted_at,
-        'machine_attach',
-        COALESCE(
-            (
-                SELECT json_agg(ma.*)
-                FROM machine_attach ma
-                WHERE ma.machine_id = m.id
-                AND ma.deleted_at IS NULL
-            ),
-            '[]'::json
-        ) AS machine_attach
-    FROM machine m
-    JOIN tech_machine tm ON m.id = tm.machine_id
-    WHERE tm.tech_id = '{var1}' AND m.project_id = '{var2}' AND m.deleted_at IS NULL;
+                    m.id AS machine_id,
+                    m.order_id,
+                    m.project_id,
+                    m.machine_type,
+                    m.serial,
+                    m.hour_count,
+                    m.nom_speed,
+                    m.act_speed,
+                    m.description,
+                    m.created_at,
+                    m.updated_at,
+                    m.deleted_at,
+                    'machine_attach',
+                    COALESCE(
+                        (
+                            SELECT json_agg(ma.*)
+                            FROM machine_attach ma
+                            WHERE ma.machine_id = m.id
+                            AND ma.deleted_at IS NULL
+                        ),
+                        '[]'::json
+                    ) AS machine_attach,
+                    COALESCE(
+                        (
+                            SELECT json_agg(pr.*)
+                            FROM project_report pr
+                            WHERE pr.machine_id = m.id
+                            AND pr.tech_id = '{var1}'
+                        ),
+                        '[]'::json
+                    ) AS project_report
+                FROM machine m
+                JOIN tech_machine tm ON m.id = tm.machine_id
+                WHERE tm.tech_id = '{var1}' AND m.project_id = '{var2}' AND m.deleted_at IS NULL;
+                ;
     `,
         "Q74":`SELECT COUNT(*) 
                FROM manager 
