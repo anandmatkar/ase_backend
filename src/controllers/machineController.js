@@ -136,11 +136,11 @@ module.exports.deleteMachine = async (req, res) => {
 module.exports.machineData = async(req,res) => {
     try {
         let { id, position, email } = req.user
-        let { machineId, projectId } = req.query
+        let { techID, projectId } = req.query
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q73'], { var1: machineId, var2 : projectId })
+            let s2 = dbScript(db_sql['Q73'], { var1: techID, var2 : projectId })
             let findMachineData = await connection.query(s2)
             if(findMachineData.rowCount > 0){
                 res.json({
