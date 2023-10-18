@@ -116,6 +116,7 @@ const db_sql = {
                                 'comments', ts.comments,
                                 'is_timesheet_requested_for_approval', ts.is_timesheet_requested_for_approval,
                                 'is_timesheet_approved', ts.is_timesheet_approved,
+                                'lunch_time', ts.lunch_time,
                                 'timesheet_attach_data', COALESCE((
                                     SELECT JSON_AGG(ta.*)
                                     FROM timesheet_attach ta
@@ -321,6 +322,7 @@ const db_sql = {
                             'comments', ts.comments,
                             'is_timesheet_requested_for_approval', ts.is_timesheet_requested_for_approval,
                             'is_timesheet_approved', ts.is_timesheet_approved,
+                            'lunch_time', ts.lunch_time,
                             'timesheet_attach_data', COALESCE(
                                 (SELECT JSON_AGG(ta.*)
                                 FROM timesheet_attach ta
