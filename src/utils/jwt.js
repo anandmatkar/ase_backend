@@ -9,7 +9,7 @@ const jwt = {
             email: user.email_address,
             position: position
         };
-        const expiresIn = 60 * 60 * 24;
+        const expiresIn = 60 * 60;
         const jwtToken = jsonwebtoken.sign(payload, 'KEy',{ expiresIn })
         return jwtToken;
     },
