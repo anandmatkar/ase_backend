@@ -416,9 +416,9 @@ const db_sql = {
             AND c.deleted_at IS NULL;
         `,
         "Q32": `INSERT INTO timesheet
-               (project_id, tech_id, date, start_time, end_time, comments, manager_id)
-               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}') RETURNING *` ,
-        "Q33": `SELECT id, project_id, tech_id, date, start_time, end_time, comments, created_at, is_timesheet_approved FROM timesheet WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
+               (project_id, tech_id, date, start_time, end_time, comments, manager_id, lunch_time)
+               VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}', '{var8}') RETURNING *` ,
+        "Q33": `SELECT id, project_id, tech_id, date, start_time, end_time, comments, created_at, is_timesheet_approved, lunch_time FROM timesheet WHERE project_id = '{var1}' AND tech_id = '{var2}' AND deleted_at IS NULL`,
         "Q34": `INSERT INTO timesheet_attach
                (project_id,tech_id,file_path,file_type,file_size, timesheet_id)
                VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
