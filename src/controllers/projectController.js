@@ -347,14 +347,13 @@ module.exports.completeProject = async (req, res) => {
         let s2 = dbScript(db_sql['Q75'], { var1: true, var2: false, var3: _dt, var4: projectId })
         let approveProject = await connection.query(s2)
         if (approveProject.rowCount > 0) {
-            // await connection.query("COMMIT")
-            await connection.query("ROLLBACK")
+            await connection.query("COMMIT")
 
             let s3 = dbScript(db_sql['Q76'], { var1: projectId });
             let projectDetails = await connection.query(s3);
 
          let pdfBytes = await createPDF(projectDetails.rows)
-            await sendprojectDetails('pchetan839@gmail.com',pdfBytes)
+            await sendprojectDetails(findManager.rows[0].email_address,pdfBytes)
             res.json({
                 status: 200,
                 success: true,
