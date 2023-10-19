@@ -1,8 +1,8 @@
 const connection = require('../database/connection');
-const { mysql_real_escape_string, generateDynamicHtmlTemplate } = require('../utils/helper')
+const { mysql_real_escape_string, generateDynamicHtmlTemplate, createPDF } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const { sendProjectNotificationEmail, sendprojectDetails } = require('../utils/sendMail');
-const { create } = require('pdf-creator-node');
+const { PDFDocument, rgb } = require('pdf-lib');
 
 
 //Create Project by Manager
@@ -302,7 +302,7 @@ module.exports.deleteProject = async (req, res) => {
             let s6 = dbScript(db_sql['Q41'], { var1: _dt, var2: projectId })
             let deleteTimesheet = await connection.query(s6)
 
-            let s7 = dbScript(db_sql['Q42'], { var1: 'timesheet_attach', var2: _dt, var3 : projectId })
+            let s7 = dbScript(db_sql['Q42'], { var1: 'timesheet_attach', var2: _dt, var3: projectId })
             let deleteTimesheetAttach = await connection.query(s7)
             if (deleteProjectDetails.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -347,14 +347,19 @@ module.exports.completeProject = async (req, res) => {
         let s2 = dbScript(db_sql['Q75'], { var1: true, var2: false, var3: _dt, var4: projectId })
         let approveProject = await connection.query(s2)
         if (approveProject.rowCount > 0) {
-            await connection.query("COMMIT")
+            // await connection.query("COMMIT")
+            await connection.query("ROLLBACK")
 
-            // let s3 = dbScript(db_sql['Q76'], { var1: projectId });
-            // let projectDetails = await connection.query(s3);
+            let s3 = dbScript(db_sql['Q76'], { var1: projectId });
+            let projectDetails = await connection.query(s3);
+
+         let pdfBytes = await createPDF(projectDetails.rows)
+            await sendprojectDetails('pchetan839@gmail.com',pdfBytes)
             res.json({
                 status: 200,
                 success: true,
-                message: "Project approved successfully."
+                message: "Project approved successfully.",
+                data: projectDetails.rows
             })
         } else {
             await connection.query("ROLLBACK")

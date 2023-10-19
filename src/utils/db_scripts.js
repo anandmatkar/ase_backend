@@ -721,74 +721,45 @@ const db_sql = {
                WHERE status = {var1} AND deleted_at IS NULL;`,
         "Q75":`UPDATE project SET is_completed = '{var1}', is_requested_for_approval = '{var2}', updated_at = '{var3}' WHERE id = '{var4}' AND deleted_at IS NULL RETURNING *;`,
         "Q76": `SELECT
-                p.order_id,
-                p.project_type,
-                p.description,
-                p.start_date,
-                p.end_date,
-                c.customer_name,
-                c.customer_contact,
-                c.customer_account,
-                c.email_address,
-                c.phone_number,
-                c.country,
-                c.city,
-                c.address,
-                c.scope_of_work,
+                p.order_id AS "ORDER_ID",
+                p.project_type AS "PROJECT_TYPE",
+                p.description AS "DESCRIPTION",
+                p.start_date AS "START_DATE",
+                p.end_date AS "END_DATE",
+                c.customer_name AS "CUSTOMER_NAME",
+                c.customer_contact AS "CONTACT",
+                c.customer_account AS "ACCOUNT",
+                c.email_address AS "EMAIL",
+                c.phone_number AS "PHONE",
+                c.country AS "COUNTRY",
+                c.city AS "CITY",
+                c.address AS "ADDRESS",
+                c.scope_of_work AS "SCOPE",
                 COALESCE((
                     SELECT JSON_AGG(
                         json_build_object(
-                            'name', t.name,
-                            'surname', t.surname,
-                            'position', t.position,
-                            'email_address', t.email_address,
-                            'phone_number', t.phone_number,
-                            'nationality', t.nationality,
-                            'qualification', t.qualification,
-                            'level', t.level,
-                            'avatar', t.avatar,
+                            'NAME', t.name,
+                            'SURNAME', t.surname,
+                            'POSITION', t.position,
+                            'EMAIL', t.email_address,
+                            'PHONE', t.phone_number,
+                            'NATIONALITY', t.nationality,
+                            'QUALIFICATION', t.qualification,
+                            'EXPERIENCE', t.level,
                             'timesheet_data', COALESCE((
                                 SELECT JSON_AGG(
                                     json_build_object(
-                                        'id', ts.id,
-                                        'date', ts.date,
-                                        'start_time', ts.start_time,
-                                        'end_time', ts.end_time,
-                                        'comments', ts.comments
+                                        'DATE', ts.date,
+                                        'CHECK_IN', ts.start_time,
+                                        'CHECK_OUT', ts.end_time,
+                                        'LUNCH_TIME', ts.lunch_time,
+                                        'COMMENTS', ts.comments
                                     )
                                 )
                                 FROM timesheet ts
                                 WHERE ts.tech_id = t.id
                                 AND ts.project_id = p.id
                                 AND ts.deleted_at IS NULL
-                            )::json, '[]'::json),
-                            'project_report_data', COALESCE((
-                                SELECT JSON_AGG(
-                                    json_build_object(
-                                        'id', pr.id,
-                                        'date', pr.date,
-                                        'description', pr.description
-                                    )
-                                )
-                                FROM project_report pr
-                                WHERE pr.project_id = p.id
-                                AND pr.tech_id = t.id
-                                AND pr.deleted_at IS NULL
-                            )::json, '[]'::json),
-                            'machine_data', COALESCE((
-                                SELECT JSON_AGG(
-                                    json_build_object(
-                                        'machine_type', m.machine_type,
-                                        'description', m.description,
-                                        'serial', m.serial
-                                    )
-                                )
-                                FROM machine m
-                                INNER JOIN tech_machine tm ON m.id = tm.machine_id
-                                WHERE tm.tech_id = t.id
-                                AND tm.project_id = p.id
-                                AND tm.deleted_at IS NULL
-                                AND m.deleted_at IS NULL
                             )::json, '[]'::json)
                         )
                     )
