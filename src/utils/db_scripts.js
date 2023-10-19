@@ -532,6 +532,7 @@ const db_sql = {
                     ts.start_time, 
                     ts.end_time, 
                     ts.comments, 
+                    ts.lunch_time,
                     ts.is_timesheet_approved, 
                     ts.is_timesheet_requested_for_approval, 
                     ts.created_at, 
