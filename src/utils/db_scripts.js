@@ -787,7 +787,7 @@ const db_sql = {
             "Q78": `UPDATE {var1} SET deleted_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
             "Q79":`UPDATE timesheet SET is_timesheet_approved = '{var1}', is_timesheet_requested_for_approval = '{var2}', updated_at = '{var3}' WHERE project_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
             "Q80":  `UPDATE project_report SET is_approved = '{var1}', is_requested_for_approval = '{var2}', updated_at = '{var3}'
-            WHERE project_id = '{var4}' AND deleted_at IS NULL RETURNING *`                           
+            WHERE project_id = '{var4}' AND deleted_at IS NULL RETURNING *`,                           
 
 }
 

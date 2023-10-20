@@ -286,39 +286,54 @@ module.exports.deleteProject = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
+
+            let s0 = dbScript(db_sql['Q45'], { var1: projectId })
+            let findProject = await connection.query(s0)
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q37'], { var1: _dt, var2: projectId })
-            let deleteProjectDetails = await connection.query(s2)
-
-            let s3 = dbScript(db_sql['Q38'], { var1: _dt, var2: projectId })
-            let deleteProjectAttach = await connection.query(s3)
-
-            let s4 = dbScript(db_sql['Q39'], { var1: _dt, var2: projectId })
-            let deleteMachine = await connection.query(s4)
-
-            let s5 = dbScript(db_sql['Q40'], { var1: _dt, var2: projectId })
-            let deleteMachineAttach = await connection.query(s5)
-
-            let s6 = dbScript(db_sql['Q41'], { var1: _dt, var2: projectId })
-            let deleteTimesheet = await connection.query(s6)
-
-            let s7 = dbScript(db_sql['Q42'], { var1: 'timesheet_attach', var2: _dt, var3: projectId })
-            let deleteTimesheetAttach = await connection.query(s7)
-            if (deleteProjectDetails.rowCount > 0) {
-                await connection.query("COMMIT")
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Project deleted successfully."
-                })
-            } else {
-                await connection.query("ROLLBACK")
-                res.json({
+            console.log(findProject.rows[0].start_date <= _dt);
+            if (findProject.rows[0].is_completed == false && findProject.rows[0].start_date <= _dt) {
+                return res.json({
                     status: 400,
                     success: false,
-                    message: "Something went wrong."
+                    message: "Can not delete project since project is under progress."
                 })
             }
+            else {
+                let s2 = dbScript(db_sql['Q37'], { var1: _dt, var2: projectId })
+                let deleteProjectDetails = await connection.query(s2)
+
+                let s3 = dbScript(db_sql['Q38'], { var1: _dt, var2: projectId })
+                let deleteProjectAttach = await connection.query(s3)
+
+                let s4 = dbScript(db_sql['Q39'], { var1: _dt, var2: projectId })
+                let deleteMachine = await connection.query(s4)
+
+                let s5 = dbScript(db_sql['Q40'], { var1: _dt, var2: projectId })
+                let deleteMachineAttach = await connection.query(s5)
+
+                let s6 = dbScript(db_sql['Q41'], { var1: _dt, var2: projectId })
+                let deleteTimesheet = await connection.query(s6)
+
+                let s7 = dbScript(db_sql['Q42'], { var1: 'timesheet_attach', var2: _dt, var3: projectId })
+                let deleteTimesheetAttach = await connection.query(s7)
+                if (deleteProjectDetails.rowCount > 0) {
+                    await connection.query("COMMIT")
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "Project deleted successfully."
+                    })
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong."
+                    })
+                }
+            }
+
+
         } else {
             res.json({
                 status: 404,
@@ -358,8 +373,8 @@ module.exports.completeProject = async (req, res) => {
             let s3 = dbScript(db_sql['Q76'], { var1: projectId });
             let projectDetails = await connection.query(s3);
 
-         let pdfBytes = await createPDF(projectDetails.rows)
-            sendprojectDetails(findManager.rows[0].email_address,pdfBytes)
+            let pdfBytes = await createPDF(projectDetails.rows)
+            sendprojectDetails(findManager.rows[0].email_address, pdfBytes)
             res.json({
                 status: 200,
                 success: true,
