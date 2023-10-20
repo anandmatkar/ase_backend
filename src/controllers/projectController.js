@@ -9,7 +9,7 @@ const { PDFDocument, rgb } = require('pdf-lib');
 module.exports.createProject = async (req, res) => {
     try {
         let { id, position, email } = req.user
-        let { customerId, projectType, description, startDate, endDate, projectAttach, machineDetails, techIds } = req.body
+        let { customerId, projectType, description, startDate, endDate, projectAttach, machineDetails } = req.body
         await connection.query('BEGIN')
 
         let s1 = dbScript(db_sql['Q7'], { var1: id })
@@ -33,7 +33,7 @@ module.exports.createProject = async (req, res) => {
 
             for (let data of machineDetails) {
 
-                let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: createProject.rows[0].id, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: data.MachineSerial, var6: data.hourCount, var7: data.nomSpeed, var8: data.actSpeed, var9: mysql_real_escape_string(description), var10: id })
+                let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: createProject.rows[0].id, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(data.hourCount), var7: mysql_real_escape_string(data.nomSpeed), var8: mysql_real_escape_string(data.actSpeed), var9: mysql_real_escape_string(description), var10: id })
                 let createMachine = await connection.query(s5)
                 for (let techId of data.techIds) {
                     //Assign the machine to technicians
@@ -50,7 +50,7 @@ module.exports.createProject = async (req, res) => {
                 }
             }
             if (createProject.rowCount > 0) {
-                await this.sendProjectMail(createProject.rows[0].id)
+                this.sendProjectMail(createProject.rows[0].id)
                 await connection.query("COMMIT")
                 res.json({
                     status: 200,
@@ -118,7 +118,7 @@ module.exports.sendProjectMail = async (req, res) => {
         for (let data of selectProjectData.rows[0].technicians) {
             emailArr.push(data.email_address)
         }
-        await sendProjectNotificationEmail(emailArr, selectProjectData.rows[0])
+        sendProjectNotificationEmail(emailArr, selectProjectData.rows[0])
 
     }
 
@@ -346,6 +346,12 @@ module.exports.completeProject = async (req, res) => {
         let _dt = new Date().toISOString()
         let s2 = dbScript(db_sql['Q75'], { var1: true, var2: false, var3: _dt, var4: projectId })
         let approveProject = await connection.query(s2)
+
+        let s3 = dbScript(db_sql['Q79'], { var1: true, var2: false, var3: _dt, var4: projectId })
+        let approveTimesheet = await connection.query(s3)
+
+        let s4 = dbScript(db_sql['Q80'], { var1: true, var2: false, var3: _dt, var4: projectId })
+        let approveReport = await connection.query(s4)
         if (approveProject.rowCount > 0) {
             await connection.query("COMMIT")
 
@@ -353,7 +359,7 @@ module.exports.completeProject = async (req, res) => {
             let projectDetails = await connection.query(s3);
 
          let pdfBytes = await createPDF(projectDetails.rows)
-            await sendprojectDetails(findManager.rows[0].email_address,pdfBytes)
+            sendprojectDetails(findManager.rows[0].email_address,pdfBytes)
             res.json({
                 status: 200,
                 success: true,

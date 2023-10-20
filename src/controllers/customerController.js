@@ -165,7 +165,7 @@ module.exports.updateCustomer = async (req, res) => {
             let s2 = dbScript(db_sql['Q19'], {
                 var1: mysql_real_escape_string(customer_name),
                 var2: mysql_real_escape_string(customer_contact),
-                var3: customer_account,
+                var3: mysql_real_escape_string(customer_account),
                 var4: mysql_real_escape_string(email_address),
                 var5: phone_number,
                 var6: mysql_real_escape_string(country),

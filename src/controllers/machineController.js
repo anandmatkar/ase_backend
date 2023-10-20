@@ -53,7 +53,7 @@ module.exports.editMachineDetails = async (req, res) => {
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q69'], { var1: machine_type, var2: serial, var3: hour_count, var4: nom_speed, var5: act_speed, var6: description, var7: _dt, var8: machine_id })
+            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(hour_count), var4: mysql_real_escape_string(nom_speed), var5: mysql_real_escape_string(act_speed), var6: mysql_real_escape_string(description), var7: _dt, var8: machine_id })
             let updateMachine = await connection.query(s2)
             if (updateMachine.rowCount > 0) {
                 res.json({

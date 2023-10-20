@@ -754,7 +754,7 @@ module.exports.createTimesheet = async (req, res) => {
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let s0 = dbScript(db_sql['Q45'], { var1: projectID })
             let findProjectDetails = await connection.query(s0)
-            let s2 = dbScript(db_sql['Q32'], { var1: projectID, var2: id, var3: date, var4: startTime, var5: endTime, var6: comments, var7: findProjectDetails.rows[0].manager_id, var8: lunchtime })
+            let s2 = dbScript(db_sql['Q32'], { var1: projectID, var2: id, var3: date, var4: startTime, var5: endTime, var6: mysql_real_escape_string(comments), var7: findProjectDetails.rows[0].manager_id, var8: lunchtime })
             let createTimeSheet = await connection.query(s2)
             if (createTimeSheet.rowCount > 0) {
                 if (attachment.length > 0) {
