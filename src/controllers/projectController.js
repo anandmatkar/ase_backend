@@ -50,8 +50,8 @@ module.exports.createProject = async (req, res) => {
                 }
             }
             if (createProject.rowCount > 0) {
-                this.sendProjectMail(createProject.rows[0].id)
                 await connection.query("COMMIT")
+                this.sendProjectMail(createProject.rows[0].id)
                 res.json({
                     status: 200,
                     success: true,
@@ -59,7 +59,6 @@ module.exports.createProject = async (req, res) => {
                     data: createProject.rows
                 })
             } else {
-                await connection.query('ROLLBACK')
                 res.json({
                     status: 400,
                     success: false,
