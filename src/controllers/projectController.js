@@ -133,34 +133,30 @@ module.exports.projectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q22'], { var1: id })
             let projectList = await connection.query(s2)
             if (projectList.rowCount > 0) {
-                let completedProjects = []
-                let projectInProgress = []
-                let projectRequestedForApproval = []
-                projectList.rows.forEach(row => {
-                    if (row.is_completed == true && row.is_requested_for_approval == false) {
-                        completedProjects.push(row)
-                    } else if (row.is_completed == false && row.is_requested_for_approval == false) {
-                        projectInProgress.push(row)
-                    } else if (row.is_requested_for_approval == true) {
-                        projectRequestedForApproval.push(row)
-                    }
-                })
+                // let completedProjects = []
+                // let projectInProgress = []
+                // let projectRequestedForApproval = []
+                // projectList.rows.forEach(row => {
+                //     if (row.is_completed == true && row.is_requested_for_approval == false) {
+                //         completedProjects.push(row)
+                //     } else if (row.is_completed == false && row.is_requested_for_approval == false) {
+                //         projectInProgress.push(row)
+                //     } else if (row.is_requested_for_approval == true) {
+                //         projectRequestedForApproval.push(row)
+                //     }
+                // })
                 res.json({
                     status: 200,
                     success: true,
                     message: "Project List",
-                    data: {
-                        completedProjects,
-                        projectInProgress,
-                        projectRequestedForApproval
-                    }
+                    data: projectList.rows
                 })
             } else {
                 res.json({
                     status: 200,
                     success: false,
                     message: "Empty project list",
-                    data: {}
+                    data: []
                 })
             }
         } else {
