@@ -95,6 +95,7 @@ const db_sql = {
                                         json_build_object(
                                             'tech_machine_id', tm.id,
                                             'tech_id', tm.tech_id,
+                                            'machine_id',tm.machine_id
                                             'name', t.name,
                                             'surname', t.surname,
                                             'position', t.position,

@@ -67,7 +67,6 @@ module.exports.createPDF = async (data) => {
         let page = addPageAndDrawText('Order Details:', yOffset);
 
         function addDataToPage(data) {
-            console.log(data, "data")
             if (typeof data === 'object') {
                 Object.keys(data).forEach((key) => {
                     yOffset -= 20;

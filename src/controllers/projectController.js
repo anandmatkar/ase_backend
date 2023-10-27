@@ -285,7 +285,6 @@ module.exports.deleteProject = async (req, res) => {
             let s0 = dbScript(db_sql['Q45'], { var1: projectId })
             let findProject = await connection.query(s0)
             let _dt = new Date().toISOString()
-            console.log(findProject.rows[0].start_date <= _dt);
             if (findProject.rows[0].is_completed == false && findProject.rows[0].start_date <= _dt) {
                 return res.json({
                     status: 400,
