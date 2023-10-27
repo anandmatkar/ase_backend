@@ -61,85 +61,133 @@ const db_sql = {
                 FROM project as p
                 INNER JOIN customer as c on c.id = p.customer_id
                 WHERE p.manager_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`,
-        "Q23": `SELECT
-        p.id AS project_id,
-        p.order_id,
-        p.customer_id,
-        p.project_type,
-        p.description,
-        p.start_date,
-        p.end_date,
-        p.created_at,
-        p.is_completed,
-        p.manager_id,
-        c.id AS customer_id,
-        c.customer_name,
-        c.customer_contact,
-        c.customer_account,
-        c.email_address,
-        c.phone_number,
-        c.country,
-        c.city,
-        c.address,
-        c.scope_of_work,
-        COALESCE((
-            SELECT JSON_AGG(
-                json_build_object(
-                    'id', m.id,
-                    'serial', m.serial,
-                    'hour_count', m.hour_count,
-                    'nom_speed', m.nom_speed,
-                    'act_speed', m.act_speed,
-                    'tech_machine_data', (
-                        SELECT JSON_AGG(
-                            json_build_object(
-                                'tech_machine_id', tm.id,
-                                'tech_id', tm.tech_id,
-                                'machine_id', tm.machine_id,
-                                'name', t.name,
-                                'surname', t.surname,
-                                'position', t.position,
-                                'email_address', t.email_address,
-                                'phone_number', t.phone_number,
-                                'nationality', t.nationality,
-                                'qualification', t.qualification,
-                                'level', t.level,
-                                'created_at', t.created_at,
-                                'updated_at', t.updated_at,
-                                'deleted_at', t.deleted_at,
-                                'project_report_data', COALESCE((
-                                    SELECT JSON_AGG(pr.*)
-                                    FROM project_report pr
-                                    WHERE pr.machine_id = m.id
-                                    AND pr.tech_id = tm.tech_id
-                                    AND pr.deleted_at IS NULL
-                                )::json, '[]'::json),
-                                'timesheet_data', COALESCE((
-                                    SELECT JSON_AGG(ts.*)
-                                    FROM timesheet ts
-                                    WHERE ts.project_id = m.project_id
-                                    AND ts.tech_id = tm.tech_id
-                                    AND ts.deleted_at IS NULL
-                                )::json, '[]'::json)
-                            )
+        "Q23": `
+        SELECT
+                            p.id AS project_id,
+                            p.order_id,
+                            p.customer_id,
+                            p.project_type,
+                            p.description,
+                            p.start_date,
+                            p.end_date,
+                            p.created_at,
+                            p.is_completed,
+                            p.manager_id,
+                            c.id AS customer_id,
+                            c.customer_name,
+                            c.customer_contact,
+                            c.customer_account,
+                            c.email_address,
+                            c.phone_number,
+                            c.country,
+                            c.city,
+                            c.address,
+                            c.scope_of_work,
+                             COALESCE((
+                    SELECT JSON_AGG(
+                        json_build_object(
+                            'id', t.id,
+                            'name', t.name,
+                            'surname', t.surname,
+                            'position', t.position,
+                            'email_address', t.email_address,
+                            'phone_number', t.phone_number,
+                            'encrypted_password', t.encrypted_password,
+                            'nationality', t.nationality,
+                            'qualification', t.qualification,
+                            'level', t.level,
+                            'avatar', t.avatar,
+                            'manager_id', t.manager_id,
+                            'created_at', t.created_at,
+                            'updated_at', t.updated_at,
+                            'deleted_at', t.deleted_at,
+                            'timesheet_data', COALESCE((
+                                SELECT JSON_AGG(
+                                    json_build_object(
+                                        'id', ts.id,
+                                        'date', ts.date,
+                                        'start_time', ts.start_time,
+                                        'end_time', ts.end_time,
+                                        'comments', ts.comments,
+                                        'is_timesheet_requested_for_approval', ts.is_timesheet_requested_for_approval,
+                                        'is_timesheet_approved', ts.is_timesheet_approved,
+                                        'lunch_time', ts.lunch_time,
+                                        'timesheet_attach_data', COALESCE((
+                                            SELECT JSON_AGG(ta.*)
+                                            FROM timesheet_attach ta
+                                            WHERE ta.timesheet_id = ts.id
+                                            AND ta.deleted_at IS NULL
+                                        )::json, '[]'::json)
+                                    )
+                                )
+                                FROM timesheet ts
+                                WHERE ts.tech_id = t.id
+                                AND ts.project_id = p.id
+                                AND ts.deleted_at IS NULL
+                            )::json, '[]'::json)
                         )
-                        FROM tech_machine tm
-                        JOIN technician t ON tm.tech_id = t.id
-                        WHERE tm.machine_id = m.id
-                        AND tm.deleted_at IS NULL
                     )
-                )
-            )
-            FROM machine m
-            WHERE m.project_id = p.id
-            AND m.deleted_at IS NULL
-        )::json, '[]'::json) AS machine_data
-    FROM project AS p
-    LEFT JOIN customer c ON c.id = p.customer_id
-    WHERE p.id = '{var1}'
-    AND p.deleted_at IS NULL
-    AND c.deleted_at IS NULL;
-    `,
+                    FROM (
+                        SELECT DISTINCT t.id
+                        FROM technician t
+                        JOIN tech_machine tm ON t.id = tm.tech_id
+                        WHERE tm.project_id = p.id
+                        AND tm.deleted_at IS NULL
+                        AND t.deleted_at IS NULL
+                    ) AS distinct_technicians
+                    JOIN technician t ON distinct_technicians.id = t.id
+                )::json, '[]'::json) AS technician_data,
+                            COALESCE((
+                                SELECT JSON_AGG(
+                                    json_build_object(
+                                        'id', m.id,
+                                        'serial', m.serial,
+                                        'hour_count', m.hour_count,
+                                        'nom_speed', m.nom_speed,
+                                        'act_speed', m.act_speed,
+                                        'tech_machine_data', (
+                                            SELECT JSON_AGG(
+                                                json_build_object(
+                                                    'tech_machine_id', tm.id,
+                                                    'tech_id', tm.tech_id,
+                                                    'machine_id',tm.machine_id,
+                                                    'name', t.name,
+                                                    'surname', t.surname,
+                                                    'position', t.position,
+                                                    'email_address', t.email_address,
+                                                    'phone_number', t.phone_number,
+                                                    'nationality', t.nationality,
+                                                    'qualification', t.qualification,
+                                                    'level', t.level,
+                                                    'created_at', t.created_at,
+                                                    'updated_at', t.updated_at,
+                                                    'deleted_at', t.deleted_at,
+                                                    'project_report_data', COALESCE((
+                                                        SELECT JSON_AGG(pr.*)
+                                                        FROM project_report pr
+                                                        WHERE pr.machine_id = m.id
+                                                        AND pr.tech_id = tm.tech_id
+                                                        AND pr.deleted_at IS NULL
+                                                    )::json, '[]'::json)
+                                                )
+                                            )
+                                            FROM tech_machine tm
+                                            JOIN technician t ON tm.tech_id = t.id
+                                            WHERE tm.machine_id = m.id
+                                            AND tm.deleted_at IS NULL
+                                        )
+                                    )
+                                )
+                                FROM machine m
+                                WHERE m.project_id = p.id
+                                AND m.deleted_at IS NULL
+                            )::json, '[]'::json) AS machine_data
+                        FROM project AS p
+                        LEFT JOIN customer c ON c.id = p.customer_id
+                        WHERE p.id = '{var1}'
+                        AND p.deleted_at IS NULL
+                        AND c.deleted_at IS NULL;
+        `,
         "Q24": `INSERT INTO technician
           (name, surname, position, email_address, encrypted_password, phone_number, nationality, qualification,level, avatar, manager_id)
           VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}', '{var9}', '{var10}', '{var11}') RETURNING *`,
