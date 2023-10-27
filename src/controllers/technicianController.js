@@ -574,48 +574,18 @@ module.exports.assignedProjectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q30'], { var1: id })
             let findAssignedProjectList = await connection.query(s2)
             if (findAssignedProjectList.rows.length > 0) {
-                const assignedProject = [];
-                const completedProject = [];
-                const projectWaitingApproval = [];
-                findAssignedProjectList.rows.forEach(project => {
-                    if (project.timesheet_data.length === 0) {
-                        // If timesheet_data is empty, push to assignedProject
-                        assignedProject.push(project);
-                    } else {
-                        const isRequestedForApproval = project.timesheet_data.some(
-                            timesheet => timesheet.is_timesheet_requested_for_approval
-                        );
-                        const isApproved = project.timesheet_data.every(
-                            timesheet => timesheet.is_timesheet_approved
-                        );
-
-                        if (!isRequestedForApproval && !isApproved) {
-                            // If none of the timesheets are requested for approval or approved, push to assignedProject
-                            assignedProject.push(project);
-                        } else if (isRequestedForApproval && !isApproved) {
-                            // If at least one timesheet is requested for approval and none are approved, push to projectWaitingApproval
-                            projectWaitingApproval.push(project);
-                        } else if (!isRequestedForApproval && isApproved) {
-                            // If none of the timesheets are requested for approval but all are approved, push to completedProject
-                            completedProject.push(project);
-                        }
-                    }
-                });
                 res.json({
                     status: 200,
                     success: true,
                     message: "Projects List ",
-                    data: {
-                        assignedProject,
-                        completedProject,
-                        projectWaitingApproval
-                    }
+                    data: findAssignedProjectList.rows
                 })
             } else {
                 res.json({
                     status: 200,
                     success: false,
-                    message: "No Projects Found on your dashboard"
+                    message: "No Projects Found on your dashboard",
+                    data : []
                 })
             }
         } else {
