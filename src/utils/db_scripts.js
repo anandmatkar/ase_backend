@@ -62,7 +62,7 @@ const db_sql = {
                 INNER JOIN customer as c on c.id = p.customer_id
                 WHERE p.manager_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`,
         "Q23": `
-        SELECT
+                        SELECT
                             p.id AS project_id,
                             p.order_id,
                             p.customer_id,
@@ -792,7 +792,9 @@ const db_sql = {
             "Q82":`SELECT *
                     FROM project_report
                     WHERE project_id = '{var1}'
-                    AND deleted_at IS NULL AND is_approved = 'false';`,            
+                    AND deleted_at IS NULL AND is_approved = 'false';`,
+            "Q83":`INSERT INTO signed_paper(project_id, tech_id, manager_id, file_path, file_type, file_size) VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}','{var6}') RETURNING *`,
+            "Q84":`SELECT * FROM signed_paper WHERE project_id = '{var1}' AND tech_id = '{var2}' AND manager_id = '{var3}' AND deleted_at IS NULL`                    
 }
 
 

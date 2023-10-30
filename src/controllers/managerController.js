@@ -750,5 +750,45 @@ module.exports.technicianDetailsForManager = async (req, res) => {
     }
 }
 
+module.exports.showSignedPaper = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, techId } = req.query
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q84'], { var1: projectId, var2 : techId, var3 : id })
+            let showPaper = await connection.query(s2)
+            if(showPaper.rowCount>0){
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: `Signed paper`,
+                    data: showPaper.rows
+                })
+            }else{
+                return res.json({
+                    status: 200,
+                    success: false,
+                    message: `No attachement found`,
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 
 

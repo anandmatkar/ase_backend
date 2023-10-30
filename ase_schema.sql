@@ -244,3 +244,19 @@ CREATE TABLE public.tech_documents (
 );
 ALTER TABLE public.tech_documents OWNER TO postgres;
 
+-- signed_paper Table
+CREATE TABLE public.signed_paper (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    project_id uuid,
+    tech_id uuid,
+    manager_id uuid,
+    file_path character varying,
+    file_type character varying,
+    file_size character varying,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone),
+    deleted_at timestamp with time zone DEFAULT timezone('utc'::text, NULL::timestamp with time zone)
+    
+);
+ALTER TABLE public.signed_paper OWNER TO postgres;
+

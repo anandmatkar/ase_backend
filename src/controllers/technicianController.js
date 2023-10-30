@@ -585,7 +585,7 @@ module.exports.assignedProjectList = async (req, res) => {
                     status: 200,
                     success: false,
                     message: "No Projects Found on your dashboard",
-                    data : []
+                    data: []
                 })
             }
         } else {
@@ -1075,6 +1075,50 @@ module.exports.deleteTechnician = async (req, res) => {
             success: false,
             message: error.message
         });
+    }
+}
+
+module.exports.uploadAgreement = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let file = req.file
+            let path = `${process.env.SIGNED_AGREEMENT}/${file.filename}`;
+            let s2 = dbScript(db_sql['Q83'], { var1: projectId, var2: id, var3: findTechnician.rows[0].manager_id, var4: path, var5: file.mimetype, var6: file.size })
+            let uploadPaper = await connection.query(s2)
+            if (uploadPaper.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Paper Uploaded successfully!",
+                    data: path
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong."
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
     }
 }
 
