@@ -1148,3 +1148,43 @@ module.exports.uploadAgreement = async (req, res) => {
     }
 }
 
+module.exports.showSignedPaper = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, techId } = req.query
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == 'Technician') {
+            let s2 = dbScript(db_sql['Q84'], { var1: projectId, var2 : id, var3 : findTechnician.rows[0].manager_id })
+            let showPaper = await connection.query(s2)
+            if(showPaper.rowCount>0){
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: `Signed paper`,
+                    data: showPaper.rows
+                })
+            }else{
+                return res.json({
+                    status: 200,
+                    success: false,
+                    message: `No attachement found`,
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "technician not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+

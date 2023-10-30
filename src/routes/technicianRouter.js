@@ -41,5 +41,6 @@ router.get('/reportDetailsForTech',verifyTokenTechnician, controller.report.repo
 // =============================================== Upload signed paper of clients =============================================
 
 router.post('/uploadAgreement',verifyTokenTechnician, uploadAgreement.single('file'), controller.technician.uploadAgreement)
+router.get('/showSignedPaper',verifyTokenTechnician, controller.technician.showSignedPaper)
 
 module.exports = router
