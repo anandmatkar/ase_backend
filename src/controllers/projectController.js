@@ -464,7 +464,7 @@ module.exports.completeProject = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         })
     }
 }
@@ -477,10 +477,8 @@ module.exports.editProject = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q86'], { var1: description, var2: startDate, var3: endDate, var4 : projectId })
-            console.log(s2,"s222222222222222");
+            let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4 : projectId })
             let updateProject = await connection.query(s2)
-            console.log(updateProject,"111111111111");
             if (updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
@@ -507,7 +505,7 @@ module.exports.editProject = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         })
     }
 }

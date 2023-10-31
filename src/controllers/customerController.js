@@ -307,7 +307,7 @@ module.exports.deleteCustomer = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         })
     }
 }
@@ -409,7 +409,7 @@ module.exports.insertCustomer = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         });
     }
 }

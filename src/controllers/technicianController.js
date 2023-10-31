@@ -155,7 +155,7 @@ module.exports.insertTechnician = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         });
     }
 }
