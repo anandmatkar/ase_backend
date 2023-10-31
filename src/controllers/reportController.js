@@ -86,12 +86,12 @@ module.exports.uploadReportAttach = async (req, res) => {
 module.exports.submitReportForApproval = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId } = req.query
+        let { projectId, machineId } = req.query
         connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, var3: id })
+            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, var3: id, var4 : machineId })
             let updateReqForApproval = await connection.query(s2)
             if (updateReqForApproval.rowCount > 0) {
                 await connection.query("COMMIT")

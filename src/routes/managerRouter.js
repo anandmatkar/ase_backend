@@ -33,6 +33,7 @@ router.get('/projectCount', verifyTokenManager, controller.project.projectCount)
 router.get('/projectDetails', verifyTokenManager, controller.project.projectDetails)
 router.put('/deleteProject', verifyTokenManager, controller.project.deleteProject)
 router.put('/completeProject', verifyTokenManager, controller.project.completeProject)
+router.put('/editProject', verifyTokenManager, controller.project.editProject)
 router.post('/uploadProjectAttach', uploadProjectAttachments.array('files'), controller.project.uploadProjectAttach)
 
 //---------------------------------------------------------- Technician Routes ------------------------------------------------------//

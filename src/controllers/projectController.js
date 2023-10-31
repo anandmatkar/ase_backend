@@ -340,7 +340,7 @@ module.exports.deleteProject = async (req, res) => {
         res.json({
             success: false,
             status: 400,
-            message: error.stack,
+            message: error.message,
         })
     }
 }
@@ -394,68 +394,120 @@ module.exports.deleteProject = async (req, res) => {
 // }
 
 module.exports.completeProject = async (req, res) => {
-    let { id, position } = req.user
-    let { projectId } = req.query
-    await connection.query("BEGIN")
-    let s1 = dbScript(db_sql['Q7'], { var1: id })
-    let findManager = await connection.query(s1)
-    if (findManager.rowCount > 0 && position == 'Manager') {
-        let s2 = dbScript(db_sql['Q81'], { var1: projectId })
-        let findNonApprovedTimesheet = await connection.query(s2)
+    try {
+        let { id, position } = req.user
+        let { projectId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q81'], { var1: projectId })
+            let findNonApprovedTimesheet = await connection.query(s2)
 
-        let s3 = dbScript(db_sql['Q82'], { var1: projectId })
-        let findNonApprovedReport = await connection.query(s3)
-        if (findNonApprovedTimesheet.rowCount > 0) {
-            res.json({
-                status: 400,
-                success: false,
-                message: "Project can not be completed unless all timesheet are approved"
-            })
-        } else if (findNonApprovedReport.rowCount > 0) {
-            res.json({
-                status: 400,
-                success: false,
-                message: "Project can not be completed unless all reports are approved"
-            })
-        } else {
-            let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q75'], { var1: true, var2: false, var3: _dt, var4: projectId })
-            let approveProject = await connection.query(s2)
-
-            let s3 = dbScript(db_sql['Q79'], { var1: true, var2: false, var3: _dt, var4: projectId })
-            let approveTimesheet = await connection.query(s3)
-
-            let s4 = dbScript(db_sql['Q80'], { var1: true, var2: false, var3: _dt, var4: projectId })
-            let approveReport = await connection.query(s4)
-            if (approveProject.rowCount > 0) {
-                await connection.query("COMMIT")
-
-                let s3 = dbScript(db_sql['Q76'], { var1: projectId });
-                let projectDetails = await connection.query(s3);
-
-                let pdfBytes = await createPDF(projectDetails.rows)
-                sendprojectDetails(findManager.rows[0].email_address, pdfBytes)
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Project approved successfully.",
-                    data: projectDetails.rows
-                })
-            } else {
-                await connection.query("ROLLBACK")
+            let s3 = dbScript(db_sql['Q82'], { var1: projectId })
+            let findNonApprovedReport = await connection.query(s3)
+            if (findNonApprovedTimesheet.rowCount > 0) {
                 res.json({
                     status: 400,
                     success: false,
-                    message: "Something went wrong."
+                    message: "Project can not be completed unless all timesheet are approved"
                 })
+            } else if (findNonApprovedReport.rowCount > 0) {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Project can not be completed unless all reports are approved"
+                })
+            } else {
+                let _dt = new Date().toISOString()
+                let s2 = dbScript(db_sql['Q75'], { var1: true, var2: false, var3: _dt, var4: projectId })
+                let approveProject = await connection.query(s2)
+
+                let s3 = dbScript(db_sql['Q79'], { var1: true, var2: false, var3: _dt, var4: projectId })
+                let approveTimesheet = await connection.query(s3)
+
+                let s4 = dbScript(db_sql['Q80'], { var1: true, var2: false, var3: _dt, var4: projectId })
+                let approveReport = await connection.query(s4)
+                if (approveProject.rowCount > 0) {
+                    await connection.query("COMMIT")
+
+                    let s3 = dbScript(db_sql['Q76'], { var1: projectId });
+                    let projectDetails = await connection.query(s3);
+
+                    let pdfBytes = await createPDF(projectDetails.rows)
+                    sendprojectDetails(findManager.rows[0].email_address, pdfBytes)
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "Project approved successfully.",
+                        data: projectDetails.rows
+                    })
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong."
+                    })
+                }
             }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
         }
-    } else {
+    } catch (error) {
         await connection.query("ROLLBACK")
         res.json({
-            status: 404,
             success: false,
-            message: "Manager not found"
+            status: 400,
+            message: error.stack,
+        })
+    }
+}
+
+module.exports.editProject = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, description, startDate, endDate } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q86'], { var1: description, var2: startDate, var3: endDate, var4 : projectId })
+            console.log(s2,"s222222222222222");
+            let updateProject = await connection.query(s2)
+            console.log(updateProject,"111111111111");
+            if (updateProject.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Project updated successfully"
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            success: false,
+            status: 400,
+            message: error.stack,
         })
     }
 }
