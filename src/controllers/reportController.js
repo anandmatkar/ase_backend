@@ -91,7 +91,7 @@ module.exports.submitReportForApproval = async (req, res) => {
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, var3: id, var4 : machineId })
+            let s2 = dbScript(db_sql['Q49'], { var1: true, var2: projectId, var3: id, var4: machineId })
             let updateReqForApproval = await connection.query(s2)
             if (updateReqForApproval.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -133,7 +133,7 @@ module.exports.reportDetails = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: techId, var3 : machineId })
+            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: techId, var3: machineId })
             let reportDetails = await connection.query(s2)
             if (reportDetails.rowCount > 0) {
                 res.json({
@@ -222,7 +222,7 @@ module.exports.validateReport = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q51'], { var1: true, var2: false, var3: projectId, var4: techId, var5 : machineId })
+            let s2 = dbScript(db_sql['Q51'], { var1: true, var2: false, var3: projectId, var4: techId, var5: machineId })
             let approveReport = await connection.query(s2)
             if (approveReport.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -263,7 +263,7 @@ module.exports.reportDetailsForTech = async (req, res) => {
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == "Technician") {
-            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: id, var3 : machineId })
+            let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: id, var3: machineId })
             let reportDetails = await connection.query(s2)
             if (reportDetails.rowCount > 0) {
                 res.json({
@@ -295,3 +295,46 @@ module.exports.reportDetailsForTech = async (req, res) => {
         });
     }
 }
+
+module.exports.editReport = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { reportId, description, duration, comments, date } = req.body
+        connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s2 = dbScript(db_sql['Q87'], { var1: date, var2: duration, var3: mysql_real_escape_string(description), var4: mysql_real_escape_string(comments), var5: reportId })
+            let updateReport = await connection.query(s2)
+            if (updateReport.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Report updated successfully"
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
