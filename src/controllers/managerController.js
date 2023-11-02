@@ -266,7 +266,7 @@ module.exports.managerLogin = async (req, res) => {
             })
         }
     } catch (error) {
-        res.json({
+       return res.json({
             success: false,
             status: 400,
             message: error.message,
