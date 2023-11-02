@@ -5,7 +5,6 @@ const app = express();
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
-const connection = require('./src/database/connection')
 const Router = require('./src/routes/index');
 const session = require('express-session');
 // Check if the current process is the master process
@@ -24,8 +23,7 @@ if (cluster.isMaster) {
     cluster.fork();
   });
 } else {
-  // This code will be executed in worker processes
-  const frontendIP = 'http://3.110.86.245';
+  
   const corsOptions = {
     origin: "*",
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

@@ -1,7 +1,6 @@
 const connection = require('../database/connection');
 const { issueJWT } = require("../utils/jwt")
 const { db_sql, dbScript } = require('../utils/db_scripts');
-const { sha3_512 } = require('js-sha3')
 const bcrypt = require('bcrypt');
 const { notificationMailToManager } = require('../utils/sendMail');
 

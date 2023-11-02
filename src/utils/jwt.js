@@ -1,5 +1,4 @@
 const jsonwebtoken = require("jsonwebtoken");
-const connection = require('../database/connection')
 
 const jwt = {
     //create token

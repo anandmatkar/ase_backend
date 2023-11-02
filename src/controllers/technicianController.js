@@ -1,9 +1,9 @@
 const connection = require('../database/connection');
 const { issueJWT } = require("../utils/jwt")
-const { mysql_real_escape_string, verifyTokenFn } = require('../utils/helper')
+const { mysql_real_escape_string } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
-const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail, sendProjectNotificationEmail } = require('../utils/sendMail');
+const {  resetPasswordMail } = require('../utils/sendMail');
 const XLSX = require('xlsx');
 
 //Create New Technician By manager Only

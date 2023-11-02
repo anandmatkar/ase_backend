@@ -1,8 +1,7 @@
 const connection = require('../database/connection');
-const { mysql_real_escape_string, generateDynamicHtmlTemplate, createPDF } = require('../utils/helper')
+const { mysql_real_escape_string, createPDF } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const { sendProjectNotificationEmail, sendprojectDetails } = require('../utils/sendMail');
-const { PDFDocument, rgb } = require('pdf-lib');
 
 
 //Create Project by Manager
