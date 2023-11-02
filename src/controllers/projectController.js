@@ -284,7 +284,8 @@ module.exports.deleteProject = async (req, res) => {
 
             let s0 = dbScript(db_sql['Q45'], { var1: projectId })
             let findProject = await connection.query(s0)
-            let _dt = new Date().toISOString()
+            let _dt = new Date().toISOString();
+            let dateOnly = _dt.split('T')[0];
             if (findProject.rows[0].is_completed == false && findProject.rows[0].start_date <= _dt) {
                 return res.json({
                     status: 400,
@@ -311,7 +312,7 @@ module.exports.deleteProject = async (req, res) => {
                 let s7 = dbScript(db_sql['Q42'], { var1: 'timesheet_attach', var2: _dt, var3: projectId })
                 let deleteTimesheetAttach = await connection.query(s7)
                 if (deleteProjectDetails.rowCount > 0) {
-                    await connection.query("COMMIT")
+                    // await connection.query("COMMIT")
                     res.json({
                         status: 200,
                         success: true,
@@ -477,7 +478,7 @@ module.exports.editProject = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4 : projectId })
+            let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4: projectId })
             let updateProject = await connection.query(s2)
             if (updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
