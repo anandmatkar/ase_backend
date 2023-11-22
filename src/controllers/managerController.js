@@ -266,7 +266,7 @@ module.exports.managerLogin = async (req, res) => {
             })
         }
     } catch (error) {
-       return res.json({
+        return res.json({
             success: false,
             status: 400,
             message: error.message,
@@ -757,16 +757,16 @@ module.exports.showSignedPaper = async (req, res) => {
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q84'], { var1: projectId, var2 : techId, var3 : id })
+            let s2 = dbScript(db_sql['Q84'], { var1: projectId, var2: techId, var3: id })
             let showPaper = await connection.query(s2)
-            if(showPaper.rowCount>0){
+            if (showPaper.rowCount > 0) {
                 res.json({
                     status: 200,
                     success: true,
                     message: `Signed paper`,
                     data: showPaper.rows
                 })
-            }else{
+            } else {
                 return res.json({
                     status: 200,
                     success: false,
