@@ -1294,13 +1294,13 @@ module.exports.deleteSignedPaper = async (req, res) => {
     try {
 
         let { id, position } = req.user
-        let { projectId } = req.query
+        let { projectId, paperId } = req.query
         await connection.query("BEGIN")
         let s0 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s0)
         if (findTechnician.rowCount > 0 && position == "Technician") {
             let _dt = new Date().toISOString()
-            let s1 = dbScript(db_sql['Q85'], { var1: _dt, var2: id, var3: projectId })
+            let s1 = dbScript(db_sql['Q85'], { var1: _dt, var2: id, var3: projectId, var4: paperId })
             let deleteFile = await connection.query(s1)
             if (deleteFile.rowCount > 0) {
                 await connection.query("COMMIT")

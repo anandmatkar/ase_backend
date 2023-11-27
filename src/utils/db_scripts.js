@@ -822,7 +822,7 @@ const db_sql = {
                     AND deleted_at IS NULL AND is_approved = 'false';`,
     "Q83": `INSERT INTO signed_paper(project_id, tech_id, manager_id, file_path, file_type, file_size) VALUES('{var1}', '{var2}', '{var3}', '{var4}', '{var5}','{var6}') RETURNING *`,
     "Q84": `SELECT * FROM signed_paper WHERE project_id = '{var1}' AND tech_id = '{var2}' AND manager_id = '{var3}' AND deleted_at IS NULL`,
-    "Q85": `UPDATE signed_paper SET deleted_at = '{var1}' WHERE tech_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+    "Q85": `UPDATE signed_paper SET deleted_at = '{var1}' WHERE tech_id = '{var2}' AND project_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
     "Q86": `UPDATE project SET description = '{var1}', start_date = '{var2}', end_date = '{var3}' WHERE id = '{var4}' AND deleted_at IS NULL RETURNING *`,
     "Q87": `UPDATE project_report SET date = '{var1}', duration = '{var2}', description = '{var3}', comments = '{var4}' WHERE id = '{var5}' AND deleted_at IS NULL RETURNING *`,
 }
