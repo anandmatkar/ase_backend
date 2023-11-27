@@ -41,7 +41,7 @@ router.put('/editReport', verifyTokenTechnician, controller.report.editReport)
 
 // =============================================== Upload signed paper of clients =============================================
 
-router.post('/uploadAgreement', verifyTokenTechnician, uploadAgreement.single('file'), controller.technician.uploadAgreement)
+router.post('/uploadAgreement', verifyTokenTechnician, uploadAgreement.array('file'), controller.technician.uploadAgreement)
 router.get('/showSignedPaper', verifyTokenTechnician, controller.technician.showSignedPaper)
 router.put('/deleteSignedPaper', verifyTokenTechnician, controller.technician.deleteSignedPaper)
 
