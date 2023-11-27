@@ -1,7 +1,7 @@
 const express = require('express');
 const controller = require('../controllers');
 const { verifyTokenAdmin, verifyTokenManager, verifyTokenManagerORTechnician } = require('../utils/jwt');
-const { uploadMachineFiles, uploadProfile, uploadProjectAttachments,uploadTechnicianDocuments, uploadCustomerFile, uploadTechnicianFile } = require('../utils/uploadFiles');
+const { uploadMachineFiles, uploadProfile, uploadProjectAttachments, uploadTechnicianDocuments, uploadCustomerFile, uploadTechnicianFile } = require('../utils/uploadFiles');
 const router = express.Router();
 
 //---------------------------------------------------------- Manager Auth Routes------------------------------------------------------//
@@ -19,7 +19,7 @@ router.post('/uploadProfilePic', uploadProfile.single('image'), controller.manag
 //---------------------------------------------------------- Customer Routes ------------------------------------------------------//
 
 router.post('/createCustomer', verifyTokenManager, controller.customer.createCustomer)
-router.post('/insertCustomer', verifyTokenManager,uploadCustomerFile.single('file'), controller.customer.insertCustomer)
+router.post('/insertCustomer', verifyTokenManager, uploadCustomerFile.single('file'), controller.customer.insertCustomer)
 router.get('/customerList', verifyTokenManager, controller.customer.customerList)
 router.get('/customerDetails', verifyTokenManager, controller.customer.customerDetails)
 router.put('/updateCustomer', verifyTokenManager, controller.customer.updateCustomer)
@@ -42,8 +42,9 @@ router.post('/createTechnician', verifyTokenManager, controller.technician.creat
 router.get('/technicianLists', verifyTokenManager, controller.technician.technicianLists)
 router.get('/technicianDetailsForManager', verifyTokenManagerORTechnician, controller.manager.technicianDetailsForManager)
 router.post('/uploadTechnicianDocuments', uploadTechnicianDocuments.array('files'), controller.technician.uploadTechnicianDocuments)
-router.post('/insertTechnician',verifyTokenManager, uploadTechnicianFile.single('file'), controller.technician.insertTechnician)
-router.put('/deleteTechnician',verifyTokenManager, controller.technician.deleteTechnician)
+router.post('/insertTechnician', verifyTokenManager, uploadTechnicianFile.single('file'), controller.technician.insertTechnician)
+router.put('/deleteTechnician', verifyTokenManager, controller.technician.deleteTechnician)
+router.put('/updateTechnicianProfile', verifyTokenManager, controller.technician.updateTechnicianProfile)
 
 //---------------------------------------------------------- TImesheet Routes ------------------------------------------------------//
 

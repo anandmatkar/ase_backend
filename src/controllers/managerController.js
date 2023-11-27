@@ -790,5 +790,51 @@ module.exports.showSignedPaper = async (req, res) => {
     }
 }
 
+//only for Manager
+module.exports.updateTechnicianProfile = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { techId, name, surname, emailAddress, phoneNumber, nationality, qualification, level, profilePic } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let _dt = new Date().toISOString()
+            let s3 = dbScript(db_sql['Q29'], { var1: name, var2: surname, var3: emailAddress, var4: phoneNumber, var5: nationality, var6: qualification, var7: level, var8: profilePic, var9: _dt, var10: techId })
+            let updateTechnician = await connection.query(s3)
+
+            if (updateTechnician.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Technician Updated successfully"
+                })
+            } else {
+                await connection.query('ROLLBACK')
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+
+    } catch (error) {
+        await connection.query("ROLLBACk")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 
 

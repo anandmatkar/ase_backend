@@ -14,7 +14,7 @@ router.post('/uploadProfilePic', uploadProfile.single('image'), controller.techn
 router.get('/showProfile', verifyTokenTechnician, controller.technician.showProfile)
 router.post('/forgotPassword', controller.technician.forgotPassword)
 router.put('/resetPassword', controller.technician.resetPassword)
-router.put('/changePassword',verifyTokenTechnician, controller.technician.changePassword)
+router.put('/changePassword', verifyTokenTechnician, controller.technician.changePassword)
 
 //================================================Technician Project routes===========================================================//
 
@@ -35,13 +35,14 @@ router.get('/deleteTimesheet', verifyTokenTechnician, controller.technician.dele
 router.post('/createReport', verifyTokenTechnician, controller.report.createReport)
 router.put('/submitReportForApproval', verifyTokenTechnician, controller.report.submitReportForApproval)
 router.post('/uploadReportAttach', uploadReportAttach.array('files'), controller.report.uploadReportAttach)
-router.get('/deleteReport',verifyTokenTechnician, controller.report.deleteReport)
-router.get('/reportDetailsForTech',verifyTokenTechnician, controller.report.reportDetailsForTech)
-router.put('/editReport',verifyTokenTechnician, controller.report.editReport)
+router.get('/deleteReport', verifyTokenTechnician, controller.report.deleteReport)
+router.get('/reportDetailsForTech', verifyTokenTechnician, controller.report.reportDetailsForTech)
+router.put('/editReport', verifyTokenTechnician, controller.report.editReport)
 
 // =============================================== Upload signed paper of clients =============================================
 
-router.post('/uploadAgreement',verifyTokenTechnician, uploadAgreement.single('file'), controller.technician.uploadAgreement)
-router.get('/showSignedPaper',verifyTokenTechnician, controller.technician.showSignedPaper)
+router.post('/uploadAgreement', verifyTokenTechnician, uploadAgreement.single('file'), controller.technician.uploadAgreement)
+router.get('/showSignedPaper', verifyTokenTechnician, controller.technician.showSignedPaper)
+router.put('/deleteSignedPaper', verifyTokenTechnician, controller.technician.deleteSignedPaper)
 
 module.exports = router
