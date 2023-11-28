@@ -38,6 +38,7 @@ router.post('/uploadReportAttach', uploadReportAttach.array('files'), controller
 router.get('/deleteReport', verifyTokenTechnician, controller.report.deleteReport)
 router.get('/reportDetailsForTech', verifyTokenTechnician, controller.report.reportDetailsForTech)
 router.put('/editReport', verifyTokenTechnician, controller.report.editReport)
+router.put('/editReportDoc', verifyTokenTechnician, uploadReportAttach.single('file'), controller.report.editReportDoc)
 
 // =============================================== Upload signed paper of clients =============================================
 

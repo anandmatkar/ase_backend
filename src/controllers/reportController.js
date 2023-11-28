@@ -335,3 +335,56 @@ module.exports.editReport = async (req, res) => {
     }
 }
 
+module.exports.editReportDoc = async (req, res) => {
+    try {
+        let { id, position } = req.user;
+        let { docId } = req.body;
+        let file = req.file
+        let path = `${process.env.REPORT_ATTACHEMENTS}/${file.filename}`;
+        let size = file.size;
+        let mimetype = file.mimetype;
+
+        console.log(path, size, mimetype);
+
+        await connection.query('BEGIN');
+
+        let s0 = dbScript(db_sql['Q27'], { var1: id });
+        let findTechnician = await connection.query(s0);
+
+        if (findTechnician.rowCount > 0 && position === 'Technician') {
+            let _dt = new Date().toISOString()
+            let s1 = dbScript(db_sql['Q88'], { var1: path, var2: mimetype, var3: size, var4: _dt, var5: docId });
+            let editDocs = await connection.query(s1);
+            if (editDocs.rowCount > 0) {
+                await connection.query('COMMIT');
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: 'Papers Uploaded successfully!'
+                });
+            } else {
+                await connection.query('ROLLBACK');
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: 'Something Went Wrong!'
+                });
+            }
+
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: 'Technician not found',
+            });
+        }
+    } catch (error) {
+        await connection.query('ROLLBACK');
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+        });
+    }
+};
+

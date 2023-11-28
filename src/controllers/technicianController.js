@@ -1133,7 +1133,6 @@ module.exports.uploadAgreement = async (req, res) => {
     }
 };
 
-
 module.exports.showSignedPaper = async (req, res) => {
     try {
         let { id, position } = req.user
@@ -1218,4 +1217,5 @@ module.exports.deleteSignedPaper = async (req, res) => {
         })
     }
 }
+
 
