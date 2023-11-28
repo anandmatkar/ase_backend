@@ -208,7 +208,6 @@ module.exports.deleteReport = async (req, res) => {
         });
     }
 }
-
 //validate report for manager
 module.exports.validateReport = async (req, res) => {
     try {
@@ -387,4 +386,44 @@ module.exports.editReportDoc = async (req, res) => {
         });
     }
 };
+
+module.exports.showReportAttach = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { reportId } = req.query
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s2 = dbScript(db_sql['Q89'], { var1: reportId })
+            let attachementList = await connection.query(s2)
+            if (attachementList.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Report Details.",
+                    data: attachementList.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Attachment Details.",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
 
