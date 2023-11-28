@@ -79,7 +79,6 @@ module.exports.createManager = async (req, res) => {
     }
 };
 
-
 // module.exports.verifyManager = async (req, res) => {
 //     try {
 //         let user = await verifyTokenFn(req)
@@ -791,7 +790,7 @@ module.exports.showSignedPaper = async (req, res) => {
 }
 
 //only for Manager
-module.exports.updateTechnicianProfile = async (req, res) => {
+module.exports.editTechnician = async (req, res) => {
     try {
         let { id, position } = req.user
         let { techId, name, surname, emailAddress, phoneNumber, nationality, qualification, level, profilePic } = req.body

@@ -345,54 +345,6 @@ module.exports.deleteProject = async (req, res) => {
     }
 }
 
-// module.exports.completeProject = async (req, res) => {
-//     let { id, position } = req.user
-//     let { projectId } = req.query
-//     await connection.query("BEGIN")
-//     let s1 = dbScript(db_sql['Q7'], { var1: id })
-//     let findManager = await connection.query(s1)
-//     if (findManager.rowCount > 0 && position == 'Manager') {
-//         let _dt = new Date().toISOString()
-//         let s2 = dbScript(db_sql['Q75'], { var1: true, var2: false, var3: _dt, var4: projectId })
-//         let approveProject = await connection.query(s2)
-
-//         let s3 = dbScript(db_sql['Q79'], { var1: true, var2: false, var3: _dt, var4: projectId })
-//         let approveTimesheet = await connection.query(s3)
-
-//         let s4 = dbScript(db_sql['Q80'], { var1: true, var2: false, var3: _dt, var4: projectId })
-//         let approveReport = await connection.query(s4)
-//         if (approveProject.rowCount > 0) {
-//             await connection.query("COMMIT")
-
-//             let s3 = dbScript(db_sql['Q76'], { var1: projectId });
-//             let projectDetails = await connection.query(s3);
-
-//             let pdfBytes = await createPDF(projectDetails.rows)
-//             sendprojectDetails(findManager.rows[0].email_address, pdfBytes)
-//             res.json({
-//                 status: 200,
-//                 success: true,
-//                 message: "Project approved successfully.",
-//                 data: projectDetails.rows
-//             })
-//         } else {
-//             await connection.query("ROLLBACK")
-//             res.json({
-//                 status: 400,
-//                 success: false,
-//                 message: "Something went wrong."
-//             })
-//         }
-//     } else {
-//         await connection.query("ROLLBACK")
-//         res.json({
-//             status: 404,
-//             success: false,
-//             message: "Manager not found"
-//         })
-//     }
-// }
-
 module.exports.completeProject = async (req, res) => {
     try {
         let { id, position } = req.user
