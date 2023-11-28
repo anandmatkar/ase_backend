@@ -424,12 +424,12 @@ module.exports.completeProject = async (req, res) => {
 module.exports.editProject = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, description, startDate, endDate } = req.body
+        let { projectId, description, startDate, endDate, projectType } = req.body
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4: projectId })
+            let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4: projectId, var5: projectType })
             let updateProject = await connection.query(s2)
             if (updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
