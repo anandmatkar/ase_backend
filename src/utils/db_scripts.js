@@ -826,7 +826,9 @@ const db_sql = {
     "Q86": `UPDATE project SET description = '{var1}', start_date = '{var2}', end_date = '{var3}', project_type = '{var5}' WHERE id = '{var4}' AND deleted_at IS NULL RETURNING *`,
     "Q87": `UPDATE project_report SET date = '{var1}', duration = '{var2}', description = '{var3}', comments = '{var4}' WHERE id = '{var5}' AND deleted_at IS NULL RETURNING *`,
     "Q88": `UPDATE report_attach SET file_path = '{var1}',file_type = '{var2}',file_size = '{var3}', updated_at = '{var4}' WHERE id = '{var5}' AND deleted_at IS NULL RETURNING *`,
-    "Q89": `SELECT * FROM report_attach WHERE report_id = '{var1}' AND deleted_at IS NULL`
+    "Q89": `SELECT * FROM report_attach WHERE report_id = '{var1}' AND deleted_at IS NULL`,
+    "Q90": `UPDATE signed_paper SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+    "Q91": `UPDATE signed_paper SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
 }
 
 

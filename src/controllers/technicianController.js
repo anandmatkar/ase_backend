@@ -884,6 +884,9 @@ module.exports.requestForTimesheetApproval = async (req, res) => {
 
             let s3 = dbScript(db_sql['Q54'], { var1: true, var2: projectId, var3: false })
             let updateProject = await connection.query(s3)
+
+            let s4 = dbScript(db_sql['Q90'], { var1: true, var2: projectId, var3: id })
+            let updateSignedPaper = await connection.query(s4)
             if (requestforApproval.rowCount > 0 && updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
@@ -1136,12 +1139,11 @@ module.exports.uploadAgreement = async (req, res) => {
 module.exports.showSignedPaper = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, techId } = req.query
+        let { projectId } = req.query
         let s1 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0 && position == 'Technician') {
             let s2 = dbScript(db_sql['Q84'], { var1: projectId, var2: id, var3: findTechnician.rows[0].manager_id })
-            console.log(s2, "s22222222");
             let showPaper = await connection.query(s2)
             if (showPaper.rowCount > 0) {
                 res.json({
