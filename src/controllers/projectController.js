@@ -381,8 +381,6 @@ module.exports.completeProject = async (req, res) => {
                 let s4 = dbScript(db_sql['Q80'], { var1: true, var2: false, var3: _dt, var4: projectId })
                 let approveReport = await connection.query(s4)
 
-                let s5 = dbScript(db_sql['Q91'], { var1: true, var2: false, var3: projectId })
-                let approveSignedPaper = await connection.query(s5)
                 if (approveProject.rowCount > 0) {
                     await connection.query("COMMIT")
 
