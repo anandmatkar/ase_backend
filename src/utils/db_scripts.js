@@ -24,8 +24,8 @@ const db_sql = {
     "Q13": `UPDATE manager SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     "Q14": `UPDATE manager SET name = '{var1}', surname = '{var2}', email_address = '{var3}', phone_number = '{var4}', avatar = '{var5}', updated_at = '{var7}' WHERE id = '{var6}' AND deleted_at IS NULL`,
     "Q15": `INSERT INTO machine
-          (customer_id,project_id,order_id,machine_type, serial,hour_count,nom_speed,act_speed,description,manager_id) 
-          VALUES('{var1}','{var2}','{var3}', '{var4}', '{var5}', '{var6}', '{var7}', '{var8}', '{var9}', '{var10}') RETURNING *`,
+          (customer_id,project_id,order_id,machine_type, serial,description,manager_id) 
+          VALUES('{var1}','{var2}','{var3}', '{var4}', '{var5}', '{var6}', '{var7}') RETURNING *`,
     "Q16": `INSERT INTO tech_machine 
           (project_id,tech_id,machine_id,manager_id)
           VALUES('{var1}','{var2}','{var3}', '{var4}') RETURNING *`,
