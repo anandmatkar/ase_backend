@@ -46,11 +46,11 @@ module.exports.editMachineDetails = async (req, res) => {
     try {
         let { id, position, email } = req.user
         let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let { machine_id, machine_type, serial, hour_count, nom_speed, act_speed, description } = req.body
+        let { machine_id, machine_type, serial, description } = req.body
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(hour_count), var4: mysql_real_escape_string(nom_speed), var5: mysql_real_escape_string(act_speed), var6: mysql_real_escape_string(description), var7: _dt, var8: machine_id })
+            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(description), var4: _dt, var5: machine_id })
             let updateMachine = await connection.query(s2)
             if (updateMachine.rowCount > 0) {
                 res.json({
@@ -98,7 +98,7 @@ module.exports.deleteMachine = async (req, res) => {
 
             let s3 = dbScript(db_sql['Q71'], { var1: _dt, var2: machineId, var3: projectId })
             let deleteTechMachine = await connection.query(s3)
-            
+
             if (deleteTechMachine.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
@@ -130,29 +130,29 @@ module.exports.deleteMachine = async (req, res) => {
     }
 }
 
-module.exports.machineData = async(req,res) => {
+module.exports.machineData = async (req, res) => {
     try {
         let { id, position, email } = req.user
         let { techId, projectId } = req.query
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q73'], { var1: techId, var2 : projectId })
+            let s2 = dbScript(db_sql['Q73'], { var1: techId, var2: projectId })
             let findMachineData = await connection.query(s2)
-            if(findMachineData.rowCount > 0){
+            if (findMachineData.rowCount > 0) {
                 res.json({
                     status: 200,
                     success: true,
                     message: "Machine Data",
                     data: findMachineData.rows
-                }) 
-            }else{
+                })
+            } else {
                 res.json({
                     status: 200,
                     success: false,
                     message: "Empty Machine Data",
                     data: []
-                })   
+                })
             }
         } else {
             res.json({
