@@ -51,7 +51,7 @@ module.exports.resetPassword = function (otp, email, userName) {
                                             <br/>
                                             ASE Team <br>
 
-                                            <h5>If you have any questions. Please email us at <a style="color:#1bb2cc;"><u>Admin@contactus.com</u></a>.</h5> 
+                                            <h5>If you have any questions. Please email us at <a style="color:#1bb2cc;"><u>nader@fseworks.com</u></a>.</h5> 
                                             </p>
                                             
                                         </td>

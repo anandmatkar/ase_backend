@@ -1,6 +1,6 @@
 module.exports.welcome = function (link, userName, otp) {
-    let welcomeTemp = 
-    `!doctype html>
+    let welcomeTemp =
+        `!doctype html>
     <html lang="en-US">
     
     <head>
@@ -44,7 +44,7 @@ module.exports.welcome = function (link, userName, otp) {
                                             help you start building stronger customer relationships across World. <br>
                                             <br/>
                                             <p>This is your OTP : ${otp}</p>
-                                            Please click on the given link for <a href="${link}" style="color:#1bb2cc;"><u>verify</u></a><br/>
+                                            <br/>
                                             If you have any questions. Please email us at <a href=""
                                             style="text-decoration:none !important; font-weight:500; margin-top:30px; color: #1bb2cc; font-size:14px;padding:4px 4px;display:inline-block;"><u>Admin@contactus.com</u></a><br>
     
