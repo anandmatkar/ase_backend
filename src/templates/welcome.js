@@ -1,6 +1,6 @@
 module.exports.welcome = function (link, userName, otp) {
     let welcomeTemp =
-        `!doctype html>
+        `
     <html lang="en-US">
     
     <head>

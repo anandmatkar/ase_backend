@@ -5,9 +5,9 @@ const managerNotificationTemplate = require('../templates/managerNotification');
 const resetPassTemplate = require("../templates/resetPassword");
 const projectNotificationTemplate = require("../templates/projectNotification");
 
-module.exports.welcomeEmail2 = async (email, link,otp, userName) => {
-    const smtpEndpoint = "smtp.gmail.com";
-    const port = 587;
+module.exports.welcomeEmail2 = async (email, link, otp, userName) => {
+    const smtpEndpoint = 'smtp.titan.email';
+    const port = 465;
     const senderAddress = process.env.SMTP_USERNAME;
     var toAddresses = email;
 
@@ -19,18 +19,14 @@ module.exports.welcomeEmail2 = async (email, link,otp, userName) => {
     const smtpUsername = process.env.SMTP_USERNAME;
     const smtpPassword = process.env.SMTP_PASSWORD;
 
-    // The subject line of the email
-    var subject = "Welcome to Fse";
-    // The email body for recipients with non-HTML email clients.
-    var body_text = `Please use the below link to activate your account and reset your password`;
+    var subject = "Welcome to FSE";
+    var body_text = `Please use the below OTP to activate your account`;
 
-    // The body of the email for recipients whose email clients support HTML contenty.
-    //var body_html= emailTem;
 
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
         port: port,
-        secure: false, // true for 465, false for other ports
+        secure: (port == 465) ? true : false,
         auth: {
             user: smtpUsername,
             pass: smtpPassword
@@ -46,7 +42,6 @@ module.exports.welcomeEmail2 = async (email, link,otp, userName) => {
         bcc: bccAddresses,
         text: body_text,
         html: welcomeTemp,
-        // Custom headers for configuration set and message tags.
         headers: {}
     };
 
@@ -57,10 +52,10 @@ module.exports.welcomeEmail2 = async (email, link,otp, userName) => {
 }
 
 module.exports.notificationMailToAdmin = async (userData) => {
-    const smtpEndpoint = "smtp.gmail.com";
-    const port = 587;
+    const smtpEndpoint = "smtp.titan.email";
+    const port = 465;
     const senderAddress = process.env.SMTP_USERNAME;
-    var toAddresses = 'aseadmin@yopmail.com';
+    var toAddresses = 'admin@fseworks.com';
     let welcomeTemp = adminNotificationTemplate.adminNotification(userData)
 
     var ccAddresses = "";
@@ -69,25 +64,18 @@ module.exports.notificationMailToAdmin = async (userData) => {
     const smtpUsername = process.env.SMTP_USERNAME;
     const smtpPassword = process.env.SMTP_PASSWORD;
 
-    // The subject line of the email
     var subject = "Manager Approval Mail to Admin";
-    // The email body for recipients with non-HTML email clients.
     var body_text = `Please verify Approval request for manager account Given Below are the details of manager`;
-
-    // The body of the email for recipients whose email clients support HTML contenty.
-    //var body_html= emailTem;
 
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
         port: port,
-        secure: false, // true for 465, false for other ports
+        secure: (port == 465) ? true : false,
         auth: {
             user: smtpUsername,
             pass: smtpPassword
         }
     });
-
-    // Specify the fields in the email.
     let mailOptions = {
         from: senderAddress,
         to: toAddresses,
@@ -96,19 +84,17 @@ module.exports.notificationMailToAdmin = async (userData) => {
         bcc: bccAddresses,
         text: body_text,
         html: welcomeTemp,
-        // Custom headers for configuration set and message tags.
         headers: {}
     };
 
-    // Send the email.
     let info = await transporter.sendMail(mailOptions)
     console.log("Message sent! Message ID: ", info.messageId);
 
 }
 
 module.exports.notificationMailToManager = async (userData) => {
-    const smtpEndpoint = "smtp.gmail.com";
-    const port = 587;
+    const smtpEndpoint = "smtp.titan.email";
+    const port = 465;
     const senderAddress = process.env.SMTP_USERNAME;
     var toAddresses = userData.email_address;
     let welcomeTemp = managerNotificationTemplate.managerNotification(userData)
@@ -119,25 +105,19 @@ module.exports.notificationMailToManager = async (userData) => {
     const smtpUsername = process.env.SMTP_USERNAME;
     const smtpPassword = process.env.SMTP_PASSWORD;
 
-    // The subject line of the email
     var subject = "Account approved Successfully";
-    // The email body for recipients with non-HTML email clients.
     var body_text = `Your account has been approved successfully from ASE Team`;
-
-    // The body of the email for recipients whose email clients support HTML contenty.
-    //var body_html= emailTem;
 
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
         port: port,
-        secure: false, // true for 465, false for other ports
+        secure: (port == 465) ? true : false,
         auth: {
             user: smtpUsername,
             pass: smtpPassword
         }
     });
 
-    // Specify the fields in the email.
     let mailOptions = {
         from: senderAddress,
         to: toAddresses,
@@ -146,19 +126,17 @@ module.exports.notificationMailToManager = async (userData) => {
         bcc: bccAddresses,
         text: body_text,
         html: welcomeTemp,
-        // Custom headers for configuration set and message tags.
         headers: {}
     };
 
-    // Send the email.
     let info = await transporter.sendMail(mailOptions)
     console.log("Message sent! Message ID: ", info.messageId);
 
 }
 
 module.exports.resetPasswordMail = async (email, otp, userName) => {
-    const smtpEndpoint = "smtp.gmail.com";
-    const port = 587;
+    const smtpEndpoint = "smtp.titan.email";
+    const port = 465;
     const senderAddress = process.env.SMTP_USERNAME;
     var toAddresses = email;
 
@@ -170,25 +148,19 @@ module.exports.resetPasswordMail = async (email, otp, userName) => {
     const smtpUsername = process.env.SMTP_USERNAME;
     const smtpPassword = process.env.SMTP_PASSWORD;
 
-    // The subject line of the email
     var subject = "Reset password";
-    // The email body for recipients with non-HTML email clients.
     var body_text = `Please use the below link to reset your password`;
-
-    // The body of the email for recipients whose email clients support HTML contenty.
-    //var body_html= emailTem;
 
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
         port: port,
-        secure: false, // true for 465, false for other ports
+        secure: (port == 465) ? true : false,
         auth: {
             user: smtpUsername,
             pass: smtpPassword
         }
     });
 
-    // Specify the fields in the email.
     let mailOptions = {
         from: senderAddress,
         to: toAddresses,
@@ -197,69 +169,58 @@ module.exports.resetPasswordMail = async (email, otp, userName) => {
         bcc: bccAddresses,
         text: body_text,
         html: resetPass,
-        // Custom headers for configuration set and message tags.
         headers: {}
     };
 
-    // Send the email.
     let info = await transporter.sendMail(mailOptions)
     console.log("Message sent! Message ID: ", info.messageId);
 
 }
 
 module.exports.sendProjectNotificationEmail = async (emails, data) => {
-    const smtpEndpoint = "smtp.gmail.com"
+    const smtpEndpoint = "smtp.titan.email"
+    const port = 465
     const senderAddress = data.manager_email_address;
     let toAddresses = emails;
 
     let sendEmail = projectNotificationTemplate.projectNotification(data)
 
-    // let ccAddresses = (cc.length > 0) ? cc : "";
-    // var bccAddresses = "";
 
     const smtpUsername = process.env.SMTP_USERNAME;
     const smtpPassword = process.env.SMTP_PASSWORD;
 
-    // The subject line of the email
     let subject = "New Project assignment";
-    // The email body for recipients with non-HTML email clients.
     var body_text = `New Project Assignment`;
 
-    // The body of the email for recipients whose email clients support HTML contenty.
-    //var body_html= emailTem;
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        port: port,
+        secure: (port == 465) ? true : false,
         auth: {
             user: smtpUsername,
             pass: smtpPassword
         }
     });
 
-    // Specify the fields in the email.
     let mailOptions = {
         from: senderAddress,
         to: toAddresses,
         subject: subject,
         text: body_text,
         html: sendEmail,
-        // Custom headers for configuration set and message tags.
         headers: {}
     };
 
-    // Send the email.
     let info = await transporter.sendMail(mailOptions)
     console.log("Message sent! Message ID: ", info.messageId);
 
 }
 
 module.exports.sendprojectDetails = async (emails, pdfData) => {
-    const smtpEndpoint = "smtp.gmail.com"
+    const smtpEndpoint = "smtp.titan.email"
+    const port = 465
     const senderAddress = process.env.SMTP_USERNAME;
     let toAddresses = emails;
-
-    // let sendEmail = projectNotificationTemplate.projectNotification(data)
 
     const smtpUsername = process.env.SMTP_USERNAME;
     const smtpPassword = process.env.SMTP_PASSWORD;
@@ -270,32 +231,28 @@ module.exports.sendprojectDetails = async (emails, pdfData) => {
 
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        port: port,
+        secure: (port == 465) ? true : false,
         auth: {
             user: smtpUsername,
             pass: smtpPassword
         }
     });
 
-    // Specify the fields in the email.
     let mailOptions = {
         from: senderAddress,
         to: toAddresses,
         subject: subject,
         text: body_text,
-        // html: sendEmail,
         attachments: [
             {
                 filename: 'project_details.pdf',
                 content: pdfData,
             },
-          ],
-        // Custom headers for configuration set and message tags.
+        ],
         headers: {}
     };
 
-    // Send the email.
     let info = await transporter.sendMail(mailOptions)
     console.log("Message sent! Message ID: ", info.messageId);
 

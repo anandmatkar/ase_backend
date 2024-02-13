@@ -58,10 +58,9 @@ module.exports.createManager = async (req, res) => {
             return res.json({
                 status: 201,
                 success: true,
-                message: `Manager Created Successfully and verification link sent to ${emailAddress.toLowerCase()}`,
+                message: `Manager Created Successfully and verification OTP sent to ${emailAddress.toLowerCase()}`,
             });
         } else {
-            // Rollback the transaction
             await connection.query("ROLLBACK");
             return res.json({
                 status: 400,
