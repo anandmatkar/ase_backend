@@ -50,6 +50,7 @@ const storage4 = multer.diskStorage({
     filename: function (req, file, cb) {
         const ext = file.mimetype.split('/')[1];
         const fileName = `${Date.now()}.${ext}`
+        const originalName = file.originalname
         cb(null, fileName)
     }
 })
@@ -62,11 +63,10 @@ const storage5 = multer.diskStorage({
         cb(null, 'uploads/reportAttacehments')
     },
     filename: function (req, file, cb) {
-        // console.log(file, "fileeee");
         const ext = file.mimetype.split('/')[1];
         const fileName = `${Date.now()}.${ext}`
         const originalName = file.originalname
-        cb(null, fileName, originalName)
+        cb(null, fileName)
     }
 })
 const uploadReportAttach = multer({
@@ -124,6 +124,7 @@ const storage9 = multer.diskStorage({
     filename: function (req, file, cb) {
         const ext = file.mimetype.split('/')[1];
         const fileName = `${Date.now()}.${ext}`
+        const originalName = file.originalname
         cb(null, fileName)
     }
 })

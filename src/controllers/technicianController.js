@@ -813,7 +813,8 @@ module.exports.uploadTimesheetAttachements = async (req, res) => {
             let path = `${process.env.TIMESHEET_ATTACHEMENTS}/${file.filename}`;
             let size = file.size;
             let mimetype = file.mimetype;
-            fileDetails.push({ path, size, mimetype });
+            let originalName = file.originalname;
+            fileDetails.push({ path, size, mimetype, originalName });
         }
         res.json({
             status: 201,
@@ -1095,6 +1096,7 @@ module.exports.uploadAgreement = async (req, res) => {
 
         if (findTechnician.rowCount > 0 && position === 'Technician') {
             for (let file of files) {
+
                 let path = `${process.env.SIGNED_AGREEMENT}/${file.filename}`;
                 let s1 = dbScript(db_sql['Q83'], {
                     var1: projectId,
@@ -1103,6 +1105,7 @@ module.exports.uploadAgreement = async (req, res) => {
                     var4: path,
                     var5: file.mimetype,
                     var6: file.size,
+                    var7: file.originalname
                 });
 
                 let uploadPaper = await connection.query(s1);

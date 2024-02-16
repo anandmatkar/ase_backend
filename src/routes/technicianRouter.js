@@ -22,7 +22,7 @@ router.get('/assignedProjectList', verifyTokenTechnician, controller.technician.
 router.get('/assignedProjectDetails', verifyTokenTechnician, controller.technician.assignedProjectDetails)
 router.get('/assignedProjectCounts', verifyTokenTechnician, controller.technician.assignedProjectCounts)
 
-//================================================Technician timesheet routes===========================================================//
+//==============================================Technician timesheet routes===========================================================//
 
 router.post('/createTimesheet', verifyTokenTechnician, controller.technician.createTimesheet)
 router.get('/timesheetList', verifyTokenTechnician, controller.technician.timesheetList)
