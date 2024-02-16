@@ -31,8 +31,7 @@ module.exports.createProject = async (req, res) => {
             //Insert data into Machine table
 
             for (let data of machineDetails) {
-
-                let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: createProject.rows[0].id, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: id, var8: nomSpeed, var9: actSpeed, var10: hourCount })
+                let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: createProject.rows[0].id, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: id, var8: mysql_real_escape_string(data.nomSpeed), var9: mysql_real_escape_string(data.actSpeed), var10: mysql_real_escape_string(data.hourCount) })
                 let createMachine = await connection.query(s5)
                 for (let techId of data.techIds) {
                     //Assign the machine to technicians
