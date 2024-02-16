@@ -18,8 +18,11 @@ module.exports.createReport = async (req, res) => {
             if (createReport.rowCount > 0) {
                 if (attachment.length > 0) {
                     for (let files of attachment) {
+                        console.log(files, "filesssss");
                         let s3 = dbScript(db_sql['Q61'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createReport.rows[0].id })
+                        console.log(s3, "s33333");
                         let createReportAttach = await connection.query(s3)
+                        console.log(createReport.rows, "create report");
                     }
                 }
                 await connection.query("COMMIT")
@@ -131,7 +134,9 @@ module.exports.reportDetails = async (req, res) => {
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let s2 = dbScript(db_sql['Q67'], { var1: projectId, var2: techId, var3: machineId })
+            console.log(s2, "s222");
             let reportDetails = await connection.query(s2)
+            console.log(reportDetails.rows, "reportdetails");
             if (reportDetails.rowCount > 0) {
                 res.json({
                     status: 200,
