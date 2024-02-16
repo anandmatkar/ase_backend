@@ -412,13 +412,33 @@ module.exports.completeProject = async (req, res) => {
 module.exports.editProject = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { projectId, description, startDate, endDate, projectType } = req.body
+        let { projectId, description, startDate, endDate, projectType, machineDetails } = req.body
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4: projectId, var5: projectType })
             let updateProject = await connection.query(s2)
+            console.log(updateProject.rows, "11111111111");
+            // if (machineDetails.length > 0) {
+            //     for (let data of machineDetails) {
+            //         let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: projectId, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: id, var8: mysql_real_escape_string(data.nomSpeed), var9: mysql_real_escape_string(data.actSpeed), var10: mysql_real_escape_string(data.hourCount) })
+            //         let createMachine = await connection.query(s5)
+            //         for (let techId of data.techIds) {
+            //             //Assign the machine to technicians
+            //             let s6 = dbScript(db_sql['Q16'], { var1: createProject.rows[0].id, var2: techId, var3: createMachine.rows[0].id, var4: id })
+            //             let assignTechToMachine = await connection.query(s6)
+            //         }
+
+            //         if (data.machineAttach.length > 0) {
+            //             //storing the machine attachments
+            //             for (let attach of data.machineAttach) {
+            //                 let s7 = dbScript(db_sql['Q18'], { var1: createProject.rows[0].id, var2: createMachine.rows[0].id, var3: attach.path, var4: attach.mimetype, var5: attach.size, var6: id })
+            //                 let storeMachineAttactements = await connection.query(s7)
+            //             }
+            //         }
+            //     }
+            // }
             if (updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
