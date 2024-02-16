@@ -433,3 +433,46 @@ module.exports.showReportAttach = async (req, res) => {
     }
 }
 
+module.exports.deleteReportAttact = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { reportAttachId, reportId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q27'], { var1: id })
+        let findTechnician = await connection.query(s1)
+        if (findTechnician.rowCount > 0 && position == "Technician") {
+            let s3 = dbScript(db_sql['Q92'], { var1: _dt, var2: reportAttachId, var3: id, var4: reportId })
+            let deletereportAttach = await connection.query(s3)
+
+            if (deletereportAttach.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Attachment deleted successfully"
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Technician not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
