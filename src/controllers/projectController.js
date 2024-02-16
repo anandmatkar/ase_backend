@@ -32,7 +32,7 @@ module.exports.createProject = async (req, res) => {
 
             for (let data of machineDetails) {
 
-                let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: createProject.rows[0].id, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: id })
+                let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: createProject.rows[0].id, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: id, var8: nomSpeed, var9: actSpeed, var10: hourCount })
                 let createMachine = await connection.query(s5)
                 for (let techId of data.techIds) {
                     //Assign the machine to technicians
@@ -132,18 +132,6 @@ module.exports.projectList = async (req, res) => {
             let s2 = dbScript(db_sql['Q22'], { var1: id })
             let projectList = await connection.query(s2)
             if (projectList.rowCount > 0) {
-                // let completedProjects = []
-                // let projectInProgress = []
-                // let projectRequestedForApproval = []
-                // projectList.rows.forEach(row => {
-                //     if (row.is_completed == true && row.is_requested_for_approval == false) {
-                //         completedProjects.push(row)
-                //     } else if (row.is_completed == false && row.is_requested_for_approval == false) {
-                //         projectInProgress.push(row)
-                //     } else if (row.is_requested_for_approval == true) {
-                //         projectRequestedForApproval.push(row)
-                //     }
-                // })
                 res.json({
                     status: 200,
                     success: true,
