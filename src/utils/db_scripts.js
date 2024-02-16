@@ -459,7 +459,7 @@ const db_sql = {
     "Q43": `SELECT id, order_id, customer_id, project_type, description, start_date, end_date, manager_id, is_completed, created_at, updated_at, deleted_at FROM project WHERE customer_id = '{var1}' AND deleted_at IS NULL`,
     "Q44": `SELECT id, project_id, tech_id, date, start_time, end_time, comments, is_timesheet_approved, is_timesheet_requested_for_approval, created_at, updated_at FROM timesheet WHERE is_timesheet_requested_for_approval = true AND manager_id = '{var1}'`,
     "Q45": `SELECT * FROM project WHERE id = '{var1}' AND deleted_at IS NULL`,
-    "Q46": `UPDATE timesheet SET is_timesheet_approved = '{var1}', is_timesheet_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+    "Q46": `UPDATE timesheet SET is_timesheet_approved = '{var1}', is_timesheet_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND manager_id = '{var5}' AND deleted_at IS NULL RETURNING *`,
     "Q47": `SELECT
                         p.id AS project_id,
                         p.order_id,
@@ -828,7 +828,7 @@ const db_sql = {
     "Q88": `UPDATE report_attach SET file_path = '{var1}',file_type = '{var2}',file_size = '{var3}', updated_at = '{var4}' WHERE id = '{var5}' AND deleted_at IS NULL RETURNING *`,
     "Q89": `SELECT * FROM report_attach WHERE report_id = '{var1}' AND deleted_at IS NULL`,
     "Q90": `UPDATE signed_paper SET is_requested_for_approval = '{var1}' WHERE project_id = '{var2}' AND tech_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-    "Q91": `UPDATE signed_paper SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+    "Q91": `UPDATE signed_paper SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND manager_id = '{var5}' AND deleted_at IS NULL RETURNING *`,
     "Q92": `UPDATE report_attach SET deleted_at = '{var1}'
                  WHERE id= '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
 }
