@@ -19,7 +19,7 @@ module.exports.createReport = async (req, res) => {
                 if (attachment.length > 0) {
                     for (let files of attachment) {
                         console.log(files, "filesssss");
-                        let s3 = dbScript(db_sql['Q61'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createReport.rows[0].id })
+                        let s3 = dbScript(db_sql['Q61'], { var1: projectID, var2: id, var3: files.path, var4: files.mimetype, var5: files.size, var6: createReport.rows[0].id, var7: files.fileName })
                         console.log(s3, "s33333");
                         let createReportAttach = await connection.query(s3)
                         console.log(createReport.rows, "create report");
@@ -65,7 +65,8 @@ module.exports.uploadReportAttach = async (req, res) => {
             let path = `${process.env.REPORT_ATTACHEMENTS}/${file.filename}`;
             let size = file.size;
             let mimetype = file.mimetype;
-            fileDetails.push({ path, size, mimetype });
+            let fileName = file.originalname;
+            fileDetails.push({ path, size, mimetype, fileName });
         }
         res.json({
             status: 201,

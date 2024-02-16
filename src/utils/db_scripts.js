@@ -542,8 +542,8 @@ const db_sql = {
     "Q59": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     "Q60": `UPDATE technician SET encrypted_password = '{var1}', updated_at = '{var3}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     "Q61": `INSERT INTO report_attach
-                 (project_id,tech_id,file_path,file_type,file_size, report_id)
-                 VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}') RETURNING *`,
+                 (project_id,tech_id,file_path,file_type,file_size, report_id, file_name)
+                 VALUES('{var1}','{var2}','{var3}','{var4}','{var5}', '{var6}', '{var7}') RETURNING *`,
     "Q62": `UPDATE project_report SET deleted_at = '{var1}'
                  WHERE project_id = '{var2}' AND tech_id = '{var3}' AND id = '{var4}' AND deleted_at IS NULL RETURNING *`,
     "Q63": `UPDATE report_attach SET deleted_at = '{var1}'

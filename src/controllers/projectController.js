@@ -217,7 +217,6 @@ module.exports.projectCount = async (req, res) => {
         });
     }
 }
-
 //Project Details for Manager
 module.exports.projectDetails = async (req, res) => {
     try {
@@ -420,25 +419,31 @@ module.exports.editProject = async (req, res) => {
             let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4: projectId, var5: projectType })
             let updateProject = await connection.query(s2)
             console.log(updateProject.rows, "11111111111");
-            // if (machineDetails.length > 0) {
-            //     for (let data of machineDetails) {
-            //         let s5 = dbScript(db_sql['Q15'], { var1: customerId, var2: projectId, var3: createProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: id, var8: mysql_real_escape_string(data.nomSpeed), var9: mysql_real_escape_string(data.actSpeed), var10: mysql_real_escape_string(data.hourCount) })
-            //         let createMachine = await connection.query(s5)
-            //         for (let techId of data.techIds) {
-            //             //Assign the machine to technicians
-            //             let s6 = dbScript(db_sql['Q16'], { var1: createProject.rows[0].id, var2: techId, var3: createMachine.rows[0].id, var4: id })
-            //             let assignTechToMachine = await connection.query(s6)
-            //         }
+            if (machineDetails.length > 0) {
+                for (let data of machineDetails) {
+                    let s5 = dbScript(db_sql['Q15'], { var1: updateProject.rows[0].customer_id, var2: projectId, var3: updateProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: updateProject.rows[0].manager_id, var8: mysql_real_escape_string(data.nomSpeed), var9: mysql_real_escape_string(data.actSpeed), var10: mysql_real_escape_string(data.hourCount) })
+                    console.log(s5, "s555555");
+                    let createMachine = await connection.query(s5)
+                    console.log(createMachine.rows, "create machine");
+                    for (let techId of data.techIds) {
+                        //Assign the machine to technicians
+                        let s6 = dbScript(db_sql['Q16'], { var1: createProject.rows[0].id, var2: techId, var3: createMachine.rows[0].id, var4: updateProject.rows[0].manager_id })
+                        console.log(s6, "s666666");
+                        let assignTechToMachine = await connection.query(s6)
+                        console.log(assignTechToMachine.rows, "assign machine to technician");
+                    }
 
-            //         if (data.machineAttach.length > 0) {
-            //             //storing the machine attachments
-            //             for (let attach of data.machineAttach) {
-            //                 let s7 = dbScript(db_sql['Q18'], { var1: createProject.rows[0].id, var2: createMachine.rows[0].id, var3: attach.path, var4: attach.mimetype, var5: attach.size, var6: id })
-            //                 let storeMachineAttactements = await connection.query(s7)
-            //             }
-            //         }
-            //     }
-            // }
+                    if (data.machineAttach.length > 0) {
+                        //storing the machine attachments
+                        for (let attach of data.machineAttach) {
+                            let s7 = dbScript(db_sql['Q18'], { var1: projectId, var2: createMachine.rows[0].id, var3: attach.path, var4: attach.mimetype, var5: attach.size, var6: updateProject.rows[0].manager_id })
+                            console.log(s7, "s77777777");
+                            let storeMachineAttactements = await connection.query(s7)
+                            console.log(storeMachineAttactements.rows, "store machine attachements");
+                        }
+                    }
+                }
+            }
             if (updateProject.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
