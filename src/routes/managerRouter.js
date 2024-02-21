@@ -50,6 +50,7 @@ router.put('/editTechnician', verifyTokenManager, controller.manager.editTechnic
 
 router.get('/timesheetListsForApproval', verifyTokenManager, controller.manager.timesheetListsForApproval)
 router.put('/acceptTimesheetRequest', verifyTokenManager, controller.manager.acceptTimesheetRequest)
+router.put('/disapproveTimeSheet', verifyTokenManager, controller.manager.disapproveTimeSheet)
 router.get('/timesheetDetails', verifyTokenManager, controller.manager.timesheetDetails)
 
 
