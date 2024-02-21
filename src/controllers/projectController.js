@@ -427,7 +427,7 @@ module.exports.editProject = async (req, res) => {
                     console.log(createMachine.rows, "create machine");
                     for (let techId of data.techIds) {
                         //Assign the machine to technicians
-                        let s6 = dbScript(db_sql['Q16'], { var1: createProject.rows[0].id, var2: techId, var3: createMachine.rows[0].id, var4: updateProject.rows[0].manager_id })
+                        let s6 = dbScript(db_sql['Q16'], { var1: projectId, var2: techId, var3: createMachine.rows[0].id, var4: updateProject.rows[0].manager_id })
                         console.log(s6, "s666666");
                         let assignTechToMachine = await connection.query(s6)
                         console.log(assignTechToMachine.rows, "assign machine to technician");
