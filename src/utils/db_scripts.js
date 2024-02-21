@@ -61,7 +61,7 @@ const db_sql = {
     COUNT(m.id) AS machine_count
 FROM project AS p
 INNER JOIN customer AS c ON c.id = p.customer_id
-LEFT JOIN machine AS m ON m.project_id = p.id
+LEFT JOIN machine AS m ON m.project_id = p.id AND m.deleted_at IS NULL
 WHERE p.manager_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL
 GROUP BY p.id, p.order_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.is_requested_for_approval, p.manager_id, c.id, c.customer_name, c.customer_contact, c.customer_account, c.email_address, c.phone_number, c.country, c.city, c.address, c.scope_of_work;`,
     "Q23": `
