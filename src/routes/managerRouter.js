@@ -58,6 +58,7 @@ router.get('/timesheetDetails', verifyTokenManager, controller.manager.timesheet
 
 router.get('/reportDetails', verifyTokenManager, controller.report.reportDetails)
 router.put('/validateReport', verifyTokenManager, controller.report.validateReport)
+router.put('/rejectReport', verifyTokenManager, controller.report.rejectReport)
 
 //-------------------------------------------------------- Machine Routes ----------------------------------------------------//
 

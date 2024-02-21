@@ -258,6 +258,50 @@ module.exports.validateReport = async (req, res) => {
     }
 }
 
+//reject report by manager
+module.exports.rejectReport = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { projectId, techId, machineId } = req.query
+
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let s2 = dbScript(db_sql['Q51'], { var1: false, var2: false, var3: projectId, var4: techId, var5: machineId })
+            let approveReport = await connection.query(s2)
+            if (approveReport.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Report Rejected Successfully."
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "SOmething went wrong."
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+}
+
 module.exports.reportDetailsForTech = async (req, res) => {
     try {
         let { id, position } = req.user
