@@ -38,29 +38,32 @@ const db_sql = {
           FROM customer WHERE id = '{var1}' AND deleted_at IS NULL`,
     "Q21": `UPDATE customer SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     "Q22": `SELECT
-                        p.id AS project_id,
-                        p.order_id,
-                        p.project_type,
-                        p.description,
-                        p.start_date,
-                        p.end_date,
-                        p.created_at,
-                        p.is_completed,
-                        p.is_requested_for_approval,
-                        p.manager_id,
-                        c.id AS customer_id,
-                        c.customer_name,
-                        c.customer_contact,
-                        c.customer_account,
-                        c.email_address,
-                        c.phone_number,
-                        c.country,
-                        c.city,
-                        c.address,
-                        c.scope_of_work
-                FROM project as p
-                INNER JOIN customer as c on c.id = p.customer_id
-                WHERE p.manager_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL`,
+    p.id AS project_id,
+    p.order_id,
+    p.project_type,
+    p.description,
+    p.start_date,
+    p.end_date,
+    p.created_at,
+    p.is_completed,
+    p.is_requested_for_approval,
+    p.manager_id,
+    c.id AS customer_id,
+    c.customer_name,
+    c.customer_contact,
+    c.customer_account,
+    c.email_address,
+    c.phone_number,
+    c.country,
+    c.city,
+    c.address,
+    c.scope_of_work,
+    COUNT(m.id) AS machine_count
+FROM project AS p
+INNER JOIN customer AS c ON c.id = p.customer_id
+LEFT JOIN machine AS m ON m.project_id = p.id
+WHERE p.manager_id = '{var1}' AND p.deleted_at IS NULL AND c.deleted_at IS NULL
+GROUP BY p.id, p.order_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.is_requested_for_approval, p.manager_id, c.id, c.customer_name, c.customer_contact, c.customer_account, c.email_address, c.phone_number, c.country, c.city, c.address, c.scope_of_work;`,
     "Q23": `
                         SELECT
                             p.id AS project_id,
