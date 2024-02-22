@@ -217,6 +217,7 @@ module.exports.uploadMachineFilesWhileEditing = async (req, res) => {
         let { id, position } = req.user
         let { project_id, machine_id, manager_id } = req.query
         let files = req.files;
+        console.log(id, manager_id, "1111111111");
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
