@@ -173,13 +173,13 @@ module.exports.machineData = async (req, res) => {
 module.exports.deleteMachineAttach = async (req, res) => {
     try {
         let { id, position } = req.user
-        let { attach_id, manager_id } = req.query
+        let { attach_id } = req.query
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q93'], { var1: _dt, var2: attach_id, var3: manager_id })
+            let s2 = dbScript(db_sql['Q93'], { var1: _dt, var2: attach_id, var3: id })
             let deleteMachineAttach = await connection.query(s2)
             if (deleteMachineAttach.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -211,3 +211,57 @@ module.exports.deleteMachineAttach = async (req, res) => {
         })
     }
 }
+
+module.exports.uploadMachineFilesWhileEditing = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { project_id, manager_id } = req.query
+        let files = req.files;
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            if (id !== manager_id) {
+                return res.json({
+                    status: 403,
+                    success: false,
+                    message: "Unauthorized",
+                });
+            }
+            let storeMachineAttactements;
+            for (const file of files) {
+                let path = `${process.env.MACHINE_ATTACHEMENTS}/${file.filename}`;
+                let size = file.size;
+                let mimetype = file.mimetype;
+                let s2 = dbScript(db_sql['Q18'], { var1: project_id, var2: machine_id, var3: path, var4: mimetype, var5: size, var6: manager_id })
+                storeMachineAttactements = await connection.query(s2)
+            }
+            if (storeMachineAttactements.rowCount > 0) {
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Files Uploaded successfully!"
+                });
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message
+        });
+    }
+};
