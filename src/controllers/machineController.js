@@ -238,12 +238,14 @@ module.exports.uploadMachineFilesWhileEditing = async (req, res) => {
                 storeMachineAttactements = await connection.query(s2)
             }
             if (storeMachineAttactements.rowCount > 0) {
+                await connection.query("COMMIT")
                 res.json({
                     status: 201,
                     success: true,
                     message: "Files Uploaded successfully!"
                 });
             } else {
+                await connection.query("ROLLBACk")
                 res.json({
                     status: 400,
                     success: false,
@@ -259,6 +261,7 @@ module.exports.uploadMachineFilesWhileEditing = async (req, res) => {
             })
         }
     } catch (error) {
+        await connection.query("ROLLBACK")
         res.json({
             status: 400,
             success: false,
