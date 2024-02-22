@@ -66,6 +66,7 @@ router.get('/machineDetails', verifyTokenManager, controller.machine.machineDeta
 router.get('/machineData', verifyTokenManager, controller.machine.machineData)
 router.put('/editMachineDetails', verifyTokenManager, controller.machine.editMachineDetails)
 router.put('/deleteMachine', verifyTokenManager, controller.machine.deleteMachine)
+router.put('/deleteMachineAttach', verifyTokenManager, controller.machine.deleteMachineAttach)
 router.post('/uploadMachineFiles', uploadMachineFiles.array('files'), controller.manager.uploadMachineFiles);
 
 router.get('/showSignedPaper', verifyTokenManager, controller.manager.showSignedPaper)

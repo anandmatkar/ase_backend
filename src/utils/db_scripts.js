@@ -834,6 +834,7 @@ GROUP BY p.id, p.order_id, p.project_type, p.description, p.start_date, p.end_da
     "Q91": `UPDATE signed_paper SET is_approved = '{var1}', is_requested_for_approval = '{var2}' WHERE project_id = '{var3}' AND tech_id = '{var4}' AND manager_id = '{var5}' AND deleted_at IS NULL RETURNING *`,
     "Q92": `UPDATE report_attach SET deleted_at = '{var1}'
                  WHERE id= '{var2}' AND tech_id = '{var3}' AND report_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
+    "Q93": `UPDATE machine_attach SET deleted_at = '{var1}' WHERE id = '{var2}' AND manager_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
 }
 
 

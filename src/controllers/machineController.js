@@ -170,3 +170,44 @@ module.exports.machineData = async (req, res) => {
     }
 }
 
+module.exports.deleteMachineAttach = async (req, res) => {
+    try {
+        let { id, position } = req.user
+        let { attach_id, manager_id } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let findManager = await connection.query(s1)
+        if (findManager.rowCount > 0 && position == 'Manager') {
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql['Q93'], { var1: _dt, var2: attach_id, var3: manager_id })
+            let deleteMachineAttach = await connection.query(s2)
+            if (deleteMachineAttach.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Machine Attachment Deleted Successfully."
+                })
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 404,
+                success: false,
+                message: "Manager not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            success: false,
+            status: 400,
+            message: error.message,
+        })
+    }
+}
