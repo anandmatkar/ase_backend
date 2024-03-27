@@ -4,14 +4,24 @@ const { mysql_real_escape_string } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
 const { welcomeEmail2, notificationMailToAdmin, resetPasswordMail } = require('../utils/sendMail');
+const { managerCreationSchema, verifyManagerSchema, updateManagerSchema, managerChangePasswordSchema, editTechnicianSchema } = require('../utils/managerValidation');
 
 
 module.exports.createManager = async (req, res) => {
     try {
         const { name, surname, company, position, emailAddress, password, phone, profilePic } = req.body;
 
+        const { error } = managerCreationSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
+
         // Check if the email already exists in the database
-        const findManager = await connection.query(dbScript(db_sql['Q5'], { var1: emailAddress }));
+        const findManager = await connection.query(dbScript(db_sql['Q5'], { var1: emailAddress.toLowerCase() }));
 
         if (findManager.rowCount > 0) {
             return res.json({
@@ -133,6 +143,15 @@ module.exports.createManager = async (req, res) => {
 module.exports.verifyManager = async (req, res) => {
     try {
         let { email, otp } = req.body
+
+        const { error } = verifyManagerSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         if (!otp) {
             res.json({
                 status: 400,
@@ -140,7 +159,7 @@ module.exports.verifyManager = async (req, res) => {
                 message: "Please provide OTP."
             })
         }
-        let s1 = dbScript(db_sql['Q5'], { var1: email })
+        let s1 = dbScript(db_sql['Q5'], { var1: email.toLowerCase() })
         let checkuser = await connection.query(s1)
         if (checkuser.rows.length > 0) {
             if (checkuser.rows[0].otp == otp) {
@@ -200,7 +219,7 @@ module.exports.managerLogin = async (req, res) => {
                 message: "Please Provide all credentials."
             })
         }
-        let s1 = dbScript(db_sql['Q5'], { var1: email })
+        let s1 = dbScript(db_sql['Q5'], { var1: mysql_real_escape_string(email.toLowerCase()) })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0) {
             if (findManager.rows[0].status != -1) {
@@ -337,13 +356,27 @@ module.exports.updateProfile = async (req, res) => {
     try {
         let { id, position } = req.user
         let { name, surname, email_address, phone_number, profilePic } = req.body
+        const { error } = updateManagerSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN')
 
-        let s1 = dbScript(db_sql['Q7'], { var1: id })
+        let s1 = dbScript(db_sql['Q7'], { var1: id });
         let findManager = await connection.query(s1)
+        console.log(findManager.rows[0]);
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q14'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(email_address), var4: phone_number, var5: profilePic, var6: id, var7: _dt })
+            let s2 = dbScript(db_sql['Q14'], {
+                var1: mysql_real_escape_string(name),
+                var2: mysql_real_escape_string(surname),
+                var3: mysql_real_escape_string(email_address),
+                var4: phone_number, var5: profilePic, var6: id, var7: _dt
+            })
             let updateProfile = await connection.query(s2)
 
             if (updateProfile.rowCount > 0) {
@@ -374,7 +407,7 @@ module.exports.updateProfile = async (req, res) => {
         res.json({
             status: 500,
             success: false,
-            message: error.message
+            message: error.stack
         })
     }
 }
@@ -383,6 +416,14 @@ module.exports.changePassword = async (req, res) => {
     try {
         let userEmail = req.user.email
         const { oldPassword, newPassword } = req.body;
+        const { error } = managerChangePasswordSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN')
         let s1 = dbScript(db_sql['Q5'], { var1: userEmail })
         let findManager = await connection.query(s1)
@@ -443,7 +484,7 @@ module.exports.forgotPassword = async (req, res) => {
         let {
             emailAddress
         } = req.body
-        let s1 = dbScript(db_sql['Q5'], { var1: mysql_real_escape_string(emailAddress) })
+        let s1 = dbScript(db_sql['Q5'], { var1: mysql_real_escape_string(emailAddress.toLowerCase()) })
         let findManager = await connection.query(s1);
         if (findManager.rows.length > 0) {
             await connection.query("BEGIN")
@@ -452,11 +493,11 @@ module.exports.forgotPassword = async (req, res) => {
             let updateOtp = await connection.query(s2);
             if (updateOtp.rowCount > 0) {
                 await connection.query("COMMIT")
-                await resetPasswordMail(emailAddress, otp, findManager.rows[0].name);
+                await resetPasswordMail(emailAddress.toLowerCase(), otp, findManager.rows[0].name);
                 res.json({
                     status: 200,
                     success: true,
-                    message: `Password reset link has sent on your registered ${emailAddress} account`,
+                    message: `Password reset link has sent on your registered ${emailAddress.toLowerCase()} account`,
                 })
             } else {
                 await connection.query("ROLLBACK")
@@ -493,7 +534,7 @@ module.exports.resetPassword = async (req, res) => {
             password
         } = req.body
         await connection.query('BEGIN')
-        let s1 = dbScript(db_sql['Q5'], { var1: email })
+        let s1 = dbScript(db_sql['Q5'], { var1: mysql_real_escape_string(email.toLowerCase()) })
         let findManager = await connection.query(s1);
         if (findManager.rows.length > 0) {
             if (findManager.rows[0].otp == otp) {
@@ -528,8 +569,6 @@ module.exports.resetPassword = async (req, res) => {
                     message: "Please Enter correct OTP"
                 })
             }
-
-
         } else {
             res.json({
                 status: 404,
@@ -846,12 +885,20 @@ module.exports.editTechnician = async (req, res) => {
     try {
         let { id, position } = req.user
         let { techId, name, surname, email_address, phone_number, nationality, qualification, level, avatar } = req.body
+        const { error } = editTechnicianSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s3 = dbScript(db_sql['Q29'], { var1: name, var2: surname, var3: email_address, var4: phone_number, var5: nationality, var6: qualification, var7: level, var8: avatar, var9: _dt, var10: techId })
+            let s3 = dbScript(db_sql['Q29'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string(email_address.toLowerCase()), var4: phone_number, var5: mysql_real_escape_string(nationality), var6: mysql_real_escape_string(qualification), var7: mysql_real_escape_string(level), var8: avatar, var9: _dt, var10: techId })
             let updateTechnician = await connection.query(s3)
 
             if (updateTechnician.rowCount > 0) {

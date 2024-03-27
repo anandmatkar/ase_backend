@@ -5,17 +5,27 @@ const { db_sql, dbScript } = require('../utils/db_scripts');
 const bcrypt = require('bcrypt');
 const { resetPasswordMail } = require('../utils/sendMail');
 const XLSX = require('xlsx');
+const { createTechnicianSchema } = require('../utils/managerValidation');
+const { techLoginSchema, techChangePasswordSchema, techForgetPassword, techResetPassword, techEditTechnicianSchema, createTimesheetSchema } = require('../utils/techValidation');
 
 //Create New Technician By manager Only
 module.exports.createTechnician = async (req, res) => {
     try {
         let { id, position } = req.user
         let { name, surname, emailAddress, password, phone, nationality, qualification, level, profilePic, documents } = req.body
+        const { error } = createTechnicianSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
-            let s2 = dbScript(db_sql['Q25'], { var1: emailAddress })
+            let s2 = dbScript(db_sql['Q25'], { var1: emailAddress.toLowerCase() })
             let findTechnician = await connection.query(s2)
             if (findTechnician.rowCount == 0) {
                 profilePic = profilePic == "" ? process.env.DEFAULT_PROFILE_PIC_TECHNICIAN : profilePic;
@@ -24,7 +34,7 @@ module.exports.createTechnician = async (req, res) => {
                 const salt = bcrypt.genSaltSync(saltRounds);
                 const encryptedPassword = bcrypt.hashSync(password, salt);
 
-                let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: mysql_real_escape_string(level), var10: profilePic, var11: id })
+                let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress.toLowerCase()), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: mysql_real_escape_string(level), var10: profilePic, var11: id })
                 let insertTechnician = await connection.query(s2)
 
                 if (insertTechnician.rowCount > 0) {
@@ -109,7 +119,7 @@ module.exports.insertTechnician = async (req, res) => {
                 } = row;
 
                 await connection.query('BEGIN');
-                let s2 = dbScript(db_sql['Q25'], { var1: emailAddress });
+                let s2 = dbScript(db_sql['Q25'], { var1: emailAddress.toLowerCase() });
                 let findTechnician = await connection.query(s2);
 
                 if (findTechnician.rowCount == 0) {
@@ -119,7 +129,7 @@ module.exports.insertTechnician = async (req, res) => {
                     const salt = bcrypt.genSaltSync(saltRounds);
                     const encryptedPassword = bcrypt.hashSync(password, salt);
 
-                    let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: (level), var10: profilePic, var11: id })
+                    let s2 = dbScript(db_sql['Q24'], { var1: mysql_real_escape_string(name), var2: mysql_real_escape_string(surname), var3: mysql_real_escape_string("Technician"), var4: mysql_real_escape_string(emailAddress.toLowerCase()), var5: encryptedPassword, var6: phone, var7: mysql_real_escape_string(nationality), var8: mysql_real_escape_string(qualification), var9: (level), var10: profilePic, var11: id })
 
                     let insertTechnician = await connection.query(s2)
                 } else {
@@ -199,7 +209,15 @@ module.exports.techLogin = async (req, res) => {
                 message: "Please enter your email address and password"
             })
         }
-        let s1 = dbScript(db_sql['Q25'], { var1: email })
+        const { error } = techLoginSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
+        let s1 = dbScript(db_sql['Q25'], { var1: mysql_real_escape_string(email.toLowerCase()) })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0) {
             const result = await bcrypt.compare(password, findTechnician.rows[0].encrypted_password);
@@ -354,8 +372,16 @@ module.exports.changePassword = async (req, res) => {
     try {
         let userEmail = req.user.email
         const { oldPassword, newPassword } = req.body;
+        const { error } = techChangePasswordSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN')
-        let s1 = dbScript(db_sql['Q25'], { var1: userEmail })
+        let s1 = dbScript(db_sql['Q25'], { var1: mysql_real_escape_string(userEmail.toLowerCase()) })
         let findTechnician = await connection.query(s1)
         if (findTechnician.rowCount > 0) {
             const result = await bcrypt.compare(oldPassword, findTechnician.rows[0].encrypted_password);
@@ -414,7 +440,15 @@ module.exports.forgotPassword = async (req, res) => {
         let {
             emailAddress
         } = req.body
-        let s1 = dbScript(db_sql['Q25'], { var1: mysql_real_escape_string(emailAddress) })
+        const { error } = techForgetPassword.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
+        let s1 = dbScript(db_sql['Q25'], { var1: mysql_real_escape_string(emailAddress.toLowerCase()) })
         let findTechnician = await connection.query(s1);
         if (findTechnician.rows.length > 0) {
             await connection.query("BEGIN")
@@ -423,11 +457,11 @@ module.exports.forgotPassword = async (req, res) => {
             let updateOtp = await connection.query(s2);
             if (updateOtp.rowCount > 0) {
                 await connection.query("COMMIT")
-                await resetPasswordMail(emailAddress, otp, findTechnician.rows[0].name);
+                await resetPasswordMail(emailAddress.toLowerCase(), otp, findTechnician.rows[0].name);
                 res.json({
                     status: 200,
                     success: true,
-                    message: `Password reset link has sent on your registered ${emailAddress} account`,
+                    message: `Password reset link has sent on your registered ${emailAddress.toLowerCase()} account`,
                 })
             } else {
                 await connection.query("ROLLBACK")
@@ -463,8 +497,16 @@ module.exports.resetPassword = async (req, res) => {
             otp,
             password
         } = req.body
+        const { error } = techResetPassword.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN')
-        let s1 = dbScript(db_sql['Q25'], { var1: emailAddress })
+        let s1 = dbScript(db_sql['Q25'], { var1: mysql_real_escape_string(emailAddress.toLowerCase()) })
         let findTechnician = await connection.query(s1);
         if (findTechnician.rows.length > 0) {
             if (findTechnician.rows[0].otp == otp) {
@@ -525,6 +567,14 @@ module.exports.updateTechnicianProfile = async (req, res) => {
     try {
         let { id, position } = req.user
         let { name, surname, emailAddress, phoneNumber, nationality, qualification, level, profilePic } = req.body
+        const { error } = techEditTechnicianSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query("BEGIN")
         let s2 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s2)
@@ -718,6 +768,14 @@ module.exports.createTimesheet = async (req, res) => {
     try {
         let { id, position } = req.user
         let { projectID, date, startTime, endTime, comments, attachment, lunchtime } = req.body
+        const { error } = createTimesheetSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query("BEGIN")
         let s0 = dbScript(db_sql['Q27'], { var1: id })
         let findTechnician = await connection.query(s0)
