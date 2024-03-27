@@ -2,6 +2,7 @@ const connection = require('../database/connection');
 const { mysql_real_escape_string, createPDF } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const { sendProjectNotificationEmail, sendprojectDetails } = require('../utils/sendMail');
+const { createProjectSchema, editProjectSchema } = require('../utils/managerValidation');
 
 
 //Create Project by Manager
@@ -9,6 +10,14 @@ module.exports.createProject = async (req, res) => {
     try {
         let { id, position, email } = req.user
         let { customerId, projectType, description, startDate, endDate, projectAttach, machineDetails } = req.body
+        const { error } = createProjectSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN')
 
         let s1 = dbScript(db_sql['Q7'], { var1: id })
@@ -412,13 +421,20 @@ module.exports.editProject = async (req, res) => {
     try {
         let { id, position } = req.user
         let { projectId, description, startDate, endDate, projectType, machineDetails } = req.body
+        const { error } = editProjectSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let s2 = dbScript(db_sql['Q86'], { var1: mysql_real_escape_string(description), var2: startDate, var3: endDate, var4: projectId, var5: projectType })
             let updateProject = await connection.query(s2)
-            console.log(updateProject.rows, "11111111111");
             if (machineDetails.length > 0) {
                 for (let data of machineDetails) {
                     let s5 = dbScript(db_sql['Q15'], { var1: updateProject.rows[0].customer_id, var2: projectId, var3: updateProject.rows[0].order_id, var4: mysql_real_escape_string(data.MachineType), var5: mysql_real_escape_string(data.MachineSerial), var6: mysql_real_escape_string(description), var7: updateProject.rows[0].manager_id, var8: mysql_real_escape_string(data.nomSpeed), var9: mysql_real_escape_string(data.actSpeed), var10: mysql_real_escape_string(data.hourCount) })

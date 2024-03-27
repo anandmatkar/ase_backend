@@ -149,11 +149,63 @@ const createTechnicianSchema = Joi.object({
     })
 }).options({ allowUnknown: true });
 
+const createProjectSchema = Joi.object({
+    customerId: Joi.string().uuid().required().messages({
+        'any.required': 'Customer ID is required',
+        'string.empty': 'Customer ID must not be empty',
+        'string.guid': 'Customer ID must be a valid UUID'
+    }),
+    projectType: Joi.string().trim().required().messages({
+        'any.required': 'Project type is required',
+        'string.empty': 'Project type must not be empty'
+    }),
+    description: Joi.string().trim().required().messages({
+        'any.required': 'Description is required',
+        'string.empty': 'Description must not be empty'
+    }),
+    startDate: Joi.date().required().messages({
+        'any.required': 'Start date is required',
+        'date.base': 'Start date must be a valid date format'
+    }),
+    endDate: Joi.date().required().messages({
+        'any.required': 'End date is required',
+        'date.base': 'End date must be a valid date format'
+    }),
+
+}).options({ allowUnknown: true });
+
+const editProjectSchema = Joi.object({
+    projectId: Joi.string().uuid().required().messages({
+        'any.required': 'Project ID is required',
+        'string.empty': 'Project ID must not be empty',
+        'string.guid': 'Project ID must be a valid UUID'
+    }),
+    projectType: Joi.string().trim().required().messages({
+        'any.required': 'Project type is required',
+        'string.empty': 'Project type must not be empty'
+    }),
+    description: Joi.string().trim().required().messages({
+        'any.required': 'Description is required',
+        'string.empty': 'Description must not be empty'
+    }),
+    startDate: Joi.date().required().messages({
+        'any.required': 'Start date is required',
+        'date.base': 'Start date must be a valid date format'
+    }),
+    endDate: Joi.date().required().messages({
+        'any.required': 'End date is required',
+        'date.base': 'End date must be a valid date format'
+    }),
+
+}).options({ allowUnknown: true });
+
 module.exports = {
     managerCreationSchema,
     verifyManagerSchema,
     updateManagerSchema,
     managerChangePasswordSchema,
     editTechnicianSchema,
-    createTechnicianSchema
+    createTechnicianSchema,
+    createProjectSchema,
+    editProjectSchema
 };
