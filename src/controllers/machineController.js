@@ -46,13 +46,20 @@ module.exports.editMachineDetails = async (req, res) => {
     try {
         let { id, position, email } = req.user
         let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let { machine_id, machine_type, serial, description } = req.body
+        let { machine_id, machine_type, serial, description, machineAttach } = req.body
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(description), var4: _dt, var5: machine_id })
+            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(description), var4: _dt, var5: machine_id, var6: id })
             let updateMachine = await connection.query(s2)
             if (updateMachine.rowCount > 0) {
+                if (machineAttach.length > 0) {
+                    //storing the machine attachments
+                    for (let attach of data.machineAttach) {
+                        let s7 = dbScript(db_sql['Q18'], { var1: project_id, var2: createMachine.rows[0].id, var3: attach.path, var4: attach.mimetype, var5: attach.size, var6: id })
+                        let storeMachineAttactements = await connection.query(s7)
+                    }
+                }
                 res.json({
                     status: 200,
                     success: true,
@@ -99,7 +106,7 @@ module.exports.deleteMachine = async (req, res) => {
             let s3 = dbScript(db_sql['Q71'], { var1: _dt, var2: machineId, var3: projectId })
             let deleteTechMachine = await connection.query(s3)
 
-            if (deleteTechMachine.rowCount > 0) {
+            if (deleteMachine.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
                     status: 200,
@@ -217,7 +224,6 @@ module.exports.uploadMachineFilesWhileEditing = async (req, res) => {
         let { id, position } = req.user
         let { project_id, machine_id, manager_id } = req.query
         let files = req.files;
-        console.log(id, manager_id, "1111111111");
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql['Q7'], { var1: id })
         let findManager = await connection.query(s1)
