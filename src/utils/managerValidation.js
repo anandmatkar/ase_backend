@@ -199,6 +199,39 @@ const editProjectSchema = Joi.object({
 
 }).options({ allowUnknown: true });
 
+const editMachineSchema = Joi.object({
+    machine_id: Joi.string().uuid().required().messages({
+        'any.required': 'machine ID is required',
+        'string.empty': 'machine ID must not be empty',
+        'string.guid': 'machine ID must be a valid UUID'
+    }),
+    machine_type: Joi.string().trim().required().messages({
+        'any.required': 'Machine type is required',
+        'string.empty': 'Machine type must not be empty'
+    }),
+    description: Joi.string().trim().required().messages({
+        'any.required': 'Description is required',
+        'string.empty': 'Description must not be empty'
+    }),
+    serial: Joi.date().required().messages({
+        'any.required': 'serial is required',
+        'date.base': 'serial must be a valid date format'
+    }),
+    hour_count: Joi.string().trim().required().messages({
+        'any.required': 'Hour count is required',
+        'string.empty': 'Hour count must not be empty'
+    }),
+    nom_speed: Joi.string().trim().required().messages({
+        'any.required': 'Nominal speed is required',
+        'string.empty': 'Nominal speed must not be empty'
+    }),
+    act_speed: Joi.string().trim().required().messages({
+        'any.required': 'Actual speed is required',
+        'string.empty': 'Actual speed must not be empty'
+    })
+
+}).options({ allowUnknown: true });
+
 module.exports = {
     managerCreationSchema,
     verifyManagerSchema,
@@ -207,5 +240,6 @@ module.exports = {
     editTechnicianSchema,
     createTechnicianSchema,
     createProjectSchema,
-    editProjectSchema
+    editProjectSchema,
+    editMachineSchema
 };

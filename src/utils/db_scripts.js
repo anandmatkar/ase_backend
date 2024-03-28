@@ -677,8 +677,8 @@ GROUP BY p.id, p.order_id, p.project_type, p.description, p.start_date, p.end_da
                 GROUP BY
                     p.id, p.order_id, p.customer_id, p.project_type, p.description, p.start_date, p.end_date, p.created_at, p.is_completed, p.manager_id;`,
     "Q69": `UPDATE machine 
-                 SET machine_type = '{var1}', serial = '{var2}', description = '{var3}', updated_at = '{var4}'
-                 WHERE id = '{var5}' AND manager_id = '{var6}' AND deleted_at IS NULL RETURNING *`,
+                 SET machine_type = '{var1}', serial = '{var2}', description = '{var3}', updated_at = '{var4}', hour_count = '{var5}', nom_speed = '{var6}', act_speed = '{var7}'
+                 WHERE id = '{var8}' AND manager_id = '{var9}' AND deleted_at IS NULL RETURNING *`,
     "Q70": `UPDATE machine SET deleted_at = '{var1}' WHERE id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     "Q71": `UPDATE tech_machine SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     "Q72": `UPDATE machine_attach SET deleted_at = '{var1}' WHERE machine_id = '{var2}' AND project_id = '{var3}' AND deleted_at IS NULL RETURNING *`,

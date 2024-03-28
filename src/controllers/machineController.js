@@ -1,6 +1,7 @@
 const connection = require('../database/connection');
 const { mysql_real_escape_string } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
+const { editMachineSchema } = require('../utils/managerValidation');
 
 
 module.exports.machineDetails = async (req, res) => {
@@ -46,26 +47,37 @@ module.exports.editMachineDetails = async (req, res) => {
     try {
         let { id, position, email } = req.user
         let s1 = dbScript(db_sql['Q7'], { var1: id })
-        let { machine_id, machine_type, serial, description, machineAttach } = req.body
+        let { machine_id, machine_type, serial, description, machineAttach, hour_count, nom_speed, act_speed } = req.body
+        const { error } = editMachineSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
+        await connection.query("BEGIN")
         let findManager = await connection.query(s1)
         if (findManager.rowCount > 0 && position == 'Manager') {
             let _dt = new Date().toISOString()
-            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(description), var4: _dt, var5: machine_id, var6: id })
+            let s2 = dbScript(db_sql['Q69'], { var1: mysql_real_escape_string(machine_type), var2: mysql_real_escape_string(serial), var3: mysql_real_escape_string(description), var4: _dt, var5: mysql_real_escape_string(hour_count), var6: mysql_real_escape_string(nom_speed), var7: mysql_real_escape_string(act_speed), var8: machine_id, var9: id })
             let updateMachine = await connection.query(s2)
             if (updateMachine.rowCount > 0) {
-                if (machineAttach.length > 0) {
-                    //storing the machine attachments
-                    for (let attach of data.machineAttach) {
-                        let s7 = dbScript(db_sql['Q18'], { var1: project_id, var2: createMachine.rows[0].id, var3: attach.path, var4: attach.mimetype, var5: attach.size, var6: id })
-                        let storeMachineAttactements = await connection.query(s7)
-                    }
-                }
+                // if (machineAttach.length > 0) {
+                //     //storing the machine attachments
+                //     for (let attach of data.machineAttach) {
+                //         let s7 = dbScript(db_sql['Q18'], { var1: project_id, var2: createMachine.rows[0].id, var3: attach.path, var4: attach.mimetype, var5: attach.size, var6: id })
+                //         let storeMachineAttactements = await connection.query(s7)
+                //     }
+                // }
+                await connection.query("COMMIT")
                 res.json({
                     status: 200,
                     success: true,
                     message: "Machine Details Updated successfully"
                 })
             } else {
+                await connection.query("ROLLBACK")
                 res.json({
                     status: 400,
                     success: false,
@@ -80,6 +92,7 @@ module.exports.editMachineDetails = async (req, res) => {
             })
         }
     } catch (error) {
+        await connection.query("ROLLBACK")
         res.json({
             success: false,
             status: 400,
@@ -258,7 +271,6 @@ module.exports.uploadMachineFilesWhileEditing = async (req, res) => {
                     message: "Something went wrong"
                 })
             }
-
         } else {
             res.json({
                 status: 404,
