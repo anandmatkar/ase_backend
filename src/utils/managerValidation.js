@@ -232,6 +232,91 @@ const editMachineSchema = Joi.object({
 
 }).options({ allowUnknown: true });
 
+const createCustomerSchema = Joi.object({
+    customerName: Joi.string().trim().required().messages({
+        'any.required': 'Customer name is required',
+        'string.empty': 'Customer name must not be empty'
+    }),
+    customerContactName: Joi.string().trim().required().messages({
+        'any.required': 'Customer contact name is required',
+        'string.empty': 'Customer contact name must not be empty'
+    }),
+    customerAccount: Joi.string().trim().required().messages({
+        'any.required': 'Customer account is required',
+        'string.empty': 'Customer account must not be empty'
+    }),
+    email: Joi.string().email().trim().required().messages({
+        'any.required': 'Email is required',
+        'string.empty': 'Email must not be empty',
+        'string.email': 'Email must be a valid email address'
+    }),
+    phone: Joi.string().trim().required().messages({
+        'any.required': 'Phone is required',
+        'string.empty': 'Phone must not be empty'
+    }),
+    country: Joi.string().trim().required().messages({
+        'any.required': 'Country is required',
+        'string.empty': 'Country must not be empty'
+    }),
+    city: Joi.string().trim().required().messages({
+        'any.required': 'City is required',
+        'string.empty': 'City must not be empty'
+    }),
+    address: Joi.string().trim().required().messages({
+        'any.required': 'Address is required',
+        'string.empty': 'Address must not be empty'
+    }),
+    scopeOfWork: Joi.string().trim().required().messages({
+        'any.required': 'Scope of work is required',
+        'string.empty': 'Scope of work must not be empty'
+    })
+}).options({ allowUnknown: true });
+
+const updateCustomerSchema = Joi.object({
+    customer_id: Joi.string().uuid().required().messages({
+        'any.required': 'Customer ID is required',
+        'string.empty': 'Customer ID must not be empty',
+        'string.guid': 'Customer ID must be a valid UUID'
+    }),
+    customer_name: Joi.string().trim().required().messages({
+        'any.required': 'Customer name is required',
+        'string.empty': 'Customer name must not be empty'
+    }),
+    customer_contact: Joi.string().trim().required().messages({
+        'any.required': 'Customer contact is required',
+        'string.empty': 'Customer contact must not be empty'
+    }),
+    customer_account: Joi.string().trim().required().messages({
+        'any.required': 'Customer account is required',
+        'string.empty': 'Customer account must not be empty'
+    }),
+    email_address: Joi.string().email().trim().required().messages({
+        'any.required': 'Email address is required',
+        'string.empty': 'Email address must not be empty',
+        'string.email': 'Email address must be a valid email'
+    }),
+    phone_number: Joi.string().trim().required().messages({
+        'any.required': 'Phone number is required',
+        'string.empty': 'Phone number must not be empty'
+    }),
+    country: Joi.string().trim().required().messages({
+        'any.required': 'Country is required',
+        'string.empty': 'Country must not be empty'
+    }),
+    city: Joi.string().trim().required().messages({
+        'any.required': 'City is required',
+        'string.empty': 'City must not be empty'
+    }),
+    address: Joi.string().trim().required().messages({
+        'any.required': 'Address is required',
+        'string.empty': 'Address must not be empty'
+    }),
+    scope_of_work: Joi.string().trim().required().messages({
+        'any.required': 'Scope of work is required',
+        'string.empty': 'Scope of work must not be empty'
+    })
+}).options({ allowUnknown: true });
+
 module.exports = {
     managerCreationSchema,
     verifyManagerSchema,
@@ -241,5 +326,7 @@ module.exports = {
     createTechnicianSchema,
     createProjectSchema,
     editProjectSchema,
-    editMachineSchema
+    editMachineSchema,
+    createCustomerSchema,
+    updateCustomerSchema
 };

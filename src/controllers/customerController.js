@@ -2,11 +2,20 @@ const connection = require('../database/connection');
 const { mysql_real_escape_string } = require('../utils/helper')
 const { db_sql, dbScript } = require('../utils/db_scripts');
 const XLSX = require('xlsx');
+const { createCustomerSchema, updateCustomerSchema } = require('../utils/managerValidation');
 
 module.exports.createCustomer = async (req, res) => {
     try {
         let { id, position } = req.user
         let { customerName, customerContactName, customerAccount, email, phone, country, city, address, scopeOfWork } = req.body
+        const { error } = createCustomerSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN')
 
         let s1 = dbScript(db_sql['Q7'], { var1: id })
@@ -153,6 +162,15 @@ module.exports.updateCustomer = async (req, res) => {
             address,
             scope_of_work,
         } = req.body;
+
+        const { error } = updateCustomerSchema.validate(req.body); // Validate the request body
+        if (error) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: error.details[0].message
+            });
+        }
         await connection.query('BEGIN');
 
         let s1 = dbScript(db_sql['Q7'], { var1: id });
@@ -257,10 +275,10 @@ module.exports.deleteCustomer = async (req, res) => {
 
                         let s9 = dbScript(db_sql['Q42'], { var1: 'tech_machine', var2: _dt, var3: project.id })
                         let deleteTechMachine = await connection.query(s9)
-                    
+
                         let s10 = dbScript(db_sql['Q42'], { var1: 'project_report', var2: _dt, var3: project.id })
                         let deleteReport = await connection.query(s10)
-                        
+
                         let s11 = dbScript(db_sql['Q42'], { var1: 'report_attach', var2: _dt, var3: project.id })
                         let deleteReportAttach = await connection.query(s11)
                     }
@@ -321,14 +339,14 @@ module.exports.insertCustomer = async (req, res) => {
 
             const originalname = req.file.originalname;
             const fileExtension = originalname.split('.').pop().toLowerCase();
-            
+
             if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
                 return res.status(400).json({
                     success: false,
                     message: "Only Excel files can be uploaded"
                 });
             }
-            
+
             let file = req.file
             let path = file.path;
             let workbook = XLSX.readFile(path);
