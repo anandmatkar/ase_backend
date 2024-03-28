@@ -213,9 +213,9 @@ const editMachineSchema = Joi.object({
         'any.required': 'Description is required',
         'string.empty': 'Description must not be empty'
     }),
-    serial: Joi.date().required().messages({
-        'any.required': 'serial is required',
-        'date.base': 'serial must be a valid date format'
+    serial: Joi.string().trim().required().messages({
+        'any.required': 'Serial is required',
+        'string.empty': 'Serial must not be empty'
     }),
     hour_count: Joi.string().trim().required().messages({
         'any.required': 'Hour count is required',
